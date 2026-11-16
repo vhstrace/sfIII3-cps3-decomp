@@ -2113,5 +2113,5 @@ or data. `git apply --check` against main: applies.
   may look wrong or end early. Command grabs in the air were not checked.
 - A move whose animation ends with neither cue 255 nor 64 would hang until its script runs out.
 - The CPU can use it too, when its inputs match in the air.
-- Conflicts with "Each fighter's movement moves the other fighter"? No: that cheat uses
-  `pt_free` bytes 0-1, this one byte 4. Both can be built together with `--name`.
+- No conflict with "Each fighter's movement moves the other fighter": that cheat uses `pt_free`
+  bytes 0-1, and this one uses byte 4. They can be built together with `--name`.
