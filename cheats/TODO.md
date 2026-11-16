@@ -138,7 +138,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Player 2 automatically parries every attack
 - [ ] The Super Art gauge is always full
 - [ ] Every hit stuns at once
 - [ ] Stun never builds up

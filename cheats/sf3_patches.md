@@ -204,6 +204,8 @@ timer speed. `sf3_cheat.py` found no moved code or data. `git apply --check` aga
 `debug_play*_move` routines).
 **Recorded:** 2026-11-15 20:00:29
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** A parry ("blocking") is decided in the hit check, from the defender's parry command flags.
 `defense_ground` (`src/HITCHECK.c`) parries a high or mid attack when `ds->cp->waza_flag[3]` (forward
 tapped) is set, a low one with `waza_flag[4]` (down tapped), and a jump-in with `waza_flag[12]`;
@@ -236,7 +238,7 @@ command code keeps only the newest parry flag). Projectiles hitting a fighter ar
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Player 2 still can't parry where the game forbids it: while dizzy (`py->flag`), in moves that set the
   `spmv_ng_flag` parry bits, when `guard_flag & 2`, or against attacks whose `att.guard` has no parry
   bits (such as throws).
