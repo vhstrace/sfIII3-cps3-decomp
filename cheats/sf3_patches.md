@@ -572,6 +572,8 @@ against main: applies.
 literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
 **Recorded:** 2026-11-15 20:09:40
 
+Tags: `interesting` `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of ALTTP "L pauses the game, R steps one frame". The board has no L
 and R, and Start is the only button a fighter doesn't use, so pausing is "hold player 1's Start" and
 stepping is "press any of player 1's six buttons while holding Start". There is no free RAM for a
@@ -598,7 +600,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - The button that steps a frame is also a real press for player 1's fighter in that frame (it may start
   an attack). Pressing a button player 1's fighter is already holding doesn't step.
 - A step also runs a frame that the KO slow motion would have skipped.
