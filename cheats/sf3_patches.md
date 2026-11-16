@@ -946,6 +946,8 @@ address in the literal pools of `Loop_Demo`, `Game2_3`, `Game08` and the `debug_
 routines.
 **Recorded:** 2026-11-15 20:18:01
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of Zelda 1 "Sword hits every enemy on the screen" and the ALTTP and
 OoT "Sword hits enemies across most of the screen". Once a frame `hit_check_main_process`
 (`src/HITCHECK.c`) runs `attack_hit_check`, which tests each active attack box (`h_att->att_box`)
@@ -975,7 +977,7 @@ bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` ag
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Both fighters, player or CPU. If both attack in the same frame, only player 1's attack is moved.
 - The hit spark appears on the opponent, but the attacker stays far away. Pushback after a hit works
   from the real distance.
