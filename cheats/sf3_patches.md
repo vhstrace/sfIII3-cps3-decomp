@@ -1029,7 +1029,7 @@ against main: applies.
 **Caveats:**
 
 - Not tested.
-- Both fighters' projectiles. Kinds 1, 2 (Q? Oro's tengu stones), 4, 10, 11, 13 and 14 are not changed;
+- Both fighters' projectiles. Kinds 1, 2 (the tengu stones), 4, 10, 11, 13 and 14 are not changed;
   which characters use which kind was not checked.
 - The animation runs at its normal rate. A shell's lifetime is in frames, so slow shells that end by
   time go twice as far.
