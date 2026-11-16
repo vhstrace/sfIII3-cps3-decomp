@@ -741,8 +741,8 @@ or data. `git apply --check` against main: applies.
 
 **Source diff:** `patches/fighters-face-away.diff`
 **BPS:** `sf3_ggpatch/fighters-face-away/` (simm1.0-.3)
-**Changes:** 47 bytes. 06700000-0670002B: the new `set_rl_waza`. 0611788D, 06118FE1: its address in the
-literal pools of `move_player_work` and `move_player_work_bonus`.
+**Changes:** 06700000-0670002B: the new `set_rl_waza`. 0611788D, 06118FE1: its address in the literal
+pools of `move_player_work` and `move_player_work_bonus`. 0611D0C0-0611D0C5: `check_hurimuki` (in place).
 **Recorded:** 2026-11-15 20:13:35
 
 **Mechanism:** The 3rd Strike version of the "Enemies face away" cheats (SMB2, SMB3, ALTTP, SMW, OoT).
@@ -758,8 +758,25 @@ When `rl_waza` differs from the facing flag `rl_flag`, the fighter turns round (
 `check_hurimuki`). This is a hook: the new `set_rl_waza` runs the original, then flips `rl_waza`
 (`^= 1`), so each fighter turns to face away from the other.
 
+A second check, `check_hurimuki` (`src/PLS01.c`), decides when a standing, walking or crouching
+fighter turns round (`check_turn_to_back`). It works out the facing from the positions itself, not
+from `rl_waza`:
+
+```c
+s16 result = wk->xyz[0].disp.pos - em->old_pos[0];
+```
+
+With only `rl_waza` flipped, the two disagreed: one turned the fighter away and the other turned
+them back, so the fighters flickered between facings. The subtraction is now the other way round
+(`em->old_pos[0] - wk->xyz[0].disp.pos`, in place, same size), so `check_hurimuki` agrees with the
+flipped `rl_waza`. The flip now also applies in the bonus stages, except the car stage, which has
+its own facing code; `check_hurimuki` is not used there.
+
+(Fixed on 2026-11-15: the first version flipped only `rl_waza`, and the fighters flickered.)
+
 **Evidence:** `set_rl_waza` is only called from `src/PLCNT2.c` and `src/plcntset_2.c`, for both
-fighters each frame. Not in bonus stages (`Bonus_Game_Flag`), where it also handles the car.
+fighters each frame. In the car stage (`BONUS_CAR`) it uses the lever, so the flip is skipped there.
+`check_hurimuki` is only called from `check_turn_to_back`.
 `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
@@ -772,6 +789,9 @@ fighters each frame. Not in bonus stages (`Bonus_Game_Flag`), where it also hand
 - Both fighters, player or CPU. The CPU may play badly.
 - Moves that set the facing themselves (some throws, intros and win poses) may face the usual way for
   a moment.
+- After being hit, a fighter is set to face the attacker (from the hit's direction, `dm_rl`), then
+  turns away again: one turn, not a flicker.
+- The CPU's own facing checks (`src/Com_Sub.c`) are not changed.
 
 ## Fighters walk through each other
 

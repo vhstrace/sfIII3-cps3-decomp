@@ -1,5 +1,5 @@
 diff --git a/src/PLS01.c b/src/PLS01.c
-index 2ef81e4..49aad17 100644
+index 2ef81e4..045e8af 100644
 --- a/src/PLS01.c
 +++ b/src/PLS01.c
 @@ -90,7 +90,7 @@ s32 check_rl_flag(WORK* wk) {
@@ -11,6 +11,15 @@ index 2ef81e4..49aad17 100644
      s16 lever;
      s16 dx;
      WORK_Other* em;
+@@ -491,7 +491,7 @@ s32 check_turn_to_back(PLW* wk) {
+ 
+ s32 check_hurimuki(WORK* wk) {
+     WORK* em = (WORK*)wk->target_adrs;
+-    s16 result = wk->xyz[0].disp.pos - em->old_pos[0];
++    s16 result = em->old_pos[0] - wk->xyz[0].disp.pos;   /* cheat: was wk->xyz[0].disp.pos - em->old_pos[0] */
+     if (result) {
+         if (result > 0) {
+             return wk->rl_flag == 0;
 @@ -788,3 +788,14 @@ s32 check_ashimoto_ex(PLW* wk) {
      wk->wu.routine_no[3] = RN3_START;
      return 1;
@@ -21,7 +30,7 @@ index 2ef81e4..49aad17 100644
 +/* Fighters face away from each other: the way a fighter should face (rl_waza) is turned round. */
 +void set_rl_waza(PLW* wk) {
 +    set_rl_waza_orig(wk);
-+    if (Bonus_Game_Flag == 0) {
++    if (Bonus_Game_Flag != BONUS_CAR) {
 +        wk->wu.rl_waza ^= 1;
 +    }
 +}
