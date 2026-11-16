@@ -80,7 +80,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 ## Attacks and projectiles
 
-- [ ] Every attack hits the opponent no matter where they are (Zelda 1 "Sword hits every enemy on the screen", ALTTP and
+- [x] Every attack hits the opponent no matter where they are (Zelda 1 "Sword hits every enemy on the screen", ALTTP and
       OoT "Sword hits enemies across most of the screen"): the attack hit boxes ("Hit boxes" in
       `docs/HOW_THE_GAME_WORKS.md`)
 - [ ] Every throw grabs the opponent no matter where they are
@@ -148,3 +148,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Fighters walk through each other
 - [ ] Slippery floors: fighters slide after walking, dashing and jumping
 - [ ] The floor is a conveyor belt
+- [ ] Every attack hits the opponent no matter where they are

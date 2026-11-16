@@ -238,6 +238,8 @@ command code keeps only the newest parry flag). Projectiles hitting a fighter ar
   when a throw lands and can't tech it (`hazusenai_flag`).
 - Player 2 gets the parry score, Super Art gauge and grade points for every parry.
 - Works for player 2 whether human or CPU, including the attract-mode demo.
+- Can't be built together with "Every attack hits the opponent no matter where they are" (both hook
+  `hit_check_main_process`).
 
 ## The Super Art gauge is always full
 
@@ -894,3 +896,52 @@ against main: applies.
   ground.
 - Can't be built together with "Player 1 freezes the opponent by holding Start" (both diffs add to the
   end of `src/PLMAIN.c`).
+
+## Every attack hits the opponent no matter where they are
+
+**Source diff:** `patches/every-attack-hits-anywhere.diff`
+**BPS:** `sf3_ggpatch/every-attack-hits-anywhere/` (simm1.0-.3)
+**Changes:** 439 bytes. 06700000-067001A7: the new `hit_check_main_process`. 30 bytes outside: its
+address in the literal pools of `Loop_Demo`, `Game2_3`, `Game08` and the `debug_play*_move`
+routines.
+**Recorded:** 2026-11-15 20:18:01
+
+**Mechanism:** The 3rd Strike version of Zelda 1 "Sword hits every enemy on the screen" and the ALTTP and
+OoT "Sword hits enemies across most of the screen". Once a frame `hit_check_main_process`
+(`src/HITCHECK.c`) runs `attack_hit_check`, which tests each active attack box (`h_att->att_box`)
+against the opponent's body and hand boxes with `hit_check_subroutine`. That places each box at the
+work's position `xyz[0]`, `xyz[1]`:
+
+```c
+d0 = *hd1++;
+d1 = *hd1++;
+if (wk1->rl_flag) { d0 = -d0; d0 -= d1; }
+d0 += wk1->xyz[0].disp.pos;
+```
+
+This is a hook. Before running the original, the new `hit_check_main_process` looks for a fighter
+whose attack is active (`cg_ja.atix` and `att_hit_ok` set). It moves that fighter so the centre of
+their first attack box is on the centre of the opponent's first body box (`h_bod->body_dm[0]`), in
+both x and height. After the original, it puts the fighter back where they were, unless the hit check
+itself moved them.
+
+**Evidence:** `hit_check_main_process` is only called from other files (`src/Game_Main.c`, the
+`debug_play` routines). Box layout (x, width, y, height) from `hit_check_subroutine` and
+`include/structs.h`. The hit check doesn't draw anything, and the fighter is back in place before
+`add_next_position` sets the drawing position. Only during a battle (`Allow_a_battle_f`) and not in
+bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU. If both attack in the same frame, only player 1's attack is moved.
+- The hit spark appears on the opponent, but the attacker stays far away. Pushback after a hit works
+  from the real distance.
+- Blocking and parrying still work, and so do the usual rules (a low attack can still be jumped; an
+  attack still needs the opponent to be hittable).
+- Projectiles are not changed. The moved fighter can't be hit by projectiles in that frame where they
+  really are.
+- Can't be built together with "Player 2 automatically parries every attack" (both hook
+  `hit_check_main_process`).
