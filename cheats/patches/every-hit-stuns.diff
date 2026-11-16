@@ -1,0 +1,73 @@
+diff --git a/src/HITCHECK.c b/src/HITCHECK.c
+index d05335f..b57b1b0 100644
+--- a/src/HITCHECK.c
++++ b/src/HITCHECK.c
+@@ -305,7 +305,7 @@ s32 check_blocking_flag(PLW* as, PLW* ds) {
+ 
+ 
+ 
+-void setup_catch_atthit(WORK* as, WORK* ds) {
++void setup_catch_atthit_orig(WORK* as, WORK* ds) {
+     set_damage_and_piyo((PLW*)as, (PLW*)ds);
+     dm_status_copy(as, ds);
+     as->hit_stop = ds->dm_stop = 0;
+@@ -1750,3 +1750,14 @@ s32 check_ttk_damage_request(s16 pat) {
+     pat -= 32;
+     return ttk_damage_req_tbl[pat];
+ }
++
++
++#pragma section CHEAT
++void setup_catch_atthit(WORK* as, WORK* ds) {
++    PLW* wk = (PLW*)ds;
++    setup_catch_atthit_orig(as, ds);
++    if (wk->wu.dm_piyo != 0) {
++        wk->wu.dm_piyo = wk->py->genkai;
++    }
++}
++#pragma section
+diff --git a/src/PLPDM.c b/src/PLPDM.c
+index 8766c29..9d06c7b 100644
+--- a/src/PLPDM.c
++++ b/src/PLPDM.c
+@@ -206,7 +206,7 @@ const s16** kizetsu_timer_table[9] = {
+ 
+ 
+ 
+-void Player_damage(PLW* wk) {
++void Player_damage_orig(PLW* wk) {
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->guard_flag = 3;
+@@ -1367,7 +1367,7 @@ void subtract_dm_vital(PLW* wk) {
+ 
+ 
+ 
+-void subtract_dm_vital_aiuchi(PLW* wk) {
++void subtract_dm_vital_aiuchi_orig(PLW* wk) {
+     if (wk->dead_flag == 0) {
+         if (wk->wu.dm_vital != 0) {
+             if (wk->wu.routine_no[1] != PLAYER_DAMAGE || wk->wu.routine_no[2] > 11 || wk->wu.routine_no[3] != 0) {
+@@ -1520,3 +1520,22 @@ void check_bullet_damage(PLW* wk) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++void Player_damage(PLW* wk) {
++    if (wk->wu.routine_no[3] == RN3_START) {
++        if (wk->wu.dm_piyo != 0) {
++            wk->wu.dm_piyo = wk->py->genkai;
++        }
++    }
++    Player_damage_orig(wk);
++}
++
++void subtract_dm_vital_aiuchi(PLW* wk) {
++    if (wk->wu.dm_piyo != 0) {
++        wk->wu.dm_piyo = wk->py->genkai;
++    }
++    subtract_dm_vital_aiuchi_orig(wk);
++}
++#pragma section

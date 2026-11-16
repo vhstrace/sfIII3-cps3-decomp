@@ -41,7 +41,7 @@ Allow players and/or the CPU to use these:
 
 - [x] The Super Art gauge is always full (FF2 "Spells cost no MP in battle", EarthBound "PSI costs no
       PP", Metroid "Energy pickups refill all of Samus's energy"): `src/spgauge.c`
-- [ ] Every hit stuns at once (EarthBound "Every enemy starts each battle feeling strange"): the stun
+- [x] Every hit stuns at once (EarthBound "Every enemy starts each battle feeling strange"): the stun
       value `dm_piyo` in `set_damage_and_piyo` (`src/HITCHECK.c`)
 - [ ] Stun never builds up: the same place
 
@@ -131,3 +131,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Health drains slowly during a round
 - [ ] Player 2 automatically parries every attack
 - [ ] The Super Art gauge is always full
+- [ ] Every hit stuns at once
