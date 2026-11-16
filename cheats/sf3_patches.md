@@ -1162,6 +1162,8 @@ main: applies.
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:23:17
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** A fighter who is hit or blocks goes to `routine_no[1] = PLAYER_DAMAGE` (`set_struck_status`
 and `set_guard_status` in `src/HITCHECK.c`), and `Player_damage` (`src/PLPDM.c`) runs the reaction,
 whose movement data slides them away from the attacker. This is a hook: the new `Player_damage` saves
@@ -1177,7 +1179,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Both fighters. Hits that launch still send the fighter flying (in the air the position isn't put
   back). A knocked-down fighter doesn't slide along the ground.
 - The attacker still gets pushed back when the opponent is in the corner (see "No recoil from hits").

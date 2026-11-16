@@ -137,7 +137,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
 - [ ] Projectiles pass through each other
-- [ ] No knockback from hits
 - [ ] No recoil from hits
 - [ ] Blocking works holding either way
 - [ ] The CPU opponent stands still
