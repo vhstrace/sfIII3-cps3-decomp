@@ -55,6 +55,47 @@ fighter's attack hitting the other fighter), `player_at_vs_effect_dm` (`src/HITP
   hit states), as before.
 - The stun gauge (`dm_piyo`) is not changed.
 
+## Projectiles do double damage
+
+**Source diff:** `patches/projectiles-do-double-damage.diff`
+**BPS:** `sf3_ggpatch/projectiles-do-double-damage/` (simm1.0-.3)
+**Changes:** 30 bytes. 06700000-0670001F: the new `cal_damage_vitality_eff` (code and literal pool).
+0608F105: the address of `cal_damage_vitality_eff` in the literal pool of `effect_at_vs_player_dm` (3 bytes).
+**Recorded:** 2026-11-15 19:56:29
+
+**Mechanism:** This is the projectile version of "Normal hits do double damage".
+`cal_damage_vitality_eff` (`src/pow_pow.c`) works out the damage when an effect (a fireball or other
+projectile) hits a fighter, the same way as `cal_damage_vitality`:
+
+```c
+ds->wu.dm_vital = power * rate / 100;
+```
+
+then the attacker's and defender's power-ups. This is a hook: the original is renamed
+`cal_damage_vitality_eff_orig`, and a new `cal_damage_vitality_eff` in the CHEAT section calls it, then
+doubles the result:
+
+```c
+ds->wu.dm_vital = ds->wu.dm_vital * 2;
+```
+
+**Evidence:** the only caller is `effect_at_vs_player_dm` (`src/HITEFPL.c`), called from HITCHECK when an
+effect's attack hits a fighter. After the call it scales `dm_vital` for the defender's state (x1.25,
+x1.5 or x2), the owner's taunt power-ups, and combo scaling, as before. `sf3_cheat.py` found no moved code
+or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Normal hits (punches, kicks and specials that hit with the fighter's own body) do normal damage.
+  "Normal hits do double damage" covers those. Both diffs add a hook at the end of `src/pow_pow.c`,
+  so `sf3_cheat.py build` can't apply them together (checked); a combined cheat needs one diff with
+  both hooks.
+- Both fighters' projectiles, player or CPU, do double damage. Chip damage on block comes from the
+  same value, so it doubles too.
+
 ## Player 1 never takes damage
 
 **Source diff:** `patches/player-1-never-takes-damage.diff`
