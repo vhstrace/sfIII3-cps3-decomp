@@ -651,3 +651,46 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 - The walk animation plays at its normal rate, so fighters slide a little.
 - Both fighters, player or CPU. Dashes, jumps and the steps of moves are not changed.
 - Characters whose walk is not states 3 and 4 (if any) are not changed.
+
+## Jump again in mid-air
+
+**Source diff:** `patches/jump-again-in-mid-air.diff`
+**BPS:** `sf3_ggpatch/jump-again-in-mid-air/` (simm1.0-.3)
+**Changes:** 149 bytes. 06700000-0670009B: the new `check_air_jump`. 0611B5A9: its address in the
+literal pool of `nm_18000`.
+**Recorded:** 2026-11-15 20:12:08
+
+**Mechanism:** The 3rd Strike version of the Metroid, SMB2, SMB3 and Super Metroid "Jump again in
+mid-air". `nm_18000` (`src/PLS00.c`) checks a jumping fighter's inputs each frame, and last calls
+`check_air_jump` (`src/PLS01.c`). That starts the air jump only for the characters that have one
+(`spmv_ng_table` bit 0x80000 clear), once per jump (`extra_jump`), and only above height 48:
+
+```c
+if (wk->spmv_ng_flag & 0x80000) return 0;
+if (wk->extra_jump) return 0;
+...
+wk->wu.routine_no[2] = 53;
+```
+
+This is a hook. The new `check_air_jump` runs the original first, so a character with its own air jump
+still does it. Otherwise, while jumping (`pat_status` 20-30) a new press of up (`cp->sw_now &
+CMD_LV_UP`) starts a new jump from where the fighter is: `routine_no[2]` 21, 22 or 23 (forward,
+straight, back, the same states `Normal_53000` goes to after its air jump) with `routine_no[3]` at
+`RN3_START`, so `Normal_18000` sets up the jump's animation and full speed again. It uses the lever
+direction the same way `Normal_53000` does (`check_jump_rl_dir`).
+
+**Evidence:** `check_air_jump` is only called from `nm_18000` in `src/PLS00.c`. `cp->sw_now` is the
+newly pressed inputs (`sw_0 & ~sw_old`, `src/cmd_main_2.c`). `Normal_18000` is states 18-26 in
+`plpnm_lv_00`, and uses `jpdat_tbl`, which is shared by all characters. `sf3_cheat.py` found no moved
+code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- No limit: pressing up again and again climbs to the top of the screen.
+- Only when `nm_18000` gets to `check_air_jump`: not during an air attack, and an attack or special
+  input in the same frame comes first. Up must be pressed again (holding it does nothing).
+- Both fighters, player or CPU (the CPU rarely presses up in the air).
+- There is no jump-start (squat) animation in the air; the jump animation restarts.

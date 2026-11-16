@@ -1,0 +1,52 @@
+diff --git a/src/PLS01.c b/src/PLS01.c
+index 2ef81e4..2e50a8d 100644
+--- a/src/PLS01.c
++++ b/src/PLS01.c
+@@ -183,7 +183,7 @@ s32 saishin_bs2_on_car(PLW* wk) {
+ 
+ 
+ 
+-s32 check_air_jump(PLW* wk) {
++s32 check_air_jump_orig(PLW* wk) {
+     if (wk->spmv_ng_flag & 0x80000) {
+         return 0;
+     }
+@@ -788,3 +788,38 @@ s32 check_ashimoto_ex(PLW* wk) {
+     wk->wu.routine_no[3] = RN3_START;
+     return 1;
+ }
++
++
++#pragma section CHEAT
++void check_jump_rl_dir(PLW* wk);
++
++/* Jump again in mid-air: a new press of up during a jump starts a new jump from where the fighter is,
++   as many times as wanted. Characters with their own air jump do that one first. */
++s32 check_air_jump(PLW* wk) {
++    if (check_air_jump_orig(wk)) {
++        return 1;
++    }
++    if (wk->wu.pat_status < 20 || wk->wu.pat_status > 30) {
++        return 0;
++    }
++    if (!(wk->cp->sw_now & CMD_LV_UP)) {
++        return 0;
++    }
++    wk->jpdir = wk->cp->lever_dir;
++    check_jump_rl_dir(wk);
++    wk->wu.routine_no[1] = PLAYER_NORMAL;
++    switch (wk->jpdir) {
++    case LVDIR_FORWARD:
++        wk->wu.routine_no[2] = 21;
++        break;
++    case LVDIR_BACK:
++        wk->wu.routine_no[2] = 23;
++        break;
++    default:
++        wk->wu.routine_no[2] = 22;
++        break;
++    }
++    wk->wu.routine_no[3] = RN3_START;
++    return 1;
++}
++#pragma section
