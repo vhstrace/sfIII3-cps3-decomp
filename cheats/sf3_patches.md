@@ -1907,7 +1907,7 @@ check (`set_field_hosei_flag`) and the push between fighters still run on the po
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Screen X, not "forward": pushing right on player 1's side moves player 2 right. Walking toward the
   opponent moves the opponent the same way, so it walks away from you.
 - Everything a fighter's own move does moves the other one: dashes, the forward motion of attacks,
