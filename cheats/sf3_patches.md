@@ -2047,3 +2047,71 @@ against main: applies.
 - The flight distances are worked out from the rows, not measured.
 - The EX version's follow-up after a hit (`CM_HJMP` in `ibuki_saca_027`) is not changed.
 - The CPU's Ibuki uses the new Kazekiri too.
+
+## Ground special moves work in the air
+
+**Source diff:** `patches/ground-specials-in-the-air.diff`
+**BPS:** `sf3_ggpatch/ground-specials-in-the-air/` (simm1.0-.3)
+**Changes:** 386 bytes. 326 in the cheat area (new `check_special_attack`, `Player_attack` and
+`process_attack`). 60 outside, all literal-pool addresses of those three functions: the callers in
+`src/PLS00.c` (`nm_02000` ... `check_cg_cancel_data`), `plmain_lv_02` and `process_ndcca`.
+**Recorded:** 2026-11-15 23:37:47
+
+**Mechanism:** `check_special_attack` (`src/PLS03.c`) checks only the air specials (slots 46-55)
+when the fighter is above the ground:
+
+```c
+} else if (wk->wu.xyz[1].disp.pos > 0) {
+    goto air;
+}
+```
+
+Two more things keep a ground special on the ground. Each special's first step calls
+`hoken_muriyari_chakuchi` (`src/PLPAT.c`), which sets the height to 0. And `process_attack`
+(`src/PLS00.c`) only ends a move on its end cue (255, or 64) at height 0:
+
+```c
+if (wk->wu.xyz[1].disp.pos == 0 || wk->bs2_on_car != 0) {
+    jumping_cg_type_check(wk);
+```
+
+The cheat hooks all three (renamed to `_orig`, new versions in the CHEAT section):
+
+- `check_special_attack`: in the air, the original runs first (air specials still win). If nothing
+  matched, it runs again with the height set to 0, so the ground specials are checked, and the
+  height is put back. When a ground special starts, it sets `pt_free[4]` (an unused byte of the
+  player work).
+- `Player_attack`: when `pt_free[4]` is set, it clears it and puts the height back after the
+  move's first step, so the forced landing does nothing. (The check and the first step run in the
+  same frame.)
+- `process_attack`: after the original, if the move has reached its end cue in the air, the
+  fighter falls 8 pixels a frame. At height 0 the original ends the move as usual.
+
+It still respects the "no air specials" flag (`spmv_ng_flag` 0x20000000) and the "no ground
+specials" flag (0x10000000), and leaves the bonus-stage car alone.
+
+**Evidence:** `check_special_attack` is called only from `src/PLS00.c` (literal pools).
+`Player_attack` and `process_attack` are only called through `plmain_lv_02` and
+`process_ndcca`. In `player_mv_4000` (`src/PLMAIN.c`), `check_lever_data` (the input checks)
+runs before `plmain_lv_02` (`Player_attack`) in the same frame. `hoken_muriyari_chakuchi` is
+called from the first step of the specials (`PLPATxx.c`, `plpatNN.c`, `PLPATUNI.c`) and the
+command normals in `src/PLPAT.c`. No source uses `pt_free`. `sf3_cheat.py` found no moved code
+or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only special moves, not super arts. Supers use their own checks (`check_super_arts_attack`) and
+  are not changed.
+- Most ground specials don't move the fighter up or down, so the fighter hangs in the air for the
+  whole move (a fireball thrown in mid-jump) and then drops straight down at 8 pixels a frame, with
+  no landing animation. Moves that jump on their own (uppercuts like Shoryuken, which use
+  `jumping_union_process`) take off from the height they started at and land normally.
+- Moves with their own ground checks, throws (command grabs) and moves that dash along the ground
+  may look wrong or end early. Command grabs in the air were not checked.
+- A move whose animation ends with neither cue 255 nor 64 would hang until its script runs out.
+- The CPU can use it too, when its inputs match in the air.
+- Conflicts with "Each fighter's movement moves the other fighter"? No: that cheat uses
+  `pt_free` bytes 0-1, this one byte 4. Both can be built together with `--name`.
