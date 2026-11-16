@@ -1319,3 +1319,45 @@ moved code or data. `git apply --check` against main: applies.
   timers and distances.
 - Can't be built together with "Fighters walk twice as fast" or "Low gravity" (same hooks, or the end of
   the same file).
+
+## Hold Start when picking a character to play as Gill or Shin Akuma
+
+**Source diff:** `patches/gill-and-shin-akuma-selectable.diff`
+**BPS:** `sf3_ggpatch/gill-and-shin-akuma-selectable/` (simm1.0-.3)
+**Changes:** 213 bytes. The new `Sel_PL_3rd` at 06700000. 0619547D: its address in the constant copy of
+`Sel_PL_Jmp_Tbl` (the nearest symbol is `Face_Order_Data`).
+**Recorded:** 2026-11-15 20:29:24
+
+**Mechanism:** The 3rd Strike version of FF2 "New game: <character> is in the party". On the select
+screen, `Sel_PL_3rd` (`src/sel_pl.c`) runs `Sel_PL_Sub`, which sets the character from the face grid
+when a button is pressed:
+
+```c
+Sel_PL_Complete[PL_id] = 1;
+My_char[PL_id] = ID_of_Face[Cursor_Y[PL_id]][Cursor_X[PL_id]];
+```
+
+The grid (`Face_Cursor_Data`, `data/Sel_Data.c`) has no Gill (`PL_GILL`, 0) or Shin Gouki
+(`PL_GOUKI2`, 15). This is a hook: the new `Sel_PL_3rd` runs the original, and on the frame a
+character is confirmed in a paid game with that player's Start held, it changes `My_char` to Shin
+Gouki if it was Akuma and to Gill otherwise. It then does the same super-art and boss-intro reset that
+`Sel_PL_Sub` does when the character changes.
+
+**Evidence:** `Sel_PL_3rd` is only reached through `Sel_PL_Jmp_Tbl` in `Sel_PL`. Gill and Shin
+Gouki are full fighters: the CPU uses them (`EM_Cand.c`, `Com_Pl.c`), and `PLMAIN.c`, `pow_pow.c`
+and `plcntset_2.c` handle Shin Gouki as a player. Fighter numbers from `include/fighter.h`.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Hold Start, then press the punch or kick button that picks the colour.
+- The select screen still shows the face you picked. The change shows from the super-art screen or the
+  VS screen on.
+- Gill's super-art list may not be like the others' (the CPU always gives him art 1). Picking art 2 or 3
+  with Gill may not work.
+- In single-player, the CPU's opponents and the boss order may act oddly (Gill against Gill).
+- After a continue, the "same CPU opponent" check runs before the change.
+- Not in the attract demo.

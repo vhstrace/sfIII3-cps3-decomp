@@ -1,0 +1,49 @@
+diff --git a/src/sel_pl.c b/src/sel_pl.c
+index 7fe34c3..ce6dcde 100644
+--- a/src/sel_pl.c
++++ b/src/sel_pl.c
+@@ -406,7 +406,7 @@ void Sel_PL_2nd(void) {
+ 
+ 
+ 
+-void Sel_PL_3rd(void) {
++void Sel_PL_3rd_orig(void) {
+     if (Stop_Cursor[ID] != 0 || (u8)Face_Move != 0) {
+         return;
+     }
+@@ -1669,3 +1669,35 @@ s32 Setup_Battle_Country(void) {
+         return My_char[New_Challenger];
+     }
+ }
++
++
++#pragma section CHEAT
++/* Gill and Shin Akuma can be picked: in a paid game, hold Start while confirming a character. Akuma
++   gives Shin Akuma (Shin Gouki), anyone else gives Gill. */
++void Sel_PL_3rd(void) {
++    s8 before = Sel_PL_Complete[ID];
++    u16 held;
++    Sel_PL_3rd_orig();
++    if (before != 0 || Sel_PL_Complete[ID] == 0 || Demo_Flag == 0) {
++        return;
++    }
++    if (ID) {
++        held = p2sw_0;
++    } else {
++        held = p1sw_0;
++    }
++    if (!(held & BUTTON_START)) {
++        return;
++    }
++    if (My_char[ID] == PL_GOUKI1) {
++        My_char[ID] = PL_GOUKI2;
++    } else {
++        My_char[ID] = PL_GILL;
++    }
++    if (Last_My_char2[ID] != My_char[ID]) {
++        Arts_Y[ID] = Super_Arts[ID] = Last_Super_Arts[ID] = 0;
++        Introduce_Boss[ID][0] = 0;
++    }
++    Last_My_char2[ID] = My_char[ID];
++}
++#pragma section
