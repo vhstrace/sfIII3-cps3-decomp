@@ -840,7 +840,7 @@ applies.
 
 **Source diff:** `patches/slippery-floors.diff`
 **BPS:** `sf3_ggpatch/slippery-floors/` (simm1.0-.3)
-**Changes:** 229 bytes. 06700000-067000E7: the new `player_mv_4000`. 065EAF81: its entry in the
+**Changes:** 195 bytes. 06700000-067000C3: the new `player_mv_4000`. 065EAF81: its entry in the
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:15:30
 
@@ -850,17 +850,19 @@ jumping, attacking, being hit), through `plmain_lv_02[routine_no[1]]`. This is a
 `player_mv_4000` notes the position (`xyz[0].cal`, 16.16), runs the original, and works out how far
 the game moved the fighter sideways this frame. On the ground, it moves the fighter by its own speed
 instead (kept in `pt_free[8-9]`, an unused part of the player work, in 1/256 pixels a frame). That
-speed eases toward the game's movement: by 1/4 of the difference a frame when speeding up in the
-same direction, by 1/16 when slowing down or turning. In the air, the speed just follows the
+speed eases toward the game's movement by 1/16 of the difference a frame, when speeding up, slowing
+down or turning alike. In the air, the speed just follows the
 game's movement, so a landing carries the jump's speed into the slide.
 
 Over time the fighter covers the same distance as without the cheat, just later: a steady walk
-gives the same walking speed, and after a stop the fighter slides on and comes to rest.
+gives the same walking speed. From a standstill the fighter speeds up into the walk over about
+a second, and after a stop slides on and comes to rest.
 
 (Rewritten on 2026-11-16. The first version hooked only the standing state, `Normal_01000`, and
 slid with the last `mvxy` speed. Walking moves by animation steps (`cg_add_xy`, `char_move` in
 `src/CHARMOVE.c`), not by `mvxy`, and a landing goes through its own state first, so the fighter
-stopped dead and then slid off.)
+stopped dead and then slid off. Changed again the same day: speeding up first used 1/4 of the
+difference a frame; now it is 1/16 like slowing down, so walks start slowly too.)
 
 **Evidence:** `player_mv_4000` is only called through `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 `check_lever_data` (input) and the state routine both run inside it, before `move_player_work`
@@ -877,7 +879,7 @@ main: applies.
 
 - Not tested.
 - Every ground movement is smoothed: walks, dashes, attacks that step forward, and pushback from
-  hits and blocks. Dashes start a bit slower and slide further. Attacks that step forward may whiff
+  hits and blocks. Dashes start much slower and slide further: a short dash may be mostly slide. Attacks that step forward may whiff
   where they used to hit.
 - A fighter who reverses direction slides the old way for a moment first.
 - Both fighters, player or CPU.
