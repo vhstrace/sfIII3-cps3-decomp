@@ -20,6 +20,6 @@ index b6ff80f..e117b49 100644
 +#pragma section CHEAT
 +void cal_damage_vitality_eff(WORK_Other* as, PLW* ds) {
 +    cal_damage_vitality_eff_orig(as, ds);
-+    ds->wu.dm_vital = ds->wu.dm_vital * 4;
++    ds->wu.dm_vital = ds->wu.dm_vital * 16;
 +}
 +#pragma section
