@@ -1675,5 +1675,5 @@ moved code or data. `git apply --check` against main: applies.
 - The difference only shows when Yang runs into the opponent or a wall during the move: the old
   version keeps playing the move's animation instead of cutting to its follow-up. This may make the
   move miss, hit differently, or look odd.
-- Uses no cheat code space, so this patch can be applied on top of one other cheat's patches, as long
-  as that cheat doesn't change `data/plpat10_tbl.c`.
+- Uses no cheat code space, so it can go into a combined build (\`sf3_cheat.py build a b\`) with any
+  cheat that doesn't change \`data/plpat10_tbl.c\`. Its BPS files still only apply to the original chips.
