@@ -134,7 +134,15 @@ python3 -I cheats/sf3_cheat.py build <slug> --zip <scratchpad>/<slug>/sfiii3nr1.
 - **Combining cheats:** `build a b --name a+b`. Every cheat puts its code at 06700000, so single-cheat
   patches can't be stacked; a combined build gets its own patches.
 - **Testing in MAME:** MAME keeps the program flash in nvram and loads it over the ROM files, so always use
-  an empty `-nvram_directory` (see `README.md`). Only launch an emulator when the user asks.
+  an empty `-nvram_directory` (see `README.md`). Also give it `-cfg_directory` in the scratchpad: by
+  default MAME writes `cfg/` into the current folder. Only launch an emulator when the user asks:
+
+  ```
+  mame sfiii3nr1 -rompath <scratchpad>/<slug> -nvram_directory <empty scratchpad folder> \
+    -cfg_directory <scratchpad>/mame-cfg -skip_gameinfo -window
+  ```
+
+  MAME warns about wrong checksums for the patched chips; that is expected.
 - Patched ROMs no longer play Fightcade replays or load savestates from the original.
 
 ### Applying a patch (for the player)
