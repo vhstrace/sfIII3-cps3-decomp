@@ -844,6 +844,8 @@ applies.
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:15:30
 
+Tags: `interesting` `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the SMB2, SMB3, ALTTP and OoT "slippery floors" cheats.
 `player_mv_4000` (`src/PLMAIN.c`) runs a fighter for one frame of the fight (standing, walking,
 jumping, attacking, being hit), through `plmain_lv_02[routine_no[1]]`. This is a hook: the new
@@ -877,7 +879,7 @@ main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Every ground movement is smoothed: walks, dashes, attacks that step forward, and pushback from
   hits and blocks. Dashes start much slower and slide further: a short dash may be mostly slide. Attacks that step forward may whiff
   where they used to hit.
