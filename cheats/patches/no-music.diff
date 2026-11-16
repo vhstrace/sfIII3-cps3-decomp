@@ -1,0 +1,29 @@
+diff --git a/src/textsound_2.c b/src/textsound_2.c
+index 0a7deb3..8dcc212 100644
+--- a/src/textsound_2.c
++++ b/src/textsound_2.c
+@@ -499,7 +499,7 @@ void se_voice_stop_all(void) {
+ 
+ 
+ /* provisional name */
+-void sound_driver_tick(void) {
++void sound_driver_tick_orig(void) {
+     u32 i;
+     if ((bgm_state & 8) && !(bgm_state & 4)) {
+         snd_fade_level += snd_fade_speed;
+@@ -536,3 +536,15 @@ void sound_driver_tick(void) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* No music: at each tick, stop the music voices (as bgm_stop does) before they play. Sound effects and
++   voices are separate (se_voice) and play as usual. */
++void sound_driver_tick(void) {
++    if (bgm_state & 2) {
++        bgm_stop();
++    }
++    sound_driver_tick_orig();
++}
++#pragma section

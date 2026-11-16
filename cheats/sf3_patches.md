@@ -1443,3 +1443,40 @@ data. `git apply --check` against main: applies.
   ROM (they are constant 0s), so it can't be turned on without moving code.
 - A coin (or Start on free play) while holding Start + LP + LK opens the menu instead of starting a game.
 - Can't be built together with other cheats that add to the end of `src/Game_Main.c`.
+
+## No music
+
+**Source diff:** `patches/no-music.diff`
+**BPS:** `sf3_ggpatch/no-music/` (simm1.0-.3)
+**Changes:** 38 bytes. The new `sound_driver_tick` at 06700000. 060007ED: its address in the vertical
+blank interrupt's literal pool (`src/intr.src`; the nearest symbol is `frt_overflow_intr`).
+**Recorded:** 2026-11-15 20:33:44
+
+**Mechanism:** The 3rd Strike version of the "No music" cheats in Metroid, SMB3, ALTTP, Super Metroid,
+OoT, FF2 and EarthBound. `sound_seq_start` (`src/textsound_2.c`) starts a music sequence (header byte
+0) on the 16 `bgm_voice`s and sets bit 2 of `bgm_state`. Sound effects and voices use the separate
+`se_voice`s. `bgm_stop` stops the music:
+
+```c
+for (i = 0; i < 16; i++) {
+    bgm_voice[i].status = 192;
+}
+bgm_state = 1;
+```
+
+This is a hook: the new `sound_driver_tick` (run from the vertical blank interrupt) calls `bgm_stop`
+whenever music is on, then runs the original. A song is stopped on the first tick after it starts,
+before any of its notes play.
+
+**Evidence:** `sound_driver_tick` is only called from `src/intr.src`. The game never waits for the
+music to end: `bgm_state` is only read by the sound driver and by the sound test
+(`sound_status_read`). `sf3_cheat.py` found no moved code or data. `git apply --check` against
+main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Music in the test mode's sound test is silent too.
+- A short jingle that is a music sequence (not a sound effect) is silent too.
