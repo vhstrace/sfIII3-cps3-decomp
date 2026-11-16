@@ -1220,3 +1220,39 @@ returns 3 for a projectile that comes from behind.
   high/low still matters.
 - Walking forward toward an attack now blocks it, so it is much harder to hit a fighter who is moving
   at all.
+
+## The CPU opponent stands still
+
+**Source diff:** `patches/cpu-stands-still.diff`
+**BPS:** `sf3_ggpatch/cpu-stands-still/` (simm1.0-.3)
+**Changes:** 39 bytes. The new `CPU_Sub` at 06700000. 06119639: its address in the literal pool of
+`Player_move`.
+**Recorded:** 2026-11-15 20:26:21
+
+**Mechanism:** The 3rd Strike version of Metroid "Enemies can't move", EarthBound "Enemies on the map
+can't move" and SMW "Every Chargin' Chuck stands there and does nothing". `Player_move`
+(`src/PLMAIN.c`) gets a CPU fighter's input from `CPU_Sub` (`src/Com_Pl.c`), which runs the AI:
+
+```c
+if (wk->wu.operator) {
+    wk->cp->sw_lvbt = lv_data;
+} else {
+    wk->cp->sw_lvbt = processed_lvbt(CPU_Sub(wk));
+}
+```
+
+This is a hook: in a paid game (`Demo_Flag` set) and outside bonus stages, the new `CPU_Sub` returns 0
+(no lever, no buttons) without running the AI. Otherwise it runs the original.
+
+**Evidence:** `CPU_Sub` is only called from `Player_move`. The CPU's moves all come from this input
+word; the original also returns 0 when the fight doesn't allow input (`Allow_a_battle_f`).
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The CPU never blocks, parries, attacks, gets up quickly or techs throws.
+- Gill's resurrection and other automatic things that don't need input still happen.
+- The attract-mode demo and the bonus stages play as usual.

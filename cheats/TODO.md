@@ -96,7 +96,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 ## CPU opponent
 
-- [ ] The CPU opponent stands still (Metroid "Enemies can't move", EarthBound "Enemies on the map
+- [x] The CPU opponent stands still (Metroid "Enemies can't move", EarthBound "Enemies on the map
       can't move", SMW "Every Chargin' Chuck stands there and does nothing"): `src/Com_Pl.c`
 - [ ] The CPU opponent keeps running away (EarthBound "Enemies on the map always run away from Ness",
       SMB2 "Enemies face and walk away")
@@ -156,3 +156,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] No knockback from hits
 - [ ] No recoil from hits
 - [ ] Blocking works holding either way
+- [ ] The CPU opponent stands still
