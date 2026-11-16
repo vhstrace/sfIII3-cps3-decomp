@@ -63,6 +63,8 @@ fighter's attack hitting the other fighter), `player_at_vs_effect_dm` (`src/HITP
 0608F105: the address of `cal_damage_vitality_eff` in the literal pool of `effect_at_vs_player_dm` (3 bytes).
 **Recorded:** 2026-11-15 19:56:29
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** This is the projectile version of "Normal hits do double damage".
 `cal_damage_vitality_eff` (`src/pow_pow.c`) works out the damage when an effect (a fireball or other
 projectile) hits a fighter, the same way as `cal_damage_vitality`:
@@ -88,7 +90,7 @@ or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Normal hits (punches, kicks and specials that hit with the fighter's own body) do normal damage.
   "Normal hits do double damage" covers those. Both diffs add a hook at the end of `src/pow_pow.c`,
   so `sf3_cheat.py build` can't apply them together (checked); a combined cheat needs one diff with
