@@ -535,6 +535,8 @@ main: applies.
 `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:07:23
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of SMW "Bullet Time for Banzai Bill". A KO calls
 `set_conclusion_slow` (`src/SLOWF.c`), which sets `SLOW_timer = 95`; `set_EXE_flag` then eases
 `SLOW_flag` from slow back to normal through `slow_timer_to_flag` as the timer runs down. This is a hook
@@ -557,7 +559,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Each hit restarts the 95-frame slow-down, so a long combo plays in slow motion all the way.
 - The round clock also slows while it plays.
 - Throws don't go through `Player_damage`, so they don't slow the game (unless they KO).

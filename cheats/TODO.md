@@ -138,7 +138,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Every hit plays the KO slow motion
 - [ ] The round timer never runs out
 - [ ] Hold Start to pause, press a button to step one frame
 - [ ] Fighters walk twice as fast
