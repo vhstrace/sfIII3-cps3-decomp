@@ -56,7 +56,9 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Freeze the opponent while a button is held (OoT "Freeze time for enemies by holding L")
 - [x] Every hit plays the KO slow motion (SMW "Bullet Time for Banzai Bill"): `set_conclusion_slow`
 - [ ] The game runs 1.25 or 1.5 times as fast (OoT "The game runs 1.5 times as fast"): run the fight
-      frame more than once per frame
+      frame more than once per frame. Not done (2026-11-15): running `Game2_1` twice also pushes every
+      sprite twice (`sort_push_request`, `sprite_entry_push_prio`), and the extra copies would need to
+      be dropped from the sprite pool, which wasn't worked out.
 - [x] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
       `Time_Control` (`src/Game_Main.c`), `Check_Time_Over` (`src/manage_2.c`)
 - [x] L pauses, R steps one frame (ALTTP "L pauses the game, R steps one frame"): the 3rd Strike
