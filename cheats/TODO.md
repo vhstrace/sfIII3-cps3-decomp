@@ -139,7 +139,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] Hold Start when picking a character to play as Gill or Shin Akuma
 - [ ] Skip the logos and the opening movie
 - [ ] Hold Start + LP + LK in the attract mode for the debug menu
 - [ ] No music

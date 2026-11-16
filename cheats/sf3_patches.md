@@ -1335,6 +1335,8 @@ moved code or data. `git apply --check` against main: applies.
 `Sel_PL_Jmp_Tbl` (the nearest symbol is `Face_Order_Data`).
 **Recorded:** 2026-11-15 20:29:24
 
+Tags: `demo-ready` `curated` `play-start`
+
 **Mechanism:** The 3rd Strike version of FF2 "New game: <character> is in the party". On the select
 screen, `Sel_PL_3rd` (`src/sel_pl.c`) runs `Sel_PL_Sub`, which sets the character from the face grid
 when a button is pressed:
@@ -1359,7 +1361,7 @@ and `plcntset_2.c` handle Shin Gouki as a player. Fighter numbers from `include/
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Hold Start, then press the punch or kick button that picks the colour.
 - The select screen still shows the face you picked. The change shows from the super-art screen or the
   VS screen on.
