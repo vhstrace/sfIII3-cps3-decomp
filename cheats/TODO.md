@@ -136,7 +136,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Every throw grabs the opponent no matter where they are
 - [ ] Projectiles fly twice as fast
 - [ ] Projectiles stay where they appear
 - [ ] Projectiles pass through each other

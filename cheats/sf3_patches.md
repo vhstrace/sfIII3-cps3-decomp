@@ -996,6 +996,8 @@ bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` ag
 the literal pools of `Loop_Demo`, `Game2_3`, `Game08` and the `debug_play*_move` routines.
 **Recorded:** 2026-11-15 20:19:01
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The throw version of "Every attack hits the opponent no matter where they are" (same
 idea). `hit_check_main_process` (`src/HITCHECK.c`) runs `catch_hit_check` when `ca_check_flag` is
 set, which tests a fighter's throw box (`h_cat->cat_box`) against the opponent's "can be thrown" box
@@ -1025,7 +1027,7 @@ a fighter in hit stun, `tsukamarenai_flag`, and so on). `sf3_cheat.py` found no 
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Both fighters, player or CPU. If both throw in the same frame, only player 1's throw is moved.
 - Throws include command grabs (Hugo, Alex) and air throws. A normal throw input is still needed: the
   game only makes a throw box when the throw starts, and some characters' throw inputs may do a normal
