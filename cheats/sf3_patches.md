@@ -651,6 +651,8 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 - The walk animation plays at its normal rate, so fighters slide a little.
 - Both fighters, player or CPU. Dashes, jumps and the steps of moves are not changed.
 - Characters whose walk is not states 3 and 4 (if any) are not changed.
+- Can't be built together with "Low gravity: jumps go twice as high" (both diffs add to the end of
+  `src/PLNORMAL.c`).
 
 ## Jump again in mid-air
 
