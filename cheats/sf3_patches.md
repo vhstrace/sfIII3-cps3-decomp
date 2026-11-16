@@ -945,3 +945,49 @@ bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` ag
   really are.
 - Can't be built together with "Player 2 automatically parries every attack" (both hook
   `hit_check_main_process`).
+
+## Every throw grabs the opponent no matter where they are
+
+**Source diff:** `patches/every-throw-grabs-anywhere.diff`
+**BPS:** `sf3_ggpatch/every-throw-grabs-anywhere/` (simm1.0-.3)
+**Changes:** 409 bytes. The new `hit_check_main_process` at 06700000. 30 bytes outside: its address in
+the literal pools of `Loop_Demo`, `Game2_3`, `Game08` and the `debug_play*_move` routines.
+**Recorded:** 2026-11-15 20:19:01
+
+**Mechanism:** The throw version of "Every attack hits the opponent no matter where they are" (same
+idea). `hit_check_main_process` (`src/HITCHECK.c`) runs `catch_hit_check` when `ca_check_flag` is
+set, which tests a fighter's throw box (`h_cat->cat_box`) against the opponent's "can be thrown" box
+(`h_cau->cau_box`):
+
+```c
+mh = &mad->h_cat->cat_box[0];
+...
+sh = &sad->h_cau->cau_box[0];
+...
+if (hit_check_subroutine(mad, sad, mh, sh)) {
+```
+
+This is a hook. Before running the original, the new `hit_check_main_process` looks for a fighter
+with an active throw box (`att_hit_ok` set and a box of non-zero width). It moves that fighter so the
+centre of the throw box is on the centre of the opponent's box, in both x and height. After the
+original, it puts the fighter back, unless the hit check moved them. Once a throw has caught, the
+thrown fighter is placed next to the thrower each frame (`catch_hos_x` in `src/PLPCU.c`), so they are
+pulled across the screen.
+
+**Evidence:** `hit_check_main_process` is only called from other files. Only during a battle
+(`Allow_a_battle_f`) and not in bonus stages. The rules in `catch_hit_check` still apply (can't throw
+a fighter in hit stun, `tsukamarenai_flag`, and so on). `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU. If both throw in the same frame, only player 1's throw is moved.
+- Throws include command grabs (Hugo, Alex) and air throws. A normal throw input is still needed: the
+  game only makes a throw box when the throw starts, and some characters' throw inputs may do a normal
+  attack when far away.
+- The thrown fighter may jump across the screen in one frame.
+- Can't be built together with the other cheats that hook `hit_check_main_process` ("Player 2
+  automatically parries every attack", "Every attack hits the opponent no matter where they are").

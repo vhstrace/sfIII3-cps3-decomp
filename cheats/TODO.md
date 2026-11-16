@@ -83,7 +83,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Every attack hits the opponent no matter where they are (Zelda 1 "Sword hits every enemy on the screen", ALTTP and
       OoT "Sword hits enemies across most of the screen"): the attack hit boxes ("Hit boxes" in
       `docs/HOW_THE_GAME_WORKS.md`)
-- [ ] Every throw grabs the opponent no matter where they are
+- [x] Every throw grabs the opponent no matter where they are
 - [ ] Projectiles fly twice as fast (SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast")
 - [ ] Projectiles crawl or stand still (ALTTP "Sword beams fly at quarter speed" and "stay where they
       appear", Zelda 1 "Sword beams and Magical Rod shots crawl")
@@ -149,3 +149,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Slippery floors: fighters slide after walking, dashing and jumping
 - [ ] The floor is a conveyor belt
 - [ ] Every attack hits the opponent no matter where they are
+- [ ] Every throw grabs the opponent no matter where they are

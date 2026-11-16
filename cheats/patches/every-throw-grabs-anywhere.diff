@@ -1,0 +1,80 @@
+diff --git a/src/HITCHECK.c b/src/HITCHECK.c
+index d05335f..6af0f42 100644
+--- a/src/HITCHECK.c
++++ b/src/HITCHECK.c
+@@ -52,7 +52,7 @@ const s16 * dmdat_adrs[16];  /* 0200EE48 */
+ s16 mkm_wk[32];  /* 0200EE88 */
+ s16 hpq_in;  /* 0200EEC8 */
+ 
+-void hit_check_main_process(void) {
++void hit_check_main_process_orig(void) {
+     aiuchi_flag = 0;
+     if (hpq_in > 1) {
+         if (ca_check_flag) {
+@@ -1750,3 +1750,66 @@ s32 check_ttk_damage_request(s16 pat) {
+     pat -= 32;
+     return ttk_damage_req_tbl[pat];
+ }
++
++
++#pragma section CHEAT
++/* Every throw grabs the opponent no matter where they are: during the hit check, a fighter whose throw
++   box is active is moved for a moment so that it is centred on the opponent's "can be thrown" box. It is
++   put back afterwards (unless the hit check moved it). */
++void hit_check_main_process(void) {
++    PLW* as;
++    PLW* ds;
++    const s16* ab;
++    const s16* db;
++    s16 i;
++    s16 ac;
++    s16 dc;
++    s16 ox;
++    s16 oy;
++    s16 nx;
++    s16 ny;
++    as = 0;
++    if (Allow_a_battle_f && Bonus_Game_Flag == 0 && ca_check_flag) {
++        for (i = 0; i < 2; i++) {
++            as = &plw[i];
++            ds = &plw[i ^ 1];
++            if (as->wu.att_hit_ok == 0 || as->wu.h_cat == 0 || ds->wu.h_cau == 0) {
++                as = 0;
++                continue;
++            }
++            ab = as->wu.h_cat->cat_box;
++            db = ds->wu.h_cau->cau_box;
++            if (ab[1] == 0 || db[1] == 0) {
++                as = 0;
++                continue;
++            }
++            if (as->wu.rl_flag) {
++                ac = -ab[0] - ab[1] + ab[1] / 2;
++            } else {
++                ac = ab[0] + ab[1] / 2;
++            }
++            if (ds->wu.rl_flag) {
++                dc = -db[0] - db[1] + db[1] / 2;
++            } else {
++                dc = db[0] + db[1] / 2;
++            }
++            ox = as->wu.xyz[0].disp.pos;
++            oy = as->wu.xyz[1].disp.pos;
++            nx = ds->wu.xyz[0].disp.pos + dc - ac;
++            ny = ds->wu.xyz[1].disp.pos + (db[2] + db[3] / 2) - (ab[2] + ab[3] / 2);
++            as->wu.xyz[0].disp.pos = nx;
++            as->wu.xyz[1].disp.pos = ny;
++            break;
++        }
++    }
++    hit_check_main_process_orig();
++    if (as != 0) {
++        if (as->wu.xyz[0].disp.pos == nx) {
++            as->wu.xyz[0].disp.pos = ox;
++        }
++        if (as->wu.xyz[1].disp.pos == ny) {
++            as->wu.xyz[1].disp.pos = oy;
++        }
++    }
++}
++#pragma section
