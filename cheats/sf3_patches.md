@@ -1996,7 +1996,7 @@ frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 
 
 **Caveats:**
 
-- Not tested since the buttons were swapped (2026-11-15): first LK was the bound jump and MK the hop jump, and that version worked.
+- Tested by the user in MAME (2026-11-15): works (LK hop jump, MK bound jump).
 - Light and medium Hien are gone; HK and EX Hien still work. The CPU's Ibuki gets the new moves too
   when it picks light or medium Hien.
 - Neither jump attacks: no attack boxes, as the routines have no attack step. Hurt boxes are the ones
