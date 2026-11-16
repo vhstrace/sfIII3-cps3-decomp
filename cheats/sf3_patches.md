@@ -1939,6 +1939,8 @@ routine numbers for LK and MK), `ibuki_saca` entries 74, 75, 77 and 78, `pl07_ex
 11 and 12, and Ibuki's Hien row in `asstbl_sa_ground`.
 **Recorded:** 2026-11-15 22:16:59
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** `Att_PL07_BOUND_JUMP` and `Att_PL07_HOP_JUMP` (`src/PLPAT07.c`) are in the ROM but
 not in Ibuki's move table, and no animation was made for them. They step on animation cues:
 
@@ -1994,7 +1996,7 @@ frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Light and medium Hien are gone; HK and EX Hien still work. The CPU's Ibuki gets the new moves too
   when it picks light or medium Hien.
 - Neither jump attacks: no attack boxes, as the routines have no attack step. Hurt boxes are the ones
