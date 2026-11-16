@@ -385,3 +385,45 @@ found no moved code or data. `git apply --check` against main: applies.
 - Both fighters, player or CPU. Nobody can be dizzied, and the stun gauge stays empty.
 - This uses the same hooks as "Player 1 never takes damage" and "Every hit stuns at once", so it can't be
   built together with them as is.
+
+## The game runs at half speed
+
+**Source diff:** `patches/half-speed.diff`
+**BPS:** `sf3_ggpatch/half-speed/` (simm1.0-.3)
+**Changes:** 92 bytes. 06700000-06700047: the new `set_EXE_flag`. 27 bytes outside: its address in the
+literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
+**Recorded:** 2026-11-15 20:05:21
+
+**Mechanism:** The 3rd Strike version of the half-speed cheats in Tetris, SMB3, Metroid, ALTTP, Super
+Metroid and OoT. The KO slow motion works by skipping frames: `set_EXE_flag` (`src/SLOWF.c`) runs at the
+start of each fight frame and does
+
+```c
+EXE_flag = Game_timer % (SLOW_flag + 1);
+```
+
+and fighters, effects, the health bars and the round clock only run when `EXE_flag` is 0. This is a hook:
+the new `set_EXE_flag` runs the original, then, when no slow motion is playing (`SLOW_flag == 0`) and the
+game isn't paused, sets
+
+```c
+EXE_flag = Game_timer % 2;
+```
+
+the same as `SLOW_flag` 1. The KO slow motion (`SLOW_flag` 1 and up) is left as it was.
+
+**Evidence:** `EXE_flag` is read by `Player_control`, `vital_cont_main`, `src/count.c` (the round
+clock) and over 100 effect routines. The screen, scrolling and sprites still update every frame, as in
+the KO slow motion. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Movement is not smoothed: each picture is shown for 2 frames, so it looks choppier than real slow
+  motion.
+- Input is read every frame, but fighters only act every other frame. Special move timing windows are
+  counted in fighter frames, so they feel twice as long.
+- Also applies to the attract-mode fight demo (`Title` calls `set_EXE_flag`) and bonus stages.

@@ -1,0 +1,29 @@
+diff --git a/src/SLOWF.c b/src/SLOWF.c
+index 6368343..9e375b6 100644
+--- a/src/SLOWF.c
++++ b/src/SLOWF.c
+@@ -33,7 +33,7 @@ void set_conclusion_slow(void) {
+ 
+ 
+ 
+-void set_EXE_flag(void) {
++void set_EXE_flag_orig(void) {
+     s16 tmw;
+ 
+     if (Game_pause) {
+@@ -52,3 +52,15 @@ void set_EXE_flag(void) {
+     }
+     EXE_flag = Game_timer % (SLOW_flag + 1);
+ }
++
++
++#pragma section CHEAT
++/* Half speed: objects move only every other frame, as in SLOW_flag 1. The KO slow motion, which is
++   slower than that, still plays as before. */
++void set_EXE_flag(void) {
++    set_EXE_flag_orig();
++    if (!Game_pause && SLOW_flag == 0) {
++        EXE_flag = Game_timer % 2;
++    }
++}
++#pragma section

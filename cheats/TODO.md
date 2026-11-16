@@ -50,7 +50,7 @@ Allow players and/or the CPU to use these:
 The fight frame runs objects only when `EXE_flag = Game_timer % (SLOW_flag + 1)` is 0 (the KO slow
 motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
-- [ ] The game runs at half speed (Tetris, SMB3, Metroid, ALTTP, Super Metroid and OoT): keep
+- [x] The game runs at half speed (Tetris, SMB3, Metroid, ALTTP, Super Metroid and OoT): keep
       `SLOW_flag` at 1
 - [ ] Time moves only while any controller input is held
 - [ ] Freeze the opponent while a button is held (OoT "Freeze time for enemies by holding L")
@@ -133,3 +133,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The Super Art gauge is always full
 - [ ] Every hit stuns at once
 - [ ] Stun never builds up
+- [ ] The game runs at half speed
