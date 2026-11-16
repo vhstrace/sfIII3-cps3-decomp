@@ -153,6 +153,7 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] All music plays 1.5 times as fast
 - [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
+- [ ] Special moves travel twice as far sideways (added 2026-11-16)
 
 ## To test: new cheats from the to-do items
 
