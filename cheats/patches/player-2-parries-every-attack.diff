@@ -1,0 +1,40 @@
+diff --git a/src/HITCHECK.c b/src/HITCHECK.c
+index d05335f..a344c7a 100644
+--- a/src/HITCHECK.c
++++ b/src/HITCHECK.c
+@@ -52,7 +52,7 @@ const s16 * dmdat_adrs[16];  /* 0200EE48 */
+ s16 mkm_wk[32];  /* 0200EE88 */
+ s16 hpq_in;  /* 0200EEC8 */
+ 
+-void hit_check_main_process(void) {
++void hit_check_main_process_orig(void) {
+     aiuchi_flag = 0;
+     if (hpq_in > 1) {
+         if (ca_check_flag) {
+@@ -1750,3 +1750,26 @@ s32 check_ttk_damage_request(s16 pat) {
+     pat -= 32;
+     return ttk_damage_req_tbl[pat];
+ }
++
++
++#pragma section CHEAT
++/* Player 2 parries every attack: during the hit check, player 2's parry inputs (forward, down, the two
++   air parries and the anti-air parry) all look freshly entered. They are put back afterwards. */
++void hit_check_main_process(void) {
++    s16* wf;
++    s16 f3, f4, f5, f6, f12;
++    if (plw[1].cp == 0) {               /* before the first fight sets it up */
++        hit_check_main_process_orig();
++        return;
++    }
++    wf = plw[1].cp->waza_flag;
++    f3 = wf[3]; f4 = wf[4]; f5 = wf[5]; f6 = wf[6]; f12 = wf[12];
++    wf[3] = wf[4] = wf[5] = wf[6] = wf[12] = 10;
++    hit_check_main_process_orig();
++    wf[3] = f3;
++    wf[4] = f4;
++    wf[5] = f5;
++    wf[6] = f6;
++    wf[12] = f12;
++}
++#pragma section

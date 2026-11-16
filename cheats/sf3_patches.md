@@ -185,3 +185,53 @@ timer speed. `sf3_cheat.py` found no moved code or data. `git apply --check` aga
 - The drain stops at 1 point, so it never KOs; the next hit does.
 - Both fighters drain the same, so on time over the one who took less damage still wins.
 - The red "recent damage" part of the bar should follow the drain, as it does for chip damage.
+
+## Player 2 automatically parries every attack
+
+**Source diff:** `patches/player-2-parries-every-attack.diff`
+**BPS:** `sf3_ggpatch/player-2-parries-every-attack/` (simm1.0-.3)
+**Changes:** 178 bytes. 06700000-06700093: the new `hit_check_main_process`. 30 bytes outside: its address in
+10 literal pools (`Game2_1`, `Loop_Demo`, `Game08`, the bonus stages in `end_sub_*.c` and the
+`debug_play*_move` routines).
+**Recorded:** 2026-11-15 20:00:29
+
+**Mechanism:** A parry ("blocking") is decided in the hit check, from the defender's parry command flags.
+`defense_ground` (`src/HITCHECK.c`) parries a high or mid attack when `ds->cp->waza_flag[3]` (forward
+tapped) is set, a low one with `waza_flag[4]` (down tapped), and a jump-in with `waza_flag[12]`;
+`defense_sky` uses `waza_flag[5]` and `[6]` for air parries. For example:
+
+```c
+} else if (ds->cp->waza_flag[3] != 0) {
+    blocking_point_count_up(ds);
+    as->wu.hf.hit.player = 64;
+```
+
+This is a hook on `hit_check_main_process`, which runs the whole hit check at the end of each frame. The
+new one sets player 2's five parry flags to 10 (at least the 9 that `blocking_term_tbl` needs for a parry
+just after a guard), runs the original, and puts the old values back, so the command code never sees the
+change:
+
+```c
+wf[3] = wf[4] = wf[5] = wf[6] = wf[12] = 10;
+hit_check_main_process_orig();
+wf[3] = f3; ...
+```
+
+It skips this while `plw[1].cp` is still 0 (before `cmd_init` first runs).
+
+**Evidence:** `waza_flag[3..6, 12]` are only read in `src/HITCHECK.c` and `src/cmd_main_2.c` (where the
+command code keeps only the newest parry flag). Projectiles hitting a fighter are judged in the same pass.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Player 2 still can't parry where the game forbids it: while dizzy (`py->flag`), in moves that set the
+  `spmv_ng_flag` parry bits, when `guard_flag & 2`, or against attacks without parry bits in
+  `att.guard` (throws, most supers' later hits are still parryable as usual).
+- Throws: `check_blocking_flag` also reads `waza_flag[3]` and `[4]`, so player 2 counts as "parrying"
+  when a throw lands and can't tech it (`hazusenai_flag`).
+- Player 2 gets the parry score, Super Art gauge and grade points for every parry.
+- Works for player 2 whether human or CPU, including the attract-mode demo.

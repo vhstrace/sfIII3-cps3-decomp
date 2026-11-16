@@ -35,7 +35,7 @@ Allow players and/or the CPU to use these:
       never hurt the Player"): hook the damage routines, check which side `ds` is
 - [x] Health drains slowly during a round (OoT "Link loses a quarter heart every 20 seconds", the
       Metroid, Zelda 1 and ALTTP drains): the fight frame in `src/Game_Main.c`, health in `src/VITAL.c`
-- [ ] Player 2 automatically parries every attack
+- [x] Player 2 automatically parries every attack
 
 ## Gauges
 
@@ -129,3 +129,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Projectiles do double damage
 - [ ] Player 1 never takes damage
 - [ ] Health drains slowly during a round
+- [ ] Player 2 automatically parries every attack
