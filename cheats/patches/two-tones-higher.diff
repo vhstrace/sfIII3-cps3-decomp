@@ -1,0 +1,33 @@
+diff --git a/src/sound_voice_2.c b/src/sound_voice_2.c
+index c442f43..1fd9b30 100644
+--- a/src/sound_voice_2.c
++++ b/src/sound_voice_2.c
+@@ -123,7 +123,7 @@ u16 sound_voice_volume_compute(u16 level, u32 pan_scale, s8 vol_offset, SNDVOICE
+     } while (0)
+ 
+ /* provisional name */
+-void voice_process_secondary(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {
++void voice_process_secondary_orig(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {
+     u8 owns_hardware_voice = 1;
+     SNDREGS* regs;
+     s32 next;
+@@ -450,3 +450,19 @@ void sound_reg_write_verify(s16 *reg, u16 value) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* Music and sound effects play 2 whole tones higher: 4 semitones (256 each, 3072 an octave) are added to
++   the voice's pitches while it writes the pitch register, then taken off again. Everything the
++   original does with them is relative, so the notes and slides are unchanged otherwise. */
++void voice_process_secondary(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {
++    voice->current_pitch += 1024;
++    voice->target_pitch += 1024;
++    voice->decoded_pitch += 1024;
++    voice_process_secondary_orig(voice, voice_index, is_bgm);
++    voice->current_pitch -= 1024;
++    voice->target_pitch -= 1024;
++    voice->decoded_pitch -= 1024;
++}
++#pragma section

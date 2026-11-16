@@ -1480,3 +1480,40 @@ main: applies.
 - Not tested.
 - Music in the test mode's sound test is silent too.
 - A short jingle that is a music sequence (not a sound effect) is silent too.
+
+## Music, sound effects and voices play 2 whole tones higher
+
+**Source diff:** `patches/two-tones-higher.diff`
+**BPS:** `sf3_ggpatch/two-tones-higher/` (simm1.0-.3)
+**Changes:** 67 bytes. The new `voice_process_secondary` at 06700000. 0613A6A5: its address in the
+literal pool of `sound_driver_tick`.
+**Recorded:** 2026-11-15 20:34:47
+
+**Mechanism:** The 3rd Strike version of the FF2, ALTTP and SMW "2 whole tones higher" cheats. At the end
+of `voice_process_secondary` (`src/sound_voice_2.c`), each voice's pitch register is set from its
+pitch (3072 units an octave, 256 a semitone):
+
+```c
+*(u16*)&regs->pitch = (u16)sound_note_to_pitch(
+    (s16)((u32)voice->pitch_lfo >> 16) + voice->current_pitch + ...
+```
+
+`sound_note_to_pitch` is only called from this file, so hooking it would move code. Instead this is a
+hook on `voice_process_secondary`: the new one adds 1024 (4 semitones) to `current_pitch`,
+`target_pitch` and `decoded_pitch`, runs the original, then takes the 1024 off again. Inside the
+original these three are only copied to each other, compared, or moved by a slide step, so the offset
+changes nothing but the pitch written.
+
+**Evidence:** `voice_process_secondary` is only called from `sound_driver_tick` (`src/textsound_2.c`),
+for the 16 music voices and the 16 effect voices. Field types (all `s32`) from `include/structs.h`.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The CPS3 plays samples, so higher pitch also means faster: voices and effects are shorter and sound
+  like chipmunks.
+- The pitch register is 16 bits. A note already near the top may wrap around and play very low.
+- The test mode's sound test is changed too.
