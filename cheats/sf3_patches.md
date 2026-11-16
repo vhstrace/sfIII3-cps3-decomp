@@ -1972,7 +1972,7 @@ first jump rows: LK `{ 76, 74, 0 }` (row 76: Hien LK's own hop), MK `{ 124, 77, 
 then 125: a small hop, then a longer one). All in place; the routines themselves are not changed.
 
 **Evidence:** cue lists of all of Ibuki's `saca` scripts (from `data/ibuki_char.c`): only 20, 21,
-30, 40, 64, 88 and 255. `saca` slots 74 and 75 (scripts that only return) and 77 and 78 (copies of 76)
+30, 31, 40, 64, 88 and 255. `saca` slots 74 and 75 (scripts that only return) and 77 and 78 (copies of 76)
 are not started by any table, script (`CM_JSR`/`CM_JMP`/`CM_RJA` with 5, 74-78) or code.
 `jumping_union_process` (`src/PLS01.c`) lands by setting `routine_no[3]` and starting the
 `CM_RJA` animation (`char_move_cmja`). `exca_038` ends with cue 255, which is how Hien's own landing
