@@ -737,3 +737,39 @@ or data. `git apply --check` against main: applies.
 - Jumps may go above the top of the screen.
 - Can't be built together with "Fighters walk twice as fast" (both diffs add to the end of
   `src/PLNORMAL.c`).
+
+## Fighters face away from each other
+
+**Source diff:** `patches/fighters-face-away.diff`
+**BPS:** `sf3_ggpatch/fighters-face-away/` (simm1.0-.3)
+**Changes:** 47 bytes. 06700000-0670002B: the new `set_rl_waza`. 0611788D, 06118FE1: its address in the
+literal pools of `move_player_work` and `move_player_work_bonus`.
+**Recorded:** 2026-11-15 20:13:35
+
+**Mechanism:** The 3rd Strike version of the "Enemies face away" cheats (SMB2, SMB3, ALTTP, SMW, OoT).
+Each frame `set_rl_waza` (`src/PLS01.c`) works out which way each fighter should face (`rl_waza`), from
+where the opponent is:
+
+```c
+dx = wk->wu.xyz[0].disp.pos - em->wu.xyz[0].disp.pos;
+if (dx > 0) wk->wu.rl_waza = 0; else wk->wu.rl_waza = 1;
+```
+
+When `rl_waza` differs from the facing flag `rl_flag`, the fighter turns round (`check_rl_flag`,
+`check_hurimuki`). This is a hook: the new `set_rl_waza` runs the original, then flips `rl_waza`
+(`^= 1`), so each fighter turns to face away from the other.
+
+**Evidence:** `set_rl_waza` is only called from `src/PLCNT2.c` and `src/plcntset_2.c`, for both
+fighters each frame. Not in bonus stages (`Bonus_Game_Flag`), where it also handles the car.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- "Forward" is away from the opponent, so walking, dashing, blocking and motion inputs are mirrored.
+  Projectiles fly away from the opponent. Back-facing attacks and crossed-up jumps can still hit.
+- Both fighters, player or CPU. The CPU may play badly.
+- Moves that set the facing themselves (some throws, intros and win poses) may face the usual way for
+  a moment.

@@ -71,7 +71,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Jump again in mid-air (Metroid, SMB2, SMB3 and Super Metroid "Jump again in mid-air")
 - [x] Low gravity: higher, floaty jumps (SMB3 "Low gravity", Super Metroid "Samus jumps much higher",
       SMW "Everything that leaves the ground keeps rising")
-- [ ] Fighters face away from each other (SMB2, SMB3, ALTTP, SMW and OoT "Enemies face away", OoT
+- [x] Fighters face away from each other (SMB2, SMB3, ALTTP, SMW and OoT "Enemies face away", OoT
       "Link always faces away from the way he walks"): the facing flag `rl_flag`
 - [ ] Fighters walk through each other (EarthBound "Ness walks through people", ALTTP "Enemies pass
       through Link"): the push boxes
@@ -144,3 +144,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Fighters walk twice as fast
 - [ ] Jump again in mid-air
 - [ ] Low gravity: jumps go twice as high
+- [ ] Fighters face away from each other

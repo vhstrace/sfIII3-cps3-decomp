@@ -1,0 +1,28 @@
+diff --git a/src/PLS01.c b/src/PLS01.c
+index 2ef81e4..49aad17 100644
+--- a/src/PLS01.c
++++ b/src/PLS01.c
+@@ -90,7 +90,7 @@ s32 check_rl_flag(WORK* wk) {
+ 
+ 
+ 
+-void set_rl_waza(PLW* wk) {
++void set_rl_waza_orig(PLW* wk) {
+     s16 lever;
+     s16 dx;
+     WORK_Other* em;
+@@ -788,3 +788,14 @@ s32 check_ashimoto_ex(PLW* wk) {
+     wk->wu.routine_no[3] = RN3_START;
+     return 1;
+ }
++
++
++#pragma section CHEAT
++/* Fighters face away from each other: the way a fighter should face (rl_waza) is turned round. */
++void set_rl_waza(PLW* wk) {
++    set_rl_waza_orig(wk);
++    if (Bonus_Game_Flag == 0) {
++        wk->wu.rl_waza ^= 1;
++    }
++}
++#pragma section
