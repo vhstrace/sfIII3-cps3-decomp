@@ -100,15 +100,16 @@ or data. `git apply --check` against main: applies.
 
 **Source diff:** `patches/player-1-never-takes-damage.diff`
 **BPS:** `sf3_ggpatch/player-1-never-takes-damage/` (simm1.0-.3)
-**Changes:** 58 bytes. 06700000-06700037: the new `Player_damage` and `subtract_dm_vital_aiuchi`.
-065EAF89: the `Player_damage` entry of the `routine_no[1]` jump table (`data/PLMAIN_tbl.c`).
-06116F05, 06118CF1: the address of `subtract_dm_vital_aiuchi` in the literal pools of `plcnt_move` and
-`plcnt_b_move` (3 bytes each).
+**Changes:** 92 bytes. 06700000-0670005B: the new `setup_catch_atthit`, `Player_damage` and
+`subtract_dm_vital_aiuchi`. 065EAF89: the `Player_damage` entry of the `routine_no[1]` jump table
+(`data/PLMAIN_tbl.c`). 06125A01: the address of `setup_catch_atthit` in the literal pool of
+`catch_cg_type_check`. 06116F05, 06118CF1: the address of `subtract_dm_vital_aiuchi` in the literal pools
+of `plcnt_move` and `plcnt_b_move` (3 bytes each).
 **Recorded:** 2026-11-15 19:58:07
 
 **Mechanism:** The EarthBound "Enemies never hurt the party" and SMB3 "Enemies and spikes never hurt the
-Player" idea. Health only goes down in `subtract_dm_vital` and `subtract_dm_vital_aiuchi`
-(`src/PLPDM.c`):
+Player" idea. Health only goes down in `subtract_dm_vital`, `subtract_dm_vital_aiuchi` (`src/PLPDM.c`)
+and `subtract_cu_vital` (`src/PLPCA.c`, throws):
 
 ```c
 wk->wu.vital_new -= wk->wu.dm_vital;
@@ -128,9 +129,12 @@ Player_damage_orig(wk);
 ```
 
 `subtract_dm_vital_aiuchi` (trades, where both fighters hit each other on the same frame, called from
-`src/PLCNT2.c` and `src/plcntset_2.c`) gets the same check.
+`src/PLCNT2.c` and `src/plcntset_2.c`) gets the same check. Throw damage is worked out by
+`setup_catch_atthit` (`src/HITCHECK.c`, called only from `catch_cg_type_check` in `src/PLPCA.c`) and taken
+off later by `subtract_cu_vital`, which has short calls from its own file; so `setup_catch_atthit` is
+hooked instead, and sets `dm_vital = 0` after the original when the one thrown is player 1.
 
-**Evidence:** `grep` finds `vital_new -=` for fighters only in these two functions. `Player_damage` runs
+**Evidence:** `grep` finds `vital_new -=` for fighters only in these three functions. `Player_damage` runs
 for hits and for blocked hits (chip damage). `get_damage_reaction_data` already sets `dm_vital = 0` for
 `atemi_flag == 2`. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
 applies.
@@ -143,7 +147,6 @@ applies.
 - Player 1 still reacts to hits (hit stun, knockdown) and the stun gauge still fills, so player 1 can
   be dizzied. Only the health bar stays full.
 - Player 2 gets no score for hitting player 1, since `Additinal_Score_DM` only runs when `dm_vital` is not 0.
-- Throw damage was not traced separately; if a throw takes health some other way, it still does.
 - Player 2 takes damage as normal.
 
 ## Health drains slowly during a round

@@ -1,3 +1,31 @@
+diff --git a/src/HITCHECK.c b/src/HITCHECK.c
+index d05335f..fdc64c0 100644
+--- a/src/HITCHECK.c
++++ b/src/HITCHECK.c
+@@ -305,7 +305,7 @@ s32 check_blocking_flag(PLW* as, PLW* ds) {
+ 
+ 
+ 
+-void setup_catch_atthit(WORK* as, WORK* ds) {
++void setup_catch_atthit_orig(WORK* as, WORK* ds) {
+     set_damage_and_piyo((PLW*)as, (PLW*)ds);
+     dm_status_copy(as, ds);
+     as->hit_stop = ds->dm_stop = 0;
+@@ -1750,3 +1750,14 @@ s32 check_ttk_damage_request(s16 pat) {
+     pat -= 32;
+     return ttk_damage_req_tbl[pat];
+ }
++
++
++#pragma section CHEAT
++/* Throw damage (applied later by subtract_cu_vital): none for player 1. */
++void setup_catch_atthit(WORK* as, WORK* ds) {
++    setup_catch_atthit_orig(as, ds);
++    if (ds->id == 0) {
++        ds->dm_vital = 0;
++    }
++}
++#pragma section
 diff --git a/src/PLPDM.c b/src/PLPDM.c
 index 8766c29..1cfaa21 100644
 --- a/src/PLPDM.c
