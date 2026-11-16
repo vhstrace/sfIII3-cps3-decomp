@@ -657,6 +657,7 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 - Characters whose walk is not states 3 and 4 (if any) are not changed.
 - Can't be built together with "Low gravity: jumps go twice as high" (both diffs add to the end of
   `src/PLNORMAL.c`).
+- Can't be built together with "The CPU opponent walks twice as fast" (same file end in `src/PLNORMAL.c`).
 
 ## Jump again in mid-air
 
@@ -741,6 +742,7 @@ or data. `git apply --check` against main: applies.
 - Jumps may go above the top of the screen.
 - Can't be built together with "Fighters walk twice as fast" (both diffs add to the end of
   `src/PLNORMAL.c`).
+- Can't be built together with "The CPU opponent walks twice as fast" (same file end in `src/PLNORMAL.c`).
 
 ## Fighters face away from each other
 
