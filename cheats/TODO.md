@@ -87,7 +87,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Projectiles fly twice as fast (SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast")
 - [x] Projectiles crawl or stand still (ALTTP "Sword beams fly at quarter speed" and "stay where they
       appear", Zelda 1 "Sword beams and Magical Rod shots crawl")
-- [ ] Projectiles pass through each other (SMB1, SMB3, SMW and ALTTP "fly through enemies"):
+- [x] Projectiles pass through each other (SMB1, SMB3, SMW and ALTTP "fly through enemies"):
       `effect_at_vs_effect_dm` (`src/HITEFEF.c`)
 - [ ] no position change from hits
 - [ ] no recoil from hits
@@ -152,3 +152,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Every throw grabs the opponent no matter where they are
 - [ ] Projectiles fly twice as fast
 - [ ] Projectiles stay where they appear
+- [ ] Projectiles pass through each other

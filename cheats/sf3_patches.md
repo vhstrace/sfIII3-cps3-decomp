@@ -1066,3 +1066,42 @@ applies.
 - All kinds of shell, including ones that work differently (Oro's tengu stones, falling shells); those
   stay where they are made too, which may look odd.
 - Can't be built together with "Projectiles fly twice as fast" (both hook `effect_13_move`).
+
+## Projectiles pass through each other
+
+**Source diff:** `patches/projectiles-pass-through-each-other.diff`
+**BPS:** `sf3_ggpatch/projectiles-pass-through-each-other/` (simm1.0-.3)
+**Changes:** 70 bytes. 06700000-06700047: the new `effect_at_vs_effect_dm`. 0608D019: its address in the
+literal pool after `cal_hit_mark_pos` (used by `set_struck_status`).
+**Recorded:** 2026-11-15 20:22:17
+
+**Mechanism:** The 3rd Strike version of the SMB1, SMB3, SMW and ALTTP "fly through enemies" cheats.
+When `attack_hit_check` finds one effect's attack box on another effect, `set_struck_status`
+(`src/HITCHECK.c`) calls `effect_at_vs_effect_dm` (`src/HITEFEF.c`). For two projectiles it trades
+their power, so both usually vanish:
+
+```c
+} else if (ds->wu.id == 13) {
+    switch (as->wu.work_id) {
+    case 4:
+        ds->wu.dm_vital = as->wu.vital_new;
+        as->wu.dm_vital = ds->wu.vital_new;
+```
+
+and then sets the hit state (`routine_no[1] = 1`, hit stop 6). This is a hook: when both works are
+projectiles (effect id 13), the new `effect_at_vs_effect_dm` does none of that and sets the attacking
+shell's `att_hit_ok` back to 1 (`attack_hit_check` cleared it), so it can still hit the opponent.
+Otherwise it runs the original.
+
+**Evidence:** `effect_at_vs_effect_dm` is only called from `set_struck_status`. `effect_13_init` sets
+`wu.id = 13` (`src/EFF13.c`). `sf3_cheat.py` found no moved code or data. `git apply --check` against
+main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- In the frame the two meet, the hit check has already used up that frame's hit for both shells, so
+  a shell that is touching the opponent and the other shell at once hits the opponent one frame late.
+- Other effects that can hit projectiles (not effect 13) still stop them.
