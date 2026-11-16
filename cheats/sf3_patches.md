@@ -745,6 +745,8 @@ or data. `git apply --check` against main: applies.
 pools of `move_player_work` and `move_player_work_bonus`. 0611D0C0-0611D0C5: `check_hurimuki` (in place).
 **Recorded:** 2026-11-15 20:13:35
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the "Enemies face away" cheats (SMB2, SMB3, ALTTP, SMW, OoT).
 Each frame `set_rl_waza` (`src/PLS01.c`) works out which way each fighter should face (`rl_waza`), from
 where the opponent is:
@@ -783,7 +785,7 @@ fighters each frame. In the car stage (`BONUS_CAR`) it uses the lever, so the fl
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - "Forward" is away from the opponent, so walking, dashing, blocking and motion inputs are mirrored.
   Projectiles fly away from the opponent. Back-facing attacks and crossed-up jumps can still hit.
 - Both fighters, player or CPU. The CPU may play badly.
