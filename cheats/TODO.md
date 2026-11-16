@@ -66,7 +66,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 ## Movement
 
-- [ ] Fighters walk twice as fast (Ness, Link, Cecil, SM64 Mario "runs twice as fast", SMB2 walk and
+- [x] Fighters walk twice as fast (Ness, Link, Cecil, SM64 Mario "runs twice as fast", SMB2 walk and
       run faster): the walk states (`check_F_R_walk`, `src/PLS01.c`)
 - [ ] Jump again in mid-air (Metroid, SMB2, SMB3 and Super Metroid "Jump again in mid-air")
 - [ ] Low gravity: higher, floaty jumps (SMB3 "Low gravity", Super Metroid "Samus jumps much higher",
@@ -141,3 +141,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Every hit plays the KO slow motion
 - [ ] The round timer never runs out
 - [ ] Hold Start to pause, press a button to step one frame
+- [ ] Fighters walk twice as fast

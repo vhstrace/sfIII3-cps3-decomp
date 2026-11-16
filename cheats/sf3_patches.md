@@ -615,3 +615,39 @@ applies.
 - A step also runs a frame that the KO slow motion would have skipped.
 - Off in attract mode (`Demo_Flag` is 0).
 - The screen still updates while paused (the camera and stage animation may still move).
+
+## Fighters walk twice as fast
+
+**Source diff:** `patches/fighters-walk-twice-as-fast.diff`
+**BPS:** `sf3_ggpatch/fighters-walk-twice-as-fast/` (simm1.0-.3)
+**Changes:** 112 bytes. 06700000-0670006B: the new `Normal_03000` and `Normal_04000`. 065EBB41, 065EBB45:
+their entries in the `routine_no[2]` jump table `plpnm_lv_00` (`data/PLPNM_tbl.c`).
+**Recorded:** 2026-11-15 20:10:39
+
+**Mechanism:** The 3rd Strike version of the "runs twice as fast" cheats (Ness, Link, Cecil, SM64 Mario,
+SMB2). `check_F_R_walk` (`src/PLS01.c`) starts a walk with `routine_no[2]` 3 (forward) or 4 (back).
+Those states, `Normal_03000` and `Normal_04000` (`src/PLNORMAL.c`), move the fighter by the walk
+speed from the character's move data each frame:
+
+```c
+case N03_MOVE:
+    cal_mvxy_speed(&wk->wu);
+    add_mvxy_speed(&wk->wu);
+    char_move(&wk->wu);
+```
+
+These are hooks: the new ones run the original, then, if the fighter is still walking, call
+`add_mvxy_speed` (`src/PLS02.c`) once more, which adds the same speed to the position again.
+
+**Evidence:** both states are reached only through `plpnm_lv_00`. `add_mvxy_speed` adds `mvxy.a[0].sp`
+to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to the height.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The walk animation plays at its normal rate, so fighters slide a little.
+- Both fighters, player or CPU. Dashes, jumps and the steps of moves are not changed.
+- Characters whose walk is not states 3 and 4 (if any) are not changed.
