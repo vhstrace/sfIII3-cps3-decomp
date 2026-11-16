@@ -142,6 +142,6 @@ applies.
 - Not tested.
 - Player 1 still reacts to hits (hit stun, knockdown) and the stun gauge still fills, so player 1 can
   be dizzied. Only the health bar stays full.
-- Player 1 gets no score from damage taken, since that only happens when `dm_vital` is not 0.
+- Player 2 gets no score for hitting player 1, since `Additinal_Score_DM` only runs when `dm_vital` is not 0.
 - Throw damage was not traced separately; if a throw takes health some other way, it still does.
 - Player 2 takes damage as normal.
