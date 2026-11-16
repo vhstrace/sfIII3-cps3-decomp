@@ -1929,12 +1929,12 @@ check (`set_field_hosei_flag`) and the push between fighters still run on the po
   changed.
 - Can't be built together with "The floor is a conveyor belt", which hooks `Player_move` too.
 
-## Ibuki's light and medium Hien do her two unused jumps (bound jump and hop jump)
+## Ibuki's light Hien does her unused hop jump and medium Hien her bound jump
 
 **Source diff:** `patches/ibuki-bound-and-hop-jumps.diff`
 **BPS:** `sf3_ggpatch/ibuki-bound-and-hop-jumps/` (simm1.0-.3)
-**Changes:** 715 bytes. 06700000-06700927: the four new animation scripts (`cheat_bound_jump`,
-`cheat_bound_land`, `cheat_hop_jump`, `cheat_hop_land`). 21 bytes outside: `p7_cmd_30` (Hien's
+**Changes:** 716 bytes. 06700000-06700927: the four new animation scripts (`cheat_bound_jump`,
+`cheat_bound_land`, `cheat_hop_jump`, `cheat_hop_land`). 22 bytes outside: `p7_cmd_30` (Hien's
 routine numbers for LK and MK), `ibuki_saca` entries 74, 75, 77 and 78, `pl07_exatt_table` entries
 11 and 12, and Ibuki's Hien row in `asstbl_sa_ground`.
 **Recorded:** 2026-11-15 22:16:59
@@ -1978,10 +1978,10 @@ of Hien's header. A `CM_RJA` at the start of each script picks the next landing 
   exca 38.
 
 The routines go into the empty slots 11 and 12 of `pl07_exatt_table` (routines 27 and 28, were
-`Att_DUMMY`). Hien's command (`p7_cmd_30`, 421+K) now starts routine 27 with LK and 28 with MK
+`Att_DUMMY`). Hien's command (`p7_cmd_30`, 421+K) now starts routine 28 with LK and 27 with MK
 (HK and EX are unchanged). Its rows in `asstbl_sa_ground` give them the new animations and their
-first jump rows: LK `{ 76, 74, 0 }` (row 76: Hien LK's own hop), MK `{ 124, 77, 0 }` (rows 124
-then 125: a small hop, then a longer one). All in place; the routines themselves are not changed.
+first jump rows: LK `{ 124, 77, 0 }` (rows 124
+then 125: a small hop, then a longer one), MK `{ 76, 74, 0 }` (row 76: Hien LK's own hop). All in place; the routines themselves are not changed.
 
 **Evidence:** cue lists of all of Ibuki's `saca` scripts (from `data/ibuki_char.c`): only 20, 21,
 30, 31, 40, 64, 88 and 255. `saca` slots 74 and 75 (scripts that only return) and 77 and 78 (copies of 76)
@@ -1996,7 +1996,7 @@ frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 
 
 **Caveats:**
 
-- Tested by the user in MAME (2026-11-15): works.
+- Not tested since the buttons were swapped (2026-11-15): first LK was the bound jump and MK the hop jump, and that version worked.
 - Light and medium Hien are gone; HK and EX Hien still work. The CPU's Ibuki gets the new moves too
   when it picks light or medium Hien.
 - Neither jump attacks: no attack boxes, as the routines have no attack step. Hurt boxes are the ones

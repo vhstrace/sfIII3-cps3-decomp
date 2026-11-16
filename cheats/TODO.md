@@ -23,7 +23,7 @@ Allow players and/or the CPU to use these:
 - [x] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
   - [x] Att_PL10_MACH_SLIDE: "Yang's Kaihou uses its old, unused version".
   - [x] Att_RESURRECTION2: "Urien's SA II refills his health (his unused resurrection)".
-  - [x] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): "Ibuki's light and medium Hien do her two
+  - [x] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): "Ibuki's light Hien does the hop jump and medium Hien the bound jump, her two
         unused jumps". None of her animations has cues 1, 8 and 10, so the cheat adds new animation
         scripts made from her jump and landing frames.
 - [x] Normal_air_paring, a separate air-parry state.

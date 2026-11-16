@@ -30,7 +30,7 @@ index a994ea3..7e91b01 100644
          { { { 43, 24, 47 }, 1 }, { { 44, 25, 48 }, 1 }, { { 45, 26, 49 }, 1 }, { { 46, 27, 50 }, 1 } },
          { { { 105, 32, 0 }, 1 }, { { 107, 33, 0 }, 1 }, { { 109, 34, 0 }, 1 }, { { 109, 34, 0 }, 1 } },
 -        { { { 76, 28, 0 }, 1 }, { { 79, 29, 0 }, 1 }, { { 82, 30, 0 }, 1 }, { { 2, 31, 118 }, 1 } },
-+        { { { 76, 74, 0 }, 1 }, { { 124, 77, 0 }, 1 }, { { 82, 30, 0 }, 1 }, { { 2, 31, 118 }, 1 } },  /* cheat: was 76, 28 and 79, 29 */
++        { { { 124, 77, 0 }, 1 }, { { 76, 74, 0 }, 1 }, { { 82, 30, 0 }, 1 }, { { 2, 31, 118 }, 1 } },  /* cheat: was 76, 28 and 79, 29 */
          { { { 128, 107, 0 }, 1 }, { { 129, 108, 0 }, 1 }, { { 130, 109, 0 }, 1 }, { { 131, 110, 0 }, 1 } },
          { { { 67, 40, 85 }, 1 }, { { 70, 41, 86 }, 1 }, { { 73, 42, 87 }, 1 }, { { 121, 102, 87 }, 1 } },
          { { { 51, 36, 52 }, 1 }, { { 54, 37, 55 }, 1 }, { { 57, 38, 58 }, 1 }, { { 60, 39, 61 }, 1 } },
@@ -43,7 +43,7 @@ index 48422fa..a5c6c7a 100644
  };
  const s16 p7_cmd_30[25] = {  /* Ibuki: Hien, 421+K */
 -    CMD_RESET, CMD_LV_UP, 0, CMD_WAZA_EX(IBUKI_HIEN, IBUKI_HIEN_EX), CMD_BT_CHG | CMD_BT_EX, CMD_EX_KICKS,
-+    CMD_RESET, CMD_LV_UP, 0, 27, 28, IBUKI_HIEN, IBUKI_HIEN_EX, CMD_BT_CHG | CMD_BT_EX, CMD_EX_KICKS,  /* cheat: LK bound jump, MK hop jump */
++    CMD_RESET, CMD_LV_UP, 0, 28, 27, IBUKI_HIEN, IBUKI_HIEN_EX, CMD_BT_CHG | CMD_BT_EX, CMD_EX_KICKS,  /* cheat: LK hop jump, MK bound jump */
      CMD_LEVER(0, CMD_LV_BACK),
      CMD_LEVER(10, CMD_LV_DOWN),
      CMD_LEVER(10, CMD_LV_DOWN | CMD_LV_BACK),
