@@ -773,3 +773,41 @@ fighters each frame. Not in bonus stages (`Bonus_Game_Flag`), where it also hand
 - Both fighters, player or CPU. The CPU may play badly.
 - Moves that set the facing themselves (some throws, intros and win poses) may face the usual way for
   a moment.
+
+## Fighters walk through each other
+
+**Source diff:** `patches/fighters-walk-through-each-other.diff`
+**BPS:** `sf3_ggpatch/fighters-walk-through-each-other/` (simm1.0-.3)
+**Changes:** 26 bytes. 06700000-06700017: the new `check_body_touch`. 0611684D, 06118939: its address in
+the literal pools of `Player_control` and `Player_control_bonus`.
+**Recorded:** 2026-11-15 20:14:16
+
+**Mechanism:** The 3rd Strike version of EarthBound "Ness walks through people" and ALTTP "Enemies pass
+through Link". Each fight frame `check_body_touch` (`src/PLS02.c`) checks whether the two fighters'
+push boxes (`h_hos->hos_box[0]`) overlap, and if so moves them apart:
+
+```c
+meri = hit_check_subroutine(&p1w->wu, &p2w->wu, &p1w->wu.h_hos->hos_box[0], &p2w->wu.h_hos->hos_box[0]);
+...
+p1w->wu.xyz[0].disp.pos += meri * (p1w->micchaku_flag != 1);
+p2w->wu.xyz[0].disp.pos -= meri * (p2w->micchaku_flag != 2);
+```
+
+This is a hook that replaces it: the new `check_body_touch` only does what the original does when the
+boxes don't overlap (`hos_em_flag = 0` for both), so the fighters are never pushed apart.
+
+**Evidence:** `check_body_touch` is only called from `Player_control` (`src/plcntset_2.c`) and
+`Player_control_bonus` (`src/PLCNT2.c`). The bonus stage with the car uses `check_body_touch2`,
+which is not changed. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Fighters can stand in the same place and walk past each other; they then turn round as after a jump
+  over.
+- Hits still push the fighters apart (`check_damage_hosei`, not changed).
+- A fighter in the corner can't be pushed out by the other's body, and the other can walk into the
+  corner past them.

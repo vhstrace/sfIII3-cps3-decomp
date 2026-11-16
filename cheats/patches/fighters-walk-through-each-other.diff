@@ -1,0 +1,27 @@
+diff --git a/src/PLS02.c b/src/PLS02.c
+index 12dfb59..625d3a5 100644
+--- a/src/PLS02.c
++++ b/src/PLS02.c
+@@ -252,7 +252,7 @@ void remake_mvxy_PoGR(WORK* wk) {
+ 
+ 
+ 
+-void check_body_touch(void) {
++void check_body_touch_orig(void) {
+     PLW* p1w = &plw[0];
+     PLW* p2w = &plw[1];
+     s16 meri;
+@@ -592,3 +592,13 @@ s32 cal_attdir(WORK* wk) {
+ s16 cal_attdir_flip(s16 index) {
+     return dir16_rl_conv[index];
+ }
++
++
++#pragma section CHEAT
++/* Fighters walk through each other: the two bodies never push each other apart. This is what the
++   original does when the push boxes don't touch. */
++void check_body_touch(void) {
++    plw[0].hos_em_flag = 0;
++    plw[1].hos_em_flag = 0;
++}
++#pragma section
