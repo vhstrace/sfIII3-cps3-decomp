@@ -1105,3 +1105,35 @@ main: applies.
 - In the frame the two meet, the hit check has already used up that frame's hit for both shells, so
   a shell that is touching the opponent and the other shell at once hits the opponent one frame late.
 - Other effects that can hit projectiles (not effect 13) still stop them.
+
+## No knockback from hits
+
+**Source diff:** `patches/no-knockback-from-hits.diff`
+**BPS:** `sf3_ggpatch/no-knockback-from-hits/` (simm1.0-.3)
+**Changes:** 68 bytes. 06700000-06700043: the new `Player_damage`. 065EAF89: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-15 20:23:17
+
+**Mechanism:** A fighter who is hit or blocks goes to `routine_no[1] = PLAYER_DAMAGE` (`set_struck_status`
+and `set_guard_status` in `src/HITCHECK.c`), and `Player_damage` (`src/PLPDM.c`) runs the reaction,
+whose movement data slides them away from the attacker. This is a hook: the new `Player_damage` saves
+the fighter's sideways position (`xyz[0].cal`), runs the original, and if the fighter was and still is
+on the ground and still in `PLAYER_DAMAGE`, puts the position back. So ground hits and blocks don't
+push the fighter away.
+
+**Evidence:** `Player_damage` is reached only through `plmain_lv_02`. Blocking is also
+`PLAYER_DAMAGE` (`set_guard_status`). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters. Hits that launch still send the fighter flying (in the air the position isn't put
+  back), and they still slide where they land while knocked down only if they are in the air.
+- The attacker still gets pushed back when the opponent is in the corner (see "No recoil from hits").
+- Without knockback, combos and blockstrings stay at close range, so some moves combo that normally
+  don't, and the opponent can't be pushed out of range.
+- Can't be built together with the other cheats that hook `Player_damage` ("Player 1 never takes
+  damage", "Every hit stuns at once", "Stun never builds up", "Every hit plays the KO slow motion").

@@ -89,7 +89,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       appear", Zelda 1 "Sword beams and Magical Rod shots crawl")
 - [x] Projectiles pass through each other (SMB1, SMB3, SMW and ALTTP "fly through enemies"):
       `effect_at_vs_effect_dm` (`src/HITEFEF.c`)
-- [ ] no position change from hits
+- [x] no position change from hits
 - [ ] no recoil from hits
 - [ ] Blocking works facing either way (Zelda 1 and ALTTP "Shield blocks shots from any direction"):
       `Check_Guard_Type` and the guard checks
@@ -153,3 +153,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Projectiles fly twice as fast
 - [ ] Projectiles stay where they appear
 - [ ] Projectiles pass through each other
+- [ ] No knockback from hits

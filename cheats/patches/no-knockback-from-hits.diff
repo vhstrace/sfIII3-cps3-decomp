@@ -1,0 +1,32 @@
+diff --git a/src/PLPDM.c b/src/PLPDM.c
+index 8766c29..def5a71 100644
+--- a/src/PLPDM.c
++++ b/src/PLPDM.c
+@@ -206,7 +206,7 @@ const s16** kizetsu_timer_table[9] = {
+ 
+ 
+ 
+-void Player_damage(PLW* wk) {
++void Player_damage_orig(PLW* wk) {
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->guard_flag = 3;
+@@ -1520,3 +1520,18 @@ void check_bullet_damage(PLW* wk) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* No knockback from hits: a fighter who is hit or blocks on the ground doesn't slide away. Their
++   sideways position is put back after each frame of the hit or block reaction, while they stay on the
++   ground. */
++void Player_damage(PLW* wk) {
++    s32 x = wk->wu.xyz[0].cal;
++    s32 ground = (wk->wu.xyz[1].disp.pos == 0);
++    Player_damage_orig(wk);
++    if (ground && wk->wu.routine_no[1] == PLAYER_DAMAGE && wk->wu.xyz[1].disp.pos == 0) {
++        wk->wu.xyz[0].cal = x;
++    }
++}
++#pragma section
