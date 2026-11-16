@@ -701,6 +701,8 @@ code or data. `git apply --check` against main: applies.
 (states 18-26) in the `routine_no[2]` jump table `plpnm_lv_00` (`data/PLPNM_tbl.c`).
 **Recorded:** 2026-11-15 20:12:50
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of SMB3 "Low gravity" and Super Metroid "Samus jumps much higher".
 Every jump (states 18-26) starts in `Normal_18000` (`src/PLNORMAL.c`), which reads the jump's speeds
 from the character's move data:
@@ -725,7 +727,7 @@ or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Both fighters. Normal, high and super jumps; not air jumps, wall jumps, jumping specials or being
   knocked into the air.
 - The jump animation may reach its end before landing and hold its last frame.
