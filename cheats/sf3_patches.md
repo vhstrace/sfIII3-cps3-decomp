@@ -1286,3 +1286,34 @@ moved code or data. `git apply --check` against main: applies.
 - Holding back also blocks, so the CPU blocks every high and mid attack (but not lows or throws).
 - Can't be built together with "The CPU opponent stands still" (both hook `CPU_Sub`).
 - The attract-mode demo and the bonus stages play as usual.
+
+## The CPU opponent walks twice as fast
+
+**Source diff:** `patches/cpu-walks-twice-as-fast.diff`
+**BPS:** `sf3_ggpatch/cpu-walks-twice-as-fast/` (simm1.0-.3)
+**Changes:** 144 bytes. The new `Normal_03000` and `Normal_04000` at 06700000. 065EBB41 and 065EBB45: their
+addresses in the jump table `plpnm_lv_00`.
+**Recorded:** 2026-11-15 20:27:34
+
+**Mechanism:** The 3rd Strike version of Metroid "Most enemies move twice as fast" and ALTTP "Soldiers
+chase Link at double speed". It is "Fighters walk twice as fast" for the CPU only: after the original
+walk-forward and walk-back routines (`Normal_03000`, `Normal_04000`, `src/PLNORMAL.c`) move the
+fighter, the hooks call `add_mvxy_speed` once more while the fighter is still walking, but only for a
+CPU fighter (`wu.operator == 0`) in a paid game (`Demo_Flag` set).
+
+**Evidence:** Same hook points as `fighters-walk-twice-as-fast.diff`. `operator` is what
+`Player_move` uses to choose between the player's input and `CPU_Sub`. `sf3_cheat.py` found no
+moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only walking is faster. Dashes, jumps, attacks and the CPU's reactions are the same speed. Making the
+  whole CPU fighter run twice per frame was not done: its AI, command input and animation timers would
+  all run twice against one hit check per frame.
+- The CPU may still walk at a normal pace in places, since the AI picks how long to walk by its own
+  timers and distances.
+- Can't be built together with "Fighters walk twice as fast" or "Low gravity" (same hooks, or the end of
+  the same file).

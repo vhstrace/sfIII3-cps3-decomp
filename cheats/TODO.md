@@ -100,7 +100,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       can't move", SMW "Every Chargin' Chuck stands there and does nothing"): `src/Com_Pl.c`
 - [x] The CPU opponent keeps running away (EarthBound "Enemies on the map always run away from Ness",
       SMB2 "Enemies face and walk away")
-- [ ] The CPU opponent moves twice as fast (Metroid "Most enemies move twice as fast", ALTTP "Soldiers
+- [x] The CPU opponent moves twice as fast (Metroid "Most enemies move twice as fast", ALTTP "Soldiers
       chase Link at double speed")
 
 ## Characters and start-up
@@ -158,3 +158,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Blocking works holding either way
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
+- [ ] The CPU opponent walks twice as fast

@@ -1,0 +1,45 @@
+diff --git a/src/PLNORMAL.c b/src/PLNORMAL.c
+index b5cdd9c..d59ef1e 100644
+--- a/src/PLNORMAL.c
++++ b/src/PLNORMAL.c
+@@ -178,7 +178,7 @@ void Normal_02000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_03000(PLW* wk) {
++void Normal_03000_orig(PLW* wk) {
+     if (wk->the_same_players) {
+         wk->wu.next_z = wk->wu.my_priority - 1;
+     }
+@@ -201,7 +201,7 @@ void Normal_03000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_04000(PLW* wk) {
++void Normal_04000_orig(PLW* wk) {
+     if (wk->the_same_players) {
+         wk->wu.next_z = wk->wu.my_priority + 1;
+     }
+@@ -1214,3 +1214,22 @@ void Normal_58000(PLW* wk) {
+         break;
+     }
+ }
++
++
++#pragma section CHEAT
++/* The CPU opponent walks twice as fast: a CPU fighter (operator 0) walking forward (Normal_03000) or
++   back (Normal_04000) moves by its walk speed a second time each frame. Not in the attract demo. */
++void Normal_03000(PLW* wk) {
++    Normal_03000_orig(wk);
++    if (wk->wu.operator == 0 && Demo_Flag && wk->wu.routine_no[1] == PLAYER_NORMAL && wk->wu.routine_no[2] == 3 && wk->wu.routine_no[3] == N03_MOVE) {
++        add_mvxy_speed(&wk->wu);
++    }
++}
++
++void Normal_04000(PLW* wk) {
++    Normal_04000_orig(wk);
++    if (wk->wu.operator == 0 && Demo_Flag && wk->wu.routine_no[1] == PLAYER_NORMAL && wk->wu.routine_no[2] == 4 && wk->wu.routine_no[3] == N04_MOVE) {
++        add_mvxy_speed(&wk->wu);
++    }
++}
++#pragma section
