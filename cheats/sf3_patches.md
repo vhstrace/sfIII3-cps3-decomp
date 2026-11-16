@@ -898,6 +898,8 @@ literal pools near `move_P1_move_P2` and `check_damage_hosei` (used by the inlin
 and `move_P2_move_P1`).
 **Recorded:** 2026-11-15 20:16:33
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the SMB2, SMB3 and ALTTP "conveyor belt" cheats. Each fight
 frame `move_player_work` (`src/plcntset_2.c`) runs `Player_move` (`src/PLMAIN.c`) for each fighter,
 then keeps them inside the screen:
@@ -923,7 +925,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Always to the right, at 4 pixels a frame (240 pixels a second). That is about as fast as a walk,
   so walking left barely moves or loses ground, and walking right is about twice as fast. Dashing
   or jumping is the way to go left.
