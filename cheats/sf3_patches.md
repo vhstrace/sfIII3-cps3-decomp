@@ -615,6 +615,8 @@ applies.
 their entries in the `routine_no[2]` jump table `plpnm_lv_00` (`data/PLPNM_tbl.c`).
 **Recorded:** 2026-11-15 20:10:39
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the "runs twice as fast" cheats (Ness, Link, Cecil, SM64 Mario,
 SMB2). `check_F_R_walk` (`src/PLS01.c`) starts a walk with `routine_no[2]` 3 (forward) or 4 (back).
 Those states, `Normal_03000` and `Normal_04000` (`src/PLNORMAL.c`), move the fighter by the walk
@@ -638,7 +640,7 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - The walk animation plays at its normal rate, so fighters slide a little.
 - Both fighters, player or CPU. Dashes, jumps and the steps of moves are not changed.
 - Characters whose walk is not states 3 and 4 (if any) are not changed.
