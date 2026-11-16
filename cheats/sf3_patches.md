@@ -803,6 +803,8 @@ fighters each frame. In the car stage (`BONUS_CAR`) it uses the lever, so the fl
 the literal pools of `Player_control` and `Player_control_bonus`.
 **Recorded:** 2026-11-15 20:14:16
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of EarthBound "Ness walks through people" and ALTTP "Enemies pass
 through Link". Each fight frame `check_body_touch` (`src/PLS02.c`) checks whether the two fighters'
 push boxes (`h_hos->hos_box[0]`) overlap, and if so moves them apart:
@@ -826,7 +828,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Fighters can stand in the same place and walk past each other; they then turn round as after a jump
   over.
 - Hits still push the fighters apart (`check_damage_hosei`, not changed).

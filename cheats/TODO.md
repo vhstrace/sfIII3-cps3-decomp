@@ -136,7 +136,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Fighters walk through each other
 - [ ] Slippery floors: fighters slide after walking, dashing and jumping
 - [ ] The floor is a conveyor belt
 - [ ] Every attack hits the opponent no matter where they are
