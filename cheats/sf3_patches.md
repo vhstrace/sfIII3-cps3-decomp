@@ -1044,6 +1044,8 @@ a fighter in hit stun, `tsukamarenai_flag`, and so on). `sf3_cheat.py` found no 
 jump table `effmovejptbl` (`data/EFFECT_tbl.c`).
 **Recorded:** 2026-11-15 20:20:25
 
+Tags: `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast"
 cheats. Projectiles are effect 13 (`src/EFF13.c`, see "Worked example: Ryu throws a fireball" in
 `docs/HOW_THE_GAME_WORKS.md`). Each frame `effect_13_move` runs the shell's own process from
@@ -1072,7 +1074,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Both fighters' projectiles. Kinds 1, 2 (the tengu stones), 4, 10, 11, 13 and 14 are not changed;
   which characters use which kind was not checked.
 - The animation runs at its normal rate. A shell's lifetime is in frames, so slow shells that end by
