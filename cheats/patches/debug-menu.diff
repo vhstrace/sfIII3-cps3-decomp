@@ -1,0 +1,44 @@
+diff --git a/src/Game_Main.c b/src/Game_Main.c
+index 2b73caf..000ff6d 100644
+--- a/src/Game_Main.c
++++ b/src/Game_Main.c
+@@ -159,7 +159,7 @@ void bg0001(void) {
+ 
+ 
+ 
+-void Loop_Demo(void) {
++void Loop_Demo_orig(void) {
+     if (Ck_Coin()) {
+         tilemap_fill_all(0, 32);
+         wipe_pattern_set(0, 7, 0);
+@@ -1464,3 +1464,30 @@ void draw_operator_info(s32 y) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++s32 debug_scene_outer_dispatch(void);
++
++/* The debug menu: in the attract mode, hold P1 Start + LP + LK to run the debug menu left in CMD_MAIN.c
++   (debug_scene_outer_dispatch). Its own exit, P2 LP + MP + HP + LK, goes back to the attract mode.
++   Debug_w (never used by the game) holds 0x5A while the menu runs. */
++void Loop_Demo(void) {
++    if (Debug_w[0] == 0x5A) {
++        if (debug_scene_outer_dispatch()) {
++            Debug_w[0] = 0;
++            G_No0 = G0_DEMO;
++            G_No1 = G1_DEMO_INIT;
++            G_No2 = 0;
++            G_No3 = 0;
++        }
++        return;
++    }
++    if ((p1sw_0 & (BUTTON_START | BUTTON_LP | BUTTON_LK)) == (BUTTON_START | BUTTON_LP | BUTTON_LK)) {
++        Debug_w[0] = 0x5A;
++        Debug_R_No = Debug_Select_No = Debug_Menu_No = 0;
++        return;
++    }
++    Loop_Demo_orig();
++}
++#pragma section

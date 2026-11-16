@@ -1395,3 +1395,51 @@ from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin 
 - The CPS3 BIOS screens before the game starts are not part of this program and still show.
 - The logo screens also cleared the screen and loaded backgrounds. If leftovers from a ranking screen
   show during the next demo fight, this is why.
+
+## Hold Start + LP + LK in the attract mode for the debug menu
+
+**Source diff:** `patches/debug-menu.diff`
+**BPS:** `sf3_ggpatch/debug-menu/` (simm1.0-.3)
+**Changes:** 146 bytes. The new `Loop_Demo` at 06700000. 06194159: its address in the constant copy of
+`Main_Jmp_Tbl` (the nearest symbol is `grade_t_table`).
+**Recorded:** 2026-11-15 20:32:31
+
+**Mechanism:** The game still has the developers' "OBJECT TEST" debug menu (`src/CMD_MAIN.c`): BG
+SELECT, OBJECT LOOK, OBJECT EDIT, OBJECT EDIT 2, HIT, ALL CHARACTER, PARTS, and pages named after staff
+(YOKOYAMA, NAKAI, YOSHIZUMI, YU, RAOH, INE, OHYA). Its top routine `debug_scene_outer_dispatch` is never
+called. It reads the inputs itself, runs the menu (`Debug_R_No`: set-up, graphics, players, the
+menu, then the chosen page), and returns 1 when P2 holds LP + MP + HP + LK:
+
+```c
+if ((dbg_p2sw_0 & (BUTTON_PUNCHES | BUTTON_LK)) == (BUTTON_PUNCHES | BUTTON_LK)) {
+    return 1;
+}
+```
+
+This is a hook on `Loop_Demo` (`src/Game_Main.c`), the attract loop that the game frame task runs
+while no game is on. When P1 holds Start + LP + LK, the new `Loop_Demo` clears the menu's state (as
+`test_menu_init` in `src/test_mode.c` still does) and sets `Debug_w[0]` to 0x5A. While it is 0x5A, it
+runs `debug_scene_outer_dispatch` each frame instead of the attract mode. When that returns 1, it clears
+the flag and restarts the attract loop (`G1_DEMO_INIT`). Otherwise it runs the original.
+
+**Evidence:** `debug_scene_outer_dispatch` is in the ROM (060A4748 in `functions.tsv`), with
+`debug_main_dispatch` and the staff pages (`debug_play07` and on, `src/end_sub_3.c`). The menu's own
+set-up sets `G_No0` to 0, so it must run from `Loop_Demo`, which `bg0001` calls through
+`Main_Jmp_Tbl` while `G_No0` is 0. That is also where the game frame task flips the sprites. `Debug_w`
+(`src/Manage.c`, 02017004) is never read or written by the game. `sf3_cheat.py` found no moved code or
+data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- In the menu, P1 moves the cursor (up and down) and LP picks. The pages use both controllers, and some
+  read the DIP switches.
+- The source has no notes on how each page is used. Some may be unfinished or crash.
+- Leaving with P2 LP + MP + HP + LK restarts the attract loop. If graphics are left over, reset the
+  game.
+- The `DEBUG_DISP`, `DEBUG_EDIT` and `DEBUG_SLOW` code in the source was compiled out of the arcade
+  ROM (they are constant 0s), so it can't be turned on without moving code.
+- A coin (or Start on free play) while holding Start + LP + LK opens the menu instead of starting a game.
+- Can't be built together with other cheats that add to the end of `src/Game_Main.c`.

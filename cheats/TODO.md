@@ -23,7 +23,7 @@ Allow players and/or the CPU to use these:
 - [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
 - [ ] Normal_air_paring, a separate air-parry state.
 - [ ] check_paring_attack and check_lever_up_attack.
-- [ ] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
+- [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
 - [ ] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
 
 ## Damage and health
@@ -109,7 +109,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       party"): `src/sel_pl.c`
 - [x] Skip the logos and the attract mode (EarthBound "Skip the logos and the title screen", Super
       Metroid "New games skip the opening cinematic", Metroid "Skip the start jingle")
-- [ ] Turn on all debug features
+- [x] Turn on all debug features (the `DEBUG_*` switches were compiled out; the leftover debug menu is the cheat)
 
 ## Sound
 
@@ -161,3 +161,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent walks twice as fast
 - [ ] Hold Start when picking a character to play as Gill or Shin Akuma
 - [ ] Skip the logos and the opening movie
+- [ ] Hold Start + LP + LK in the attract mode for the debug menu
