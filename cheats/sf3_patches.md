@@ -694,3 +694,44 @@ code or data. `git apply --check` against main: applies.
   input in the same frame comes first. Up must be pressed again (holding it does nothing).
 - Both fighters, player or CPU (the CPU rarely presses up in the air).
 - There is no jump-start (squat) animation in the air; the jump animation restarts.
+
+## Low gravity: jumps go twice as high
+
+**Source diff:** `patches/low-gravity.diff`
+**BPS:** `sf3_ggpatch/low-gravity/` (simm1.0-.3)
+**Changes:** 76 bytes. 06700000-06700033: the new `Normal_18000`. 065EBB7D-065EBB9D: its 9 entries
+(states 18-26) in the `routine_no[2]` jump table `plpnm_lv_00` (`data/PLPNM_tbl.c`).
+**Recorded:** 2026-11-15 20:12:50
+
+**Mechanism:** The 3rd Strike version of SMB3 "Low gravity" and Super Metroid "Samus jumps much higher".
+Every jump (states 18-26) starts in `Normal_18000` (`src/PLNORMAL.c`), which reads the jump's speeds
+from the character's move data:
+
+```c
+case RN3_START:
+    ...
+    setup_mvxy_data(&wk->wu, jpdat_tbl[wk->wu.routine_no[2] - 18][1]);
+    add_mvxy_speed(&wk->wu);
+```
+
+`mvxy.a[1].sp` is the up speed and `mvxy.d[1].sp` is what `cal_mvxy_speed` (`src/PLS02.c`) adds to it
+each frame (gravity, a negative number). This is a hook: the new `Normal_18000` runs the original, and
+on the jump's first frame halves `mvxy.d[1].sp`. With the same take-off speed and half the gravity, a
+jump goes twice as high and stays in the air twice as long.
+
+**Evidence:** `Normal_18000` is reached only through `plpnm_lv_00`. Landing is found by height
+(`jumping_union_process` in `src/PLS01.c`), not by animation time. `sf3_cheat.py` found no moved code
+or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters. Normal, high and super jumps; not air jumps, wall jumps, jumping specials or being
+  knocked into the air.
+- The jump animation may reach its end before landing and hold its last frame.
+- An attack in the air keeps the low gravity unless the move sets its own speeds.
+- Jumps may go above the top of the screen.
+- Can't be built together with "Fighters walk twice as fast" (both diffs add to the end of
+  `src/PLNORMAL.c`).

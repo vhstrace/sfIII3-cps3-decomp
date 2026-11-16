@@ -1,0 +1,30 @@
+diff --git a/src/PLNORMAL.c b/src/PLNORMAL.c
+index b5cdd9c..d047b27 100644
+--- a/src/PLNORMAL.c
++++ b/src/PLNORMAL.c
+@@ -559,7 +559,7 @@ void Normal_17000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_18000(PLW* wk) {
++void Normal_18000_orig(PLW* wk) {
+     if (wk->the_same_players) {
+         wk->wu.next_z = wk->wu.my_priority + 1;
+     }
+@@ -1214,3 +1214,16 @@ void Normal_58000(PLW* wk) {
+         break;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Low gravity: when a jump starts, its fall speed per frame (gravity) is halved, so jumps go twice as
++   high and last twice as long. */
++void Normal_18000(PLW* wk) {
++    s32 start = (wk->wu.routine_no[3] == RN3_START);
++    Normal_18000_orig(wk);
++    if (start) {
++        wk->wu.mvxy.d[1].sp >>= 1;
++    }
++}
++#pragma section
