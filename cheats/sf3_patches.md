@@ -834,7 +834,6 @@ applies.
 - Hits still push the fighters apart (`check_damage_hosei`, not changed).
 - A fighter in the corner can't be pushed out by the other's body, and the other can walk into the
   corner past them.
-- Can't be built together with "No recoil from hits" (both hook `check_body_touch`).
 
 ## Slippery floors: fighters slide after walking, dashing, jumping and getting hit
 
@@ -1182,7 +1181,7 @@ against main: applies.
 - Tested by the user in MAME (2026-11-16): works.
 - Both fighters. Hits that launch still send the fighter flying (in the air the position isn't put
   back). A knocked-down fighter doesn't slide along the ground.
-- The attacker still gets pushed back when the opponent is in the corner (see "No recoil from hits").
+- The attacker still gets pushed back when the opponent is in the corner.
 - Without knockback, combos and blockstrings stay at close range, so some moves combo that normally
   don't, and the opponent can't be pushed out of range.
 - Can't be built together with the other cheats that hook `Player_damage` ("Player 1 never takes
