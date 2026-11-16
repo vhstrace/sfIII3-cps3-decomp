@@ -2178,6 +2178,8 @@ or data. `git apply --check` against main: applies.
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-16 01:14:56
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** Every special move and super art runs through `Player_attack` (`src/PLPAT.c`), which
 calls the fighter's own move routine (`plxx_extra_attack_table`, `routine_no[2]` 16 and up). The
 routine moves the fighter with `char_move` (animation steps, `cg_add_xy`) and the `mvxy` speeds
@@ -2202,7 +2204,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Moves that don't travel (most fireballs, Shoryuken's mostly upward path) change little. The
   projectiles themselves are not changed (see "Projectiles fly twice as fast").
 - A move's hit boxes don't change, so a fast-moving move may pass the opponent between its active
