@@ -1,0 +1,33 @@
+diff --git a/src/SLOWF.c b/src/SLOWF.c
+index 6368343..9b0b282 100644
+--- a/src/SLOWF.c
++++ b/src/SLOWF.c
+@@ -33,7 +33,7 @@ void set_conclusion_slow(void) {
+ 
+ 
+ 
+-void set_EXE_flag(void) {
++void set_EXE_flag_orig(void) {
+     s16 tmw;
+ 
+     if (Game_pause) {
+@@ -52,3 +52,19 @@ void set_EXE_flag(void) {
+     }
+     EXE_flag = Game_timer % (SLOW_flag + 1);
+ }
++
++
++#pragma section CHEAT
++/* Hold player 1's Start to pause the fight; while holding it, each new press of a player 1 button runs
++   one frame. Only in a paid game (Demo_Flag). */
++void set_EXE_flag(void) {
++    set_EXE_flag_orig();
++    if (Demo_Flag && (p1sw_0 & BUTTON_START)) {
++        if (~p1sw_1 & p1sw_0 & BUTTON_SHOTS) {
++            EXE_flag = 0;
++        } else {
++            EXE_flag = 1;
++        }
++    }
++}
++#pragma section

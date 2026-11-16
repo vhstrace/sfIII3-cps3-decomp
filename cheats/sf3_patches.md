@@ -574,3 +574,44 @@ clock (`bcount_cont_main`), which is not changed. `sf3_cheat.py` found no moved 
 - The time bonus after a win is 1 x 300 (`Time_Bonus += round_timer * 300`).
 - The CPU's "the clock is low" behaviour (`Counter_hi < 0xF` in `src/Com_Sub.c`) stays on once the clock
   is under 15.
+
+## Hold Start to pause, press a button to step one frame
+
+**Source diff:** `patches/start-pauses-buttons-step.diff`
+**BPS:** `sf3_ggpatch/start-pauses-buttons-step/` (simm1.0-.3)
+**Changes:** 111 bytes. 06700000-06700053: the new `set_EXE_flag`. 27 bytes outside: its address in the
+literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
+**Recorded:** 2026-11-15 20:09:40
+
+**Mechanism:** The 3rd Strike version of ALTTP "L pauses the game, R steps one frame". The board has no L
+and R, and Start is the only button a fighter doesn't use, so pausing is "hold player 1's Start" and
+stepping is "press any of player 1's six buttons while holding Start". There is no free RAM for a
+toggle, which is why Start has to be held. It uses the same switch as "The game runs at half speed":
+fight objects only run when `EXE_flag` is 0. The new `set_EXE_flag` (`src/SLOWF.c`) runs the original,
+then:
+
+```c
+if (Demo_Flag && (p1sw_0 & BUTTON_START)) {
+    if (~p1sw_1 & p1sw_0 & BUTTON_SHOTS) {
+        EXE_flag = 0;       /* a button went down this frame: run one frame */
+    } else {
+        EXE_flag = 1;       /* paused */
+    }
+}
+```
+
+**Evidence:** `p1sw_0` / `p1sw_1` are this and last frame's inputs, `BUTTON_START` 0x1000 and
+`BUTTON_SHOTS` 0x3F0 (`include/work.h`). `EXE_flag` gates `Player_control`, the health bars, the round
+clock and the effects. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The button that steps a frame is also a real press for player 1's fighter in that frame (it may start
+  an attack). Pressing a button player 1's fighter is already holding doesn't step.
+- A step also runs a frame that the KO slow motion would have skipped.
+- Off in attract mode (`Demo_Flag` is 0).
+- The screen still updates while paused (the camera and stage animation may still move).

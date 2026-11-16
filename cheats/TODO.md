@@ -59,7 +59,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       frame more than once per frame
 - [x] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
       `Time_Control` (`src/Game_Main.c`), `Check_Time_Over` (`src/manage_2.c`)
-- [ ] L pauses, R steps one frame (ALTTP "L pauses the game, R steps one frame"): the 3rd Strike
+- [x] L pauses, R steps one frame (ALTTP "L pauses the game, R steps one frame"): the 3rd Strike
       version would use spare buttons or player 2's inputs
 
 ## Movement
@@ -138,3 +138,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Player 1 freezes the opponent by holding Start
 - [ ] Every hit plays the KO slow motion
 - [ ] The round timer never runs out
+- [ ] Hold Start to pause, press a button to step one frame
