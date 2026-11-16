@@ -1,0 +1,40 @@
+diff --git a/src/plcntset_2.c b/src/plcntset_2.c
+index 23880dd..b71247b 100644
+--- a/src/plcntset_2.c
++++ b/src/plcntset_2.c
+@@ -98,7 +98,7 @@
+ #define SP6_INIT        0       /* start the lose pose */
+ #define SP6_LOSE        1       /* until it moves on */
+ 
+-void Player_control(void) {
++void Player_control_orig(void) {
+     s16 i;
+     pl_eff_disp_stop = 0;
+     if ((pcon_rno[0] + pcon_rno[1]) == 0) {
+@@ -976,3 +976,26 @@ void setup_gouki_wins(void) {
+         gouki_wins = 1;
+     }
+ }
++
++
++#pragma section CHEAT
++/* The Super Art gauge is always full: refill both gauges every frame, except while an art is running. */
++void Player_control(void) {
++    s16 i;
++    SA_WORK* sa;
++    if (Bonus_Game_Flag == 0) {
++        for (i = 0; i < 2; i++) {
++            sa = &super_arts[i];
++            if (sa->ok != -1 && sa->store_max > 0) {
++                sa->store = sa->store_max;
++                if (sa->gauge_type == SA_GAUGE_TIMER) {
++                    sa->gauge.s.h = sa->gauge_len;
++                } else {
++                    sa->gauge.i = 0;
++                }
++            }
++        }
++    }
++    Player_control_orig();
++}
++#pragma section

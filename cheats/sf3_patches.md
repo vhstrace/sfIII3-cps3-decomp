@@ -235,3 +235,47 @@ command code keeps only the newest parry flag). Projectiles hitting a fighter ar
   when a throw lands and can't tech it (`hazusenai_flag`).
 - Player 2 gets the parry score, Super Art gauge and grade points for every parry.
 - Works for player 2 whether human or CPU, including the attract-mode demo.
+
+## The Super Art gauge is always full
+
+**Source diff:** `patches/super-art-gauge-always-full.diff`
+**BPS:** `sf3_ggpatch/super-art-gauge-always-full/` (simm1.0-.3)
+**Changes:** 101 bytes. 06700000-06700053: the new `Player_control`. 21 bytes outside: its address in the literal
+pools of `Game2_1` and the `debug_play*_move` routines.
+**Recorded:** 2026-11-15 20:01:48
+
+**Mechanism:** The 3rd Strike version of FF2 "Spells cost no MP in battle" and EarthBound "PSI costs no
+PP". Each fighter's gauge is a `SA_WORK` in `super_arts[2]`: `store` is the number of full stocks (up to
+`store_max`) and `gauge.s.h` the part-filled bar. When the last stock fills, `add_super_arts_gauge`
+(`src/PLSGAUGE.c`) does:
+
+```c
+wk->store = wk->store_max;
+if (wk->gauge_type == SA_GAUGE_TIMER) {
+    wk->gauge.s.h = wk->gauge_len;
+} else {
+    wk->gauge.i = 0;
+}
+```
+
+This is a hook on `Player_control` (`src/plcntset_2.c`), which runs both fighters once per fight frame.
+The new one does the same as the code above for both fighters, then runs the original. It leaves a
+gauge alone while `sa->ok == -1` (a Super Art is running), so the state machines in `sag_normal` and
+`sag_timer` (`src/PLMAIN.c`) can finish the art and take the stock; it is refilled on the next frame.
+It does nothing in bonus stages (`Bonus_Game_Flag`), where the game gives no gauge either.
+
+**Evidence:** `plw[i].sa` is `&super_arts[i]` (`src/PLCNTDAT.c`). EX moves need `store != 0` or
+`gauge.s.h >= 40` (`eag_union`); a full store covers both. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU, have full gauges, so the CPU uses Super Arts and EX moves all the time.
+- Timer-type arts (Yun's and Yang's Genei-Jin, Q's and Twelve's arts with a draining bar) still drain
+  while running; the bar is full again as soon as they end.
+- The gauge flash and "MAX" lettering should play once when the gauge is first filled, then stay.
+- Gill's Resurrection (`SA_GAUGE_REBIRTH`) still works only once per round: after it, `sag_rebirth`
+  stays in `SA_REBIRTH`.
