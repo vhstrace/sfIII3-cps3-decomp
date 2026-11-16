@@ -304,6 +304,8 @@ It does nothing in bonus stages (`Bonus_Game_Flag`), where the game gives no gau
 the literal pools of `catch_cg_type_check`, `plcnt_move` and `plcnt_b_move` (3 bytes each).
 **Recorded:** 2026-11-15 20:04:14
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** The 3rd Strike version of EarthBound "Every enemy starts each battle feeling strange". Stun is added to the stun gauge (`py->now.quantity.h`) in three
 places, and a fighter becomes dizzy when it reaches `py->genkai`:
 
@@ -340,7 +342,7 @@ found no moved code or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Both fighters, player or CPU. The first hit that adds any stun makes the defender dizzy (once they
   land or the combo ends, as for a normal stun).
 - While dizzy (`py->flag`), no stun is added, so a dizzy fighter can be hit freely; the next stun
