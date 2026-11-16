@@ -76,7 +76,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Fighters walk through each other (EarthBound "Ness walks through people", ALTTP "Enemies pass
       through Link"): the push boxes
 - [x] All floors are slippery like ice (SMB2, SMB3, ALTTP and OoT): fighters keep sliding after a move
-- [ ] The floor is a conveyor belt (SMB2, SMB3 and ALTTP): push both fighters one way each frame
+- [x] The floor is a conveyor belt (SMB2, SMB3 and ALTTP): push both fighters one way each frame
 
 ## Attacks and projectiles
 
@@ -147,3 +147,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Fighters face away from each other
 - [ ] Fighters walk through each other
 - [ ] Slippery floors: fighters slide after walking, dashing and jumping
+- [ ] The floor is a conveyor belt

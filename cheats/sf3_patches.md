@@ -502,6 +502,8 @@ main: applies.
 - Player 2's projectiles and other effects keep moving.
 - Player 2's inputs are not read while frozen, so a special motion started before can't finish.
 - If Start does anything else in a fight on this board, it still does.
+- Can't be built together with "The floor is a conveyor belt" (both diffs add to the end of
+  `src/PLMAIN.c`).
 
 ## Every hit plays the KO slow motion
 
@@ -850,3 +852,45 @@ against main: applies.
   slides backward, a move that ended with a step slides that way). If a move's last speed was cleared,
   there is no slide.
 - Both fighters, player or CPU.
+
+## The floor is a conveyor belt
+
+**Source diff:** `patches/conveyor-belt-floor.diff`
+**BPS:** `sf3_ggpatch/conveyor-belt-floor/` (simm1.0-.3)
+**Changes:** 89 bytes. 06700000-06700053: the new `Player_move`. 06117989, 06117AB9: its address in the
+literal pools near `move_P1_move_P2` and `check_damage_hosei` (used by the inlined `move_P1_move_P2`
+and `move_P2_move_P1`).
+**Recorded:** 2026-11-15 20:16:33
+
+**Mechanism:** The 3rd Strike version of the SMB2, SMB3 and ALTTP "conveyor belt" cheats. Each fight
+frame `move_player_work` (`src/plcntset_2.c`) runs `Player_move` (`src/PLMAIN.c`) for each fighter,
+then keeps them inside the screen:
+
+```c
+Player_move(&plw[0], processed_lvbt(p1sw_0));
+if (bg_app_stop == 0 && bg_app == 0) {
+    if (set_field_hosei_flag(&plw[0], scrr, 1)) {
+        set_field_hosei_flag(&plw[0], scrl, 0);
+```
+
+This is a hook: the new `Player_move` moves a fighter who is on the ground 1 pixel to the right
+(`xyz[0].disp.pos++`) on every other frame, then runs the original. The screen-edge check after it
+stops them at the right edge.
+
+**Evidence:** `Player_move` is only called from `src/plcntset_2.c`. A larger `xyz[0].disp.pos` is
+further right (`set_field_hosei_flag` with `ix` 1 clamps against the right edge `scrr`). Only during
+a battle (`Allow_a_battle_f`), not in bonus stages, not in the air, and not while throwing or being
+thrown (`tsukami_f`, `tsukamare_f`). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Always to the right, at 30 pixels a second. Walking right is faster, walking left slower.
+- The camera follows, so both fighters drift to the right end of the stage and stay pinned there.
+- Also moves fighters who are knocked down, stunned or in the KO animation, as long as they are on the
+  ground.
+- Can't be built together with "Player 1 freezes the opponent by holding Start" (both diffs add to the
+  end of `src/PLMAIN.c`).
