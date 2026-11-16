@@ -893,7 +893,7 @@ main: applies.
 
 **Source diff:** `patches/conveyor-belt-floor.diff`
 **BPS:** `sf3_ggpatch/conveyor-belt-floor/` (simm1.0-.3)
-**Changes:** 89 bytes. 06700000-06700053: the new `Player_move`. 06117989, 06117AB9: its address in the
+**Changes:** 75 bytes. 06700000-06700047: the new `Player_move`. 06117989, 06117AB9: its address in the
 literal pools near `move_P1_move_P2` and `check_damage_hosei` (used by the inlined `move_P1_move_P2`
 and `move_P2_move_P1`).
 **Recorded:** 2026-11-15 20:16:33
@@ -909,8 +909,8 @@ if (bg_app_stop == 0 && bg_app == 0) {
         set_field_hosei_flag(&plw[0], scrl, 0);
 ```
 
-This is a hook: the new `Player_move` moves a fighter who is on the ground 1 pixel to the right
-(`xyz[0].disp.pos++`) on every other frame, then runs the original. The screen-edge check after it
+This is a hook: the new `Player_move` moves a fighter who is on the ground 4 pixels to the right
+(`xyz[0].disp.pos += 4`) every frame, then runs the original. The screen-edge check after it
 stops them at the right edge.
 
 **Evidence:** `Player_move` is only called from `src/plcntset_2.c`. A larger `xyz[0].disp.pos` is
@@ -924,12 +924,16 @@ against main: applies.
 **Caveats:**
 
 - Not tested.
-- Always to the right, at 30 pixels a second. Walking right is faster, walking left slower.
+- Always to the right, at 4 pixels a frame (240 pixels a second). That is about as fast as a walk,
+  so walking left barely moves or loses ground, and walking right is about twice as fast. Dashing
+  or jumping is the way to go left.
 - The camera follows, so both fighters drift to the right end of the stage and stay pinned there.
 - Also moves fighters who are knocked down, stunned or in the KO animation, as long as they are on the
   ground.
 - Can't be built together with "Player 1 freezes the opponent by holding Start" (both diffs add to the
   end of `src/PLMAIN.c`).
+- Speed changed on 2026-11-16 from 1 pixel every other frame (30 pixels a second, which the user
+  found too slow) to 8 times that. Not tested at the new speed.
 
 ## Every attack hits the opponent no matter where they are
 

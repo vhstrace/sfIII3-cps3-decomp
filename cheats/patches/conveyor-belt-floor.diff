@@ -1,5 +1,5 @@
 diff --git a/src/PLMAIN.c b/src/PLMAIN.c
-index 2038cb4..c247901 100644
+index 2038cb4..727fce9 100644
 --- a/src/PLMAIN.c
 +++ b/src/PLMAIN.c
 @@ -70,7 +70,7 @@
@@ -18,12 +18,12 @@ index 2038cb4..c247901 100644
 +
 +
 +#pragma section CHEAT
-+/* The floor is a conveyor belt: during a fight, a fighter on the ground is moved 1 pixel to the right
-+   every other frame, before their own move. The usual screen-edge check runs after this. */
++/* The floor is a conveyor belt: during a fight, a fighter on the ground is moved 4 pixels to the right
++   every frame, before their own move. The usual screen-edge check runs after this. */
 +void Player_move(PLW* wk, u16 lv_data) {
-+    if (Allow_a_battle_f && Bonus_Game_Flag == 0 && (Game_timer & 1) && wk->wu.xyz[1].disp.pos == 0 &&
++    if (Allow_a_battle_f && Bonus_Game_Flag == 0 && wk->wu.xyz[1].disp.pos == 0 &&
 +        wk->tsukami_f == 0 && wk->tsukamare_f == 0) {
-+        wk->wu.xyz[0].disp.pos++;
++        wk->wu.xyz[0].disp.pos += 4;
 +    }
 +    Player_move_orig(wk, lv_data);
 +}
