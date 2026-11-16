@@ -811,3 +811,42 @@ applies.
 - Hits still push the fighters apart (`check_damage_hosei`, not changed).
 - A fighter in the corner can't be pushed out by the other's body, and the other can walk into the
   corner past them.
+
+## Slippery floors: fighters slide after walking, dashing and jumping
+
+**Source diff:** `patches/slippery-floors.diff`
+**BPS:** `sf3_ggpatch/slippery-floors/` (simm1.0-.3)
+**Changes:** 86 bytes. 06700000-06700053: the new `Normal_01000`. 065EBB39: its entry in the
+`routine_no[2]` jump table `plpnm_lv_00` (`data/PLPNM_tbl.c`).
+**Recorded:** 2026-11-15 20:15:30
+
+**Mechanism:** The 3rd Strike version of the SMB2, SMB3, ALTTP and OoT "slippery floors" cheats. Standing
+is `Normal_01000` (`src/PLPNM.c`), which only runs the standing animation:
+
+```c
+case N01_RUN:
+    char_move((WORK*)wk);
+```
+
+The sideways speed of the walk, dash, jump or move before (`mvxy.a[0].sp`) is still in the fighter's
+work, since standing doesn't clear it. This is a hook: the new `Normal_01000` runs the original, then,
+on the ground, moves the fighter by that speed in the facing direction (as `add_mvxy_speed` does) and
+takes 1/16 off the speed, setting it to 0 when it is under 1/16 pixel per frame. So a fighter who stops
+walking or lands from a jump slides on, slowing down.
+
+**Evidence:** `Normal_01000` is reached only through `plpnm_lv_00` (state 1). `mvxy.a[0].sp` is 16.16
+fixed point; `reset_mvxy_data` (`src/PLS02.c`) is only run when an animation asks for it
+(`comm_mxyt` in `src/CHARMOVE.c`). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only while standing: crouching, blocking and attacking stop at once as usual. A fighter who starts
+  to walk the other way stops sliding.
+- How far a fighter slides depends on the last speed, so it may be odd after some moves (a back dash
+  slides backward, a move that ended with a step slides that way). If a move's last speed was cleared,
+  there is no slide.
+- Both fighters, player or CPU.

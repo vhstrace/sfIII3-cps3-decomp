@@ -1,0 +1,41 @@
+diff --git a/src/PLPNM.c b/src/PLPNM.c
+index 0c1bad9..3a4ea6f 100644
+--- a/src/PLPNM.c
++++ b/src/PLPNM.c
+@@ -83,7 +83,7 @@ void Normal_00000(PLW* wk) {
+ }
+ 
+ 
+-void Normal_01000(PLW* wk) {
++void Normal_01000_orig(PLW* wk) {
+     if (wk->the_same_players) {
+         wk->wu.next_z = wk->wu.my_priority + 1;
+     }
+@@ -97,3 +97,27 @@ void Normal_01000(PLW* wk) {
+         break;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Slippery floors: a standing fighter keeps the sideways speed of the walk, dash, jump or move before,
++   and slows down by 1/16 of it each frame. */
++void Normal_01000(PLW* wk) {
++    s32 sp;
++    Normal_01000_orig(wk);
++    if (wk->wu.xyz[1].disp.pos != 0) {
++        return;
++    }
++    sp = wk->wu.mvxy.a[0].sp;
++    if (wk->wu.rl_flag) {
++        wk->wu.xyz[0].cal += sp;
++    } else {
++        wk->wu.xyz[0].cal -= sp;
++    }
++    sp -= sp >> 4;
++    if (sp < 0x1000 && sp > -0x1000) {
++        sp = 0;
++    }
++    wk->wu.mvxy.a[0].sp = sp;
++}
++#pragma section
