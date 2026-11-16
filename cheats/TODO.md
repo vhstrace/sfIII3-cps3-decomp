@@ -107,7 +107,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 - [x] Gill (and Shin Akuma) can be picked on the select screen (FF2 "New game: <character> is in the
       party"): `src/sel_pl.c`
-- [ ] Skip the logos and the attract mode (EarthBound "Skip the logos and the title screen", Super
+- [x] Skip the logos and the attract mode (EarthBound "Skip the logos and the title screen", Super
       Metroid "New games skip the opening cinematic", Metroid "Skip the start jingle")
 - [ ] Turn on all debug features
 
@@ -160,3 +160,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
 - [ ] Hold Start when picking a character to play as Gill or Shin Akuma
+- [ ] Skip the logos and the opening movie

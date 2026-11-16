@@ -1361,3 +1361,37 @@ and `plcntset_2.c` handle Shin Gouki as a player. Fighter numbers from `include/
 - In single-player, the CPU's opponents and the boss order may act oddly (Gill against Gill).
 - After a continue, the "same CPU opponent" check runs before the change.
 - Not in the attract demo.
+
+## Skip the logos and the opening movie
+
+**Source diff:** `patches/skip-logos-and-opening.diff`
+**BPS:** `sf3_ggpatch/skip-logos-and-opening/` (simm1.0-.3)
+**Changes:** 44 bytes. The new `CAPCOM_Logo` and `Title` at 06700000. 0609501D and 06095025: their
+addresses in the literal pool of `Loop_Demo`.
+**Recorded:** 2026-11-15 20:30:41
+
+**Mechanism:** The 3rd Strike version of EarthBound "Skip the logos and the title screen" and Super
+Metroid "New games skip the opening cinematic". The attract loop in `Loop_Demo` (`src/Game_Main.c`)
+runs `CAPCOM_Logo` (`src/demo00.c`: the warning, CAPCOM and other logo screens), then `Title`
+(`src/demo01.c`: the opening movie), then demo fights and rankings. Both are hooks:
+
+- The new `CAPCOM_Logo` returns 1 ("done") at once, so the logo screens never show.
+- The new `Title` lets the original set up the screen and the colours, then skips the
+  `TT_DEMO` step (`opening_demo_tick`) by moving to `TT_HOLD` with a 1-frame timer, so it goes
+  straight to the usual wipe into the demo fight.
+
+**Evidence:** Both functions are only called from `Loop_Demo`. A coin already leaves the attract loop
+from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin is a different routine
+(`Title_At_a_Dash`), which is not changed. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The attract mode becomes demo fights and rankings only. The opening movie after a coin (in
+  `Title_At_a_Dash`) still plays.
+- The CPS3 BIOS screens before the game starts are not part of this program and still show.
+- The logo screens also cleared the screen and loaded backgrounds. If leftovers from a ranking screen
+  show during the next demo fight, this is why.

@@ -1,0 +1,54 @@
+diff --git a/src/demo00.c b/src/demo00.c
+index e0e7469..d7d852a 100644
+--- a/src/demo00.c
++++ b/src/demo00.c
+@@ -73,7 +73,7 @@ void Scrn_Move_Set(s32 n, s16 x, s16 y);
+ #define LW_PAUSE        1       /* wait D_Timer, then show it */
+ #define LW_SHOW         2       /* show it for D_Timer, then fade out */
+ #define LW_FADE_WAIT    3       /* until the fade is done, then the next screen */
+-s32 CAPCOM_Logo(void) {
++s32 CAPCOM_Logo_orig(void) {
+     void (*jmp_tbl[3])() = { Logo_Capcom, Logo_Warning, Logo_Etc };
+     Next_Demo = 0;
+     jmp_tbl[D_No0]();
+@@ -224,4 +224,9 @@ void Logo_Etc(void) {
+ }
+ 
+ 
+-
++#pragma section CHEAT
++/* Skip the logos: the warning, CAPCOM and other logo screens are done at once. */
++s32 CAPCOM_Logo(void) {
++    return 1;
++}
++#pragma section
+diff --git a/src/demo01.c b/src/demo01.c
+index 193650a..36f7629 100644
+--- a/src/demo01.c
++++ b/src/demo01.c
+@@ -70,7 +70,7 @@ void Scrn_Move_Set(s32 n, s16 x, s16 y);
+ 
+ 
+ 
+-s32 Title(void) {
++s32 Title_orig(void) {
+     switch (D_No1) {
+     case TT_INIT:
+         D_No1++;
+@@ -154,3 +154,16 @@ s32 Title_At_a_Dash(void) {
+     }
+     return 0;
+ }
++
++
++#pragma section CHEAT
++/* Skip the opening movie: when the attract mode's opening demo would start, go straight to the wipe
++   into the demo fight. */
++s32 Title(void) {
++    if (D_No1 == TT_DEMO) {
++        D_No1 = TT_HOLD;
++        D_Timer = 1;
++    }
++    return Title_orig();
++}
++#pragma section
