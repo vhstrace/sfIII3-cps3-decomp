@@ -1863,6 +1863,8 @@ shorter, which moved the code after it. `sf3_cheat.py` found no moved code or da
 literal pools of `move_P1_move_P2` and `move_P2_move_P1` (3 bytes each).
 **Recorded:** 2026-11-15 21:57:44
 
+Tags: `interesting` `demo-ready` `video-ready`
+
 **Mechanism:** Each frame `move_player_work` (`src/plcntset_2.c`) runs `Player_move` (`src/PLMAIN.c`)
 for each fighter. That runs the fighter's input and current move, which change its own position
 `wu.xyz[0].disp.pos` (X) and `wu.xyz[1].disp.pos` (height).
