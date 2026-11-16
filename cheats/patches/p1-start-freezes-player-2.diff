@@ -1,0 +1,28 @@
+diff --git a/src/PLMAIN.c b/src/PLMAIN.c
+index 2038cb4..20b5b11 100644
+--- a/src/PLMAIN.c
++++ b/src/PLMAIN.c
+@@ -247,7 +247,7 @@ void player_mv_3000(PLW* wk) {
+ 
+ 
+ 
+-void player_mv_4000(PLW* wk) {
++void player_mv_4000_orig(PLW* wk) {
+     wk->permited_koa = 0;
+     check_extra_jump_timer(wk);
+     if (wk->sa_stop_flag != 1) {
+@@ -751,3 +751,14 @@ void clear_tk_flags(PLW* wk) {
+     wk->att_plus = 8;
+     wk->def_plus = 8;
+ }
++
++
++#pragma section CHEAT
++/* Player 2 stands frozen while player 1 holds Start. */
++void player_mv_4000(PLW* wk) {
++    if (wk->wu.id == 1 && (p1sw_0 & BUTTON_START)) {
++        return;
++    }
++    player_mv_4000_orig(wk);
++}
++#pragma section

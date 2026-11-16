@@ -466,3 +466,39 @@ applies.
 - Start and coin don't count as input.
 - Before "Fight!", `Player_control` runs anyway while both fighters are in their set-up step, so the
   intro poses may still play.
+
+## Player 1 freezes the opponent by holding Start
+
+**Source diff:** `patches/p1-start-freezes-player-2.diff`
+**BPS:** `sf3_ggpatch/p1-start-freezes-player-2/` (simm1.0-.3)
+**Changes:** 37 bytes. 06700000-06700027: the new `player_mv_4000`. 065EAF81: its entry in the
+`routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-15 20:06:45
+
+**Mechanism:** The 3rd Strike version of OoT "Freeze time for enemies by holding L". Start is the only
+spare button in a fight. `player_mv_4000` (`src/PLMAIN.c`) is a fighter's whole frame once the round has
+started: it reads the lever (or the CPU's virtual lever), runs hit stop or the current state through
+`plmain_lv_02[routine_no[1]]`, the timers and the gauges. This is a hook: the new one returns at once for
+player 2 while player 1 holds Start:
+
+```c
+if (wk->wu.id == 1 && (p1sw_0 & BUTTON_START)) {
+    return;
+}
+player_mv_4000_orig(wk);
+```
+
+**Evidence:** `player_mv_4000` is only reached through `plmain_lv_00`. `BUTTON_START` is 0x1000 in
+`p1sw_0` (`include/work.h`). `sf3_cheat.py` found no moved code or data. `git apply --check` against
+main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Player 2 (human or CPU) stops in place, in mid-air too, with the animation held. Player 2 can still
+  be hit: the hit lands, and the reaction plays when Start is let go.
+- Player 2's projectiles and other effects keep moving.
+- Player 2's inputs are not read while frozen, so a special motion started before can't finish.
+- If Start does anything else in a fight on this board, it still does.
