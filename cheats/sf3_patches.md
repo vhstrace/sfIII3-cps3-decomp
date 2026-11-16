@@ -410,6 +410,8 @@ found no moved code or data. `git apply --check` against main: applies.
 literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
 **Recorded:** 2026-11-15 20:05:21
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the half-speed cheats in Tetris, SMB3, Metroid, ALTTP, Super
 Metroid and OoT. The KO slow motion works by skipping frames: `set_EXE_flag` (`src/SLOWF.c`) runs at the
 start of each fight frame and does
@@ -437,7 +439,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Movement is not smoothed: each picture is shown for 2 frames, so it looks choppier than real slow
   motion.
 - Input is read every frame, but fighters only act every other frame. Special move timing windows are
