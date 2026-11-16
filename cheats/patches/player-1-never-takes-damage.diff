@@ -1,0 +1,43 @@
+diff --git a/src/PLPDM.c b/src/PLPDM.c
+index 8766c29..1cfaa21 100644
+--- a/src/PLPDM.c
++++ b/src/PLPDM.c
+@@ -206,7 +206,7 @@ const s16** kizetsu_timer_table[9] = {
+ 
+ 
+ 
+-void Player_damage(PLW* wk) {
++void Player_damage_orig(PLW* wk) {
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->guard_flag = 3;
+@@ -1367,7 +1367,7 @@ void subtract_dm_vital(PLW* wk) {
+ 
+ 
+ 
+-void subtract_dm_vital_aiuchi(PLW* wk) {
++void subtract_dm_vital_aiuchi_orig(PLW* wk) {
+     if (wk->dead_flag == 0) {
+         if (wk->wu.dm_vital != 0) {
+             if (wk->wu.routine_no[1] != PLAYER_DAMAGE || wk->wu.routine_no[2] > 11 || wk->wu.routine_no[3] != 0) {
+@@ -1520,3 +1520,20 @@ void check_bullet_damage(PLW* wk) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++void Player_damage(PLW* wk) {
++    if (wk->wu.id == 0 && wk->wu.routine_no[3] == RN3_START) {
++        wk->wu.dm_vital = 0;
++    }
++    Player_damage_orig(wk);
++}
++
++void subtract_dm_vital_aiuchi(PLW* wk) {
++    if (wk->wu.id == 0) {
++        wk->wu.dm_vital = 0;
++    }
++    subtract_dm_vital_aiuchi_orig(wk);
++}
++#pragma section

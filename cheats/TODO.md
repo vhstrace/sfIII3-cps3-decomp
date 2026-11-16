@@ -31,7 +31,7 @@ Allow players and/or the CPU to use these:
 - [x] Normal hits do double damage (Super Metroid "Samus takes double damage", FF2 "The party's weapon
       attacks do 4 times the damage")
 - [x] Projectiles do double damage: the same hook on `cal_damage_vitality_eff` (`src/pow_pow.c`)
-- [ ] Player 1 never takes damage (EarthBound "Enemies never hurt the party", SMB3 "Enemies and spikes
+- [x] Player 1 never takes damage (EarthBound "Enemies never hurt the party", SMB3 "Enemies and spikes
       never hurt the Player"): hook the damage routines, check which side `ds` is
 - [ ] Health drains slowly during a round (OoT "Link loses a quarter heart every 20 seconds", the
       Metroid, Zelda 1 and ALTTP drains): the fight frame in `src/Game_Main.c`, health in `src/VITAL.c`
@@ -127,3 +127,4 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
 - [ ] Projectiles do double damage
+- [ ] Player 1 never takes damage

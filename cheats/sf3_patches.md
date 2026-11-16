@@ -95,3 +95,53 @@ or data. `git apply --check` against main: applies.
   both hooks.
 - Both fighters' projectiles, player or CPU, do double damage. Chip damage on block comes from the
   same value, so it doubles too.
+
+## Player 1 never takes damage
+
+**Source diff:** `patches/player-1-never-takes-damage.diff`
+**BPS:** `sf3_ggpatch/player-1-never-takes-damage/` (simm1.0-.3)
+**Changes:** 58 bytes. 06700000-06700037: the new `Player_damage` and `subtract_dm_vital_aiuchi`.
+065EAF89: the `Player_damage` entry of the `routine_no[1]` jump table (`data/PLMAIN_tbl.c`).
+06116F05, 06118CF1: the address of `subtract_dm_vital_aiuchi` in the literal pools of `plcnt_move` and
+`plcnt_b_move` (3 bytes each).
+**Recorded:** 2026-11-15 19:58:07
+
+**Mechanism:** The EarthBound "Enemies never hurt the party" and SMB3 "Enemies and spikes never hurt the
+Player" idea. Health only goes down in `subtract_dm_vital` and `subtract_dm_vital_aiuchi`
+(`src/PLPDM.c`):
+
+```c
+wk->wu.vital_new -= wk->wu.dm_vital;
+```
+
+`subtract_dm_vital` is called (by a short `bsr`) from `get_damage_reaction_data`, which
+`Player_damage` calls on the first frame of a hit (`routine_no[3] == RN3_START`). Hooking
+`subtract_dm_vital` itself moved code (the `bsr` became a longer call), so the hook is on
+`Player_damage`, which is only reached through the jump table in `data/PLMAIN_tbl.c`. Both hooks set
+the damage to 0 for side 0 (player 1) and then run the original:
+
+```c
+if (wk->wu.id == 0 && wk->wu.routine_no[3] == RN3_START) {
+    wk->wu.dm_vital = 0;
+}
+Player_damage_orig(wk);
+```
+
+`subtract_dm_vital_aiuchi` (trades, where both fighters hit each other on the same frame, called from
+`src/PLCNT2.c` and `src/plcntset_2.c`) gets the same check.
+
+**Evidence:** `grep` finds `vital_new -=` for fighters only in these two functions. `Player_damage` runs
+for hits and for blocked hits (chip damage). `get_damage_reaction_data` already sets `dm_vital = 0` for
+`atemi_flag == 2`. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Player 1 still reacts to hits (hit stun, knockdown) and the stun gauge still fills, so player 1 can
+  be dizzied. Only the health bar stays full.
+- Player 1 gets no score from damage taken, since that only happens when `dm_vital` is not 0.
+- Throw damage was not traced separately; if a throw takes health some other way, it still does.
+- Player 2 takes damage as normal.
