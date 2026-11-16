@@ -1131,7 +1131,7 @@ against main: applies.
 
 - Not tested.
 - Both fighters. Hits that launch still send the fighter flying (in the air the position isn't put
-  back), and they still slide where they land while knocked down only if they are in the air.
+  back). A knocked-down fighter doesn't slide along the ground.
 - The attacker still gets pushed back when the opponent is in the corner (see "No recoil from hits").
 - Without knockback, combos and blockstrings stay at close range, so some moves combo that normally
   don't, and the opponent can't be pushed out of range.
