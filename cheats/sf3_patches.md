@@ -90,7 +90,8 @@ or data. `git apply --check` against main: applies.
 
 - Not tested.
 - Normal hits (punches, kicks and specials that hit with the fighter's own body) do normal damage.
-  "Normal hits do double damage" covers those; the two can only be combined in a combined build
-  (`build normal-hits-do-double-damage projectiles-do-double-damage --name ...`).
+  "Normal hits do double damage" covers those. Both diffs add a hook at the end of `src/pow_pow.c`,
+  so `sf3_cheat.py build` can't apply them together (checked); a combined cheat needs one diff with
+  both hooks.
 - Both fighters' projectiles, player or CPU, do double damage. Chip damage on block comes from the
   same value, so it doubles too.
