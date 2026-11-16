@@ -2167,3 +2167,46 @@ or data. `git apply --check` against main: applies.
 - The CPU can use it too, when its inputs match in the air.
 - No conflict with "Each fighter's movement moves the other fighter": that cheat uses `pt_free`
   bytes 0-1, and this one uses byte 4. They can be built together with `--name`.
+
+## Special moves travel twice as far sideways
+
+**Source diff:** `patches/specials-travel-twice-as-far.diff`
+**BPS:** `sf3_ggpatch/specials-travel-twice-as-far/` (simm1.0-.3)
+**Changes:** 228 bytes. 06700000-067000E7: the new `Player_attack`. 065EAF95: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-16 01:14:56
+
+**Mechanism:** Every special move and super art runs through `Player_attack` (`src/PLPAT.c`), which
+calls the fighter's own move routine (`plxx_extra_attack_table`, `routine_no[2]` 16 and up). The
+routine moves the fighter with `char_move` (animation steps, `cg_add_xy`) and the `mvxy` speeds
+(`add_mvxy_speed`), all inside that call. This is a hook: the new `Player_attack` notes the
+fighter's x position (`xyz[0].cal`, 16.16), runs the original, and adds the sideways movement of
+that frame a second time. Each frame moves twice as far, and the move lasts as long as before, so it
+is twice as fast and goes twice as far. Height is not changed.
+
+Only special moves: `check_special_attack` (`src/PLS03.c`) points `wk->as` at rows 8-17 of
+`asstbl_sa_ground` or `asstbl_sa_air` (command slots 28-37 and 46-55). Super arts use rows 0-7
+(`check_super_arts_attack`), leap attacks use `asstbl_lv_D010`, and command normals use routines
+below 16, so none of them change.
+
+**Evidence:** `Player_attack` is only called through `plmain_lv_02`. It isn't run during hit stop
+(`check_hit_stop` in `player_mv_4000`, `src/PLMAIN.c`). The screen-edge and push checks in
+`move_player_work` (`src/plcntset_2.c`) run after, so walls still stop a fighter. Not while throwing
+or being thrown (`tsukami_f`, `tsukamare_f`; the thrown fighter is placed from the thrower), and not
+in bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Moves that don't travel (most fireballs, Shoryuken's mostly upward path) change little. The
+  projectiles themselves are not changed (see "Projectiles fly twice as fast").
+- A move's hit boxes don't change, so a fast-moving move may pass the opponent between its active
+  frames and miss, or cross through them.
+- Moves that place the fighter at a set spot (teleports, follow-ups that move to the opponent) also
+  go twice as far from where they started, which may put them past the target.
+- Both fighters, player or CPU.
+- Can't be built together with "Ground special moves work in the air", which also hooks
+  `Player_attack`, without merging the diffs by hand.
