@@ -91,7 +91,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       `effect_at_vs_effect_dm` (`src/HITEFEF.c`)
 - [x] no position change from hits
 - [x] no recoil from hits
-- [ ] Blocking works facing either way (Zelda 1 and ALTTP "Shield blocks shots from any direction"):
+- [x] Blocking works facing either way (Zelda 1 and ALTTP "Shield blocks shots from any direction"):
       `Check_Guard_Type` and the guard checks
 
 ## CPU opponent
@@ -155,3 +155,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Projectiles pass through each other
 - [ ] No knockback from hits
 - [ ] No recoil from hits
+- [ ] Blocking works holding either way

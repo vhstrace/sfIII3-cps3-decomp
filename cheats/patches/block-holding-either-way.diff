@@ -1,0 +1,29 @@
+diff --git a/src/PLS02.c b/src/PLS02.c
+index 12dfb59..85a03b5 100644
+--- a/src/PLS02.c
++++ b/src/PLS02.c
+@@ -549,7 +549,7 @@ s32 random_16_ex_com(void) {
+ 
+ 
+ 
+-s32 get_guard_direction(WORK* as, WORK* ds) {
++s32 get_guard_direction_orig(WORK* as, WORK* ds) {
+     s16 result;
+     s8 num;
+     if (as->work_id == 1) {
+@@ -592,3 +592,15 @@ s32 cal_attdir(WORK* wk) {
+ s16 cal_attdir_flip(s16 index) {
+     return dir16_rl_conv[index];
+ }
++
++
++#pragma section CHEAT
++/* Blocking works holding either way: the direction the lever must be held to block is "either"
++   (3, as the original gives for some projectiles from behind). */
++s32 get_guard_direction(WORK* as, WORK* ds) {
++    if (Bonus_Game_Flag) {
++        return get_guard_direction_orig(as, ds);
++    }
++    return 3;
++}
++#pragma section

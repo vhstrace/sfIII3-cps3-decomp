@@ -1179,3 +1179,44 @@ main: applies.
   from close range.
 - The fighters' own knockback in open space is not changed (see "No knockback from hits").
 - Can't be built together with "Fighters walk through each other" (both hook `check_body_touch`).
+
+## Blocking works holding either way
+
+**Source diff:** `patches/block-holding-either-way.diff`
+**BPS:** `sf3_ggpatch/block-holding-either-way/` (simm1.0-.3)
+**Changes:** 33 bytes. 06700000-0670001B: the new `get_guard_direction`. 0608CB7D, 0608EE89, 0608F0F9: its
+address in the literal pools of `set_caught_status`, `player_at_vs_player_dm` and
+`effect_at_vs_player_dm`.
+**Recorded:** 2026-11-15 20:25:06
+
+**Mechanism:** The 3rd Strike version of Zelda 1 and ALTTP "Shield blocks shots from any direction". When
+a hit lands, `get_guard_direction` (`src/PLS02.c`) works out which way the defender must hold the
+lever to block: 1 or 2 (away from the attacker), or 3 (either way). `defense_ground` and
+`defense_sky` (`src/HITCHECK.c`) then test it against the lever (`saishin_lvdir`, 1 back or 2
+forward):
+
+```c
+if (ds->saishin_lvdir & gddir) {
+    as->wu.hf.hit.player = 0x20;
+    ds->wu.routine_no[2] = 7;
+```
+
+This is a hook: the new `get_guard_direction` always returns 3, so holding the lever either way
+(toward or away from the attacker, or the wrong way on a cross-up) blocks. The original already
+returns 3 for a projectile that comes from behind.
+
+**Evidence:** `get_guard_direction` is called from `src/HITCHECK.c`, `src/HITPLPL.c` and
+`src/HITEFPL.c` only. Its result (`gddir`) is only used for the guard tests and
+`check_guard_miss` (`src/Grade.c`, the grade's "missed a block" count). Not in bonus stages.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU.
+- The fighter still needs to be able to block (not attacking or in the air without air block), and
+  high/low still matters.
+- Walking forward toward an attack now blocks it, so it is much harder to hit a fighter who is moving
+  at all.
