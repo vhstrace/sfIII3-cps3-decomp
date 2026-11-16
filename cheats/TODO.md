@@ -117,7 +117,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Music and sound effects play 2 whole tones higher (FF2, ALTTP and SMW): `sound_note_to_pitch`
       (`src/sound_voice_2.c`)
 - [x] Every sound effect is the next one in the list (FF2, ALTTP and OoT)
-- [ ] All music plays faster (SMB1 "All music plays at hurry-up speed"): `bgm_tempo_set`
+- [x] All music plays faster (SMB1 "All music plays at hurry-up speed"): `bgm_tempo_set`
       (`src/textsound_2.c`)
 
 ## Graphics
@@ -165,3 +165,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] No music
 - [ ] Music, sound effects and voices play 2 whole tones higher
 - [ ] Every sound effect is the next one in the list
+- [ ] All music plays 1.5 times as fast

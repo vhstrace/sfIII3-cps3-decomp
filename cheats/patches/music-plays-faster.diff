@@ -1,0 +1,28 @@
+diff --git a/src/textsound_2.c b/src/textsound_2.c
+index 0a7deb3..bf6c35c 100644
+--- a/src/textsound_2.c
++++ b/src/textsound_2.c
+@@ -499,7 +499,7 @@ void se_voice_stop_all(void) {
+ 
+ 
+ /* provisional name */
+-void sound_driver_tick(void) {
++void sound_driver_tick_orig(void) {
+     u32 i;
+     if ((bgm_state & 8) && !(bgm_state & 4)) {
+         snd_fade_level += snd_fade_speed;
+@@ -536,3 +536,14 @@ void sound_driver_tick(void) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* All music plays 1.5 times as fast: the music voices count down their notes by the song's tick step
++   plus bgm_tempo_add, which the game never sets (bgm_tempo_set is never called). Set it to half the
++   step at each tick. */
++void sound_driver_tick(void) {
++    bgm_tempo_add = bgm_tick_step >> 1;
++    sound_driver_tick_orig();
++}
++#pragma section

@@ -1482,6 +1482,7 @@ main: applies.
 - A short jingle that is a music sequence (not a sound effect) is silent too.
 - Can't be built together with "Every sound effect is the next one in the list" (both add to the end of
   `src/textsound_2.c`).
+- Can't be built together with "All music plays 1.5 times as fast" (the end of `src/textsound_2.c`).
 
 ## Music, sound effects and voices play 2 whole tones higher
 
@@ -1558,3 +1559,38 @@ code or data. `git apply --check` against main: applies.
 - A fighter's voice lines often become the next voice line (a different move's shout).
 - The test mode's sound test plays the next effect too.
 - Can't be built together with "No music" (both add to the end of `src/textsound_2.c`).
+- Can't be built together with "All music plays 1.5 times as fast" (the end of `src/textsound_2.c`).
+
+## All music plays 1.5 times as fast
+
+**Source diff:** `patches/music-plays-faster.diff`
+**BPS:** `sf3_ggpatch/music-plays-faster/` (simm1.0-.3)
+**Changes:** 28 bytes. The new `sound_driver_tick` at 06700000. 060007ED: its address in the vertical
+blank interrupt's literal pool (`src/intr.src`).
+**Recorded:** 2026-11-15 20:37:06
+
+**Mechanism:** The 3rd Strike version of SMB1 "All music plays at hurry-up speed". Each tick,
+`voice_process_secondary` (`src/sound_voice_2.c`) counts a music voice's note and event timers down
+by the song's tick step plus an extra tempo value:
+
+```c
+voice->event_ticks -= bgm_tick_step + bgm_tempo_add;
+```
+
+`bgm_tempo_add` is only set by `bgm_tempo_set` (`src/textsound_2.c`), which the game never calls, and
+`sound_seq_start` clears it. This is a hook: the new `sound_driver_tick` sets `bgm_tempo_add` to half
+of `bgm_tick_step` (the song's own tempo, set by its tempo events), then runs the original. Music then
+plays at 1.5 times its tempo.
+
+**Evidence:** `sound_driver_tick` is only called from `src/intr.src`. Sound effects use
+`se_tick_step` and are not changed. `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only the tempo changes, not the pitch.
+- Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
+  same hook, or the end of the same file).
