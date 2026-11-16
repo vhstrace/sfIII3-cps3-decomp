@@ -69,7 +69,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       frame more than once per frame. Not done (2026-11-15): running `Game2_1` twice also pushes every
       sprite twice (`sort_push_request`, `sprite_entry_push_prio`), and the extra copies would need to
       be dropped from the sprite pool, which wasn't worked out.
-- [x] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
+- [ ] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
       `Time_Control` (`src/Game_Main.c`), `Check_Time_Over` (`src/manage_2.c`)
 - [x] L pauses, R steps one frame (ALTTP "L pauses the game, R steps one frame"): the 3rd Strike
       version would use spare buttons or player 2's inputs
@@ -138,7 +138,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] The round timer never runs out
 - [ ] Hold Start to pause, press a button to step one frame
 - [ ] Fighters walk twice as fast
 - [ ] Jump again in mid-air
