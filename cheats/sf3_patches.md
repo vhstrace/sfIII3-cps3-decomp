@@ -454,6 +454,8 @@ applies.
 literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
 **Recorded:** 2026-11-15 20:06:14
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the "Superhot" cheats (Metroid, SMB3, ALTTP, SMW and SM64: time
 moves only while a button is held). It uses the same switch as "The game runs at half speed": objects
 only run in a fight frame when `EXE_flag` (set by `set_EXE_flag`, `src/SLOWF.c`) is 0. The new
@@ -477,7 +479,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Either player's input moves time for both. Against the CPU, the CPU acts only while the human holds
   something.
 - The round clock stops too, so a round never times out while nobody touches the controls.

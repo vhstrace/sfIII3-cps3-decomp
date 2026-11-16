@@ -138,7 +138,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Time moves only while any controller input is held
 - [ ] Player 1 freezes the opponent by holding Start
 - [ ] Every hit plays the KO slow motion
 - [ ] The round timer never runs out
