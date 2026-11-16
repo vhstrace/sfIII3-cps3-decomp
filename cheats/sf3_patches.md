@@ -502,3 +502,38 @@ main: applies.
 - Player 2's projectiles and other effects keep moving.
 - Player 2's inputs are not read while frozen, so a special motion started before can't finish.
 - If Start does anything else in a fight on this board, it still does.
+
+## Every hit plays the KO slow motion
+
+**Source diff:** `patches/every-hit-plays-ko-slow-motion.diff`
+**BPS:** `sf3_ggpatch/every-hit-plays-ko-slow-motion/` (simm1.0-.3)
+**Changes:** 58 bytes. 06700000-0670003B: the new `Player_damage`. 065EAF89: its entry in the jump table
+`plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-15 20:07:23
+
+**Mechanism:** The 3rd Strike version of SMW "Bullet Time for Banzai Bill". A KO calls
+`set_conclusion_slow` (`src/SLOWF.c`), which sets `SLOW_timer = 95`; `set_EXE_flag` then eases
+`SLOW_flag` from slow back to normal through `slow_timer_to_flag` as the timer runs down. This is a hook
+on `Player_damage` (`src/PLPDM.c`, the defender's state while hit or guarding, reached only through
+`plmain_lv_02`). On the first frame of a clean hit it starts the same slow motion, then runs the original:
+
+```c
+if (wk->wu.routine_no[3] == RN3_START && wk->wu.dm_guard_success == -1 && wk->wu.dm_vital != 0) {
+    set_conclusion_slow();
+}
+Player_damage_orig(wk);
+```
+
+**Evidence:** the hit check sets `dm_guard_success = -1` for a hit, and the guard or parry number when the
+hit was blocked (`src/HITCHECK.c`), so blocked hits and parries don't slow the game. Damage is still 0 at
+that point only for hits that do none. `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Each hit restarts the 95-frame slow-down, so a long combo plays in slow motion all the way.
+- The round clock also slows while it plays.
+- Throws don't go through `Player_damage`, so they don't slow the game (unless they KO).

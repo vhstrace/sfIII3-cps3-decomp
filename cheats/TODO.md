@@ -54,7 +54,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       `SLOW_flag` at 1
 - [x] Time moves only while any controller input is held
 - [x] Freeze the opponent while a button is held (OoT "Freeze time for enemies by holding L")
-- [ ] Every hit plays the KO slow motion (SMW "Bullet Time for Banzai Bill"): `set_conclusion_slow`
+- [x] Every hit plays the KO slow motion (SMW "Bullet Time for Banzai Bill"): `set_conclusion_slow`
 - [ ] The game runs 1.25 or 1.5 times as fast (OoT "The game runs 1.5 times as fast"): run the fight
       frame more than once per frame
 - [ ] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
@@ -136,3 +136,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The game runs at half speed
 - [ ] Time moves only while any controller input is held
 - [ ] Player 1 freezes the opponent by holding Start
+- [ ] Every hit plays the KO slow motion

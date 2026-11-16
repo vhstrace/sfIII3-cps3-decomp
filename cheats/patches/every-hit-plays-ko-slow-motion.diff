@@ -1,0 +1,28 @@
+diff --git a/src/PLPDM.c b/src/PLPDM.c
+index 8766c29..eb6f3e1 100644
+--- a/src/PLPDM.c
++++ b/src/PLPDM.c
+@@ -206,7 +206,7 @@ const s16** kizetsu_timer_table[9] = {
+ 
+ 
+ 
+-void Player_damage(PLW* wk) {
++void Player_damage_orig(PLW* wk) {
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->guard_flag = 3;
+@@ -1520,3 +1520,14 @@ void check_bullet_damage(PLW* wk) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* Every clean hit plays the KO slow motion (set_conclusion_slow, 95 frames easing back to normal). */
++void Player_damage(PLW* wk) {
++    if (wk->wu.routine_no[3] == RN3_START && wk->wu.dm_guard_success == -1 && wk->wu.dm_vital != 0) {
++        set_conclusion_slow();
++    }
++    Player_damage_orig(wk);
++}
++#pragma section
