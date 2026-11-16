@@ -427,3 +427,42 @@ applies.
 - Input is read every frame, but fighters only act every other frame. Special move timing windows are
   counted in fighter frames, so they feel twice as long.
 - Also applies to the attract-mode fight demo (`Title` calls `set_EXE_flag`) and bonus stages.
+
+## Time moves only while any controller input is held
+
+**Source diff:** `patches/time-moves-only-with-input.diff`
+**BPS:** `sf3_ggpatch/time-moves-only-with-input/` (simm1.0-.3)
+**Changes:** 93 bytes. 06700000-06700043: the new `set_EXE_flag`. 27 bytes outside: its address in the
+literal pools of `Game2_1`, `Game08`, `Title` and the `debug_play*_move` routines.
+**Recorded:** 2026-11-15 20:06:14
+
+**Mechanism:** The 3rd Strike version of the "Superhot" cheats (Metroid, SMB3, ALTTP, SMW and SM64: time
+moves only while a button is held). It uses the same switch as "The game runs at half speed": objects
+only run in a fight frame when `EXE_flag` (set by `set_EXE_flag`, `src/SLOWF.c`) is 0. The new
+`set_EXE_flag` runs the original, then stops this frame when neither player touches the lever or a
+button:
+
+```c
+if (Demo_Flag && ((p1sw_0 | p2sw_0) & 0x3FF) == 0) {
+    EXE_flag = 1;
+}
+```
+
+`p1sw_0` and `p2sw_0` are this frame's inputs (lever bits 0x00F, the six buttons 0x3F0). `Demo_Flag` is 0
+in attract mode, so the demo fight still plays.
+
+**Evidence:** `EXE_flag` gates `Player_control`, `vital_cont_main`, the round clock in `src/count.c`
+and the effect routines. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Either player's input moves time for both. Against the CPU, the CPU acts only while the human holds
+  something.
+- The round clock stops too, so a round never times out while nobody touches the controls.
+- Start and coin don't count as input.
+- Before "Fight!", `Player_control` runs anyway while both fighters are in their set-up step, so the
+  intro poses may still play.

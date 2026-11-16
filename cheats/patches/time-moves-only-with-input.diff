@@ -1,0 +1,29 @@
+diff --git a/src/SLOWF.c b/src/SLOWF.c
+index 6368343..ee8ed1b 100644
+--- a/src/SLOWF.c
++++ b/src/SLOWF.c
+@@ -33,7 +33,7 @@ void set_conclusion_slow(void) {
+ 
+ 
+ 
+-void set_EXE_flag(void) {
++void set_EXE_flag_orig(void) {
+     s16 tmw;
+ 
+     if (Game_pause) {
+@@ -52,3 +52,15 @@ void set_EXE_flag(void) {
+     }
+     EXE_flag = Game_timer % (SLOW_flag + 1);
+ }
++
++
++#pragma section CHEAT
++/* Time moves only while a player holds the lever or a button: with no input from either player,
++   objects don't run this frame. Only in a paid game (Demo_Flag), so the attract demo still plays. */
++void set_EXE_flag(void) {
++    set_EXE_flag_orig();
++    if (Demo_Flag && ((p1sw_0 | p2sw_0) & 0x3FF) == 0) {
++        EXE_flag = 1;
++    }
++}
++#pragma section
