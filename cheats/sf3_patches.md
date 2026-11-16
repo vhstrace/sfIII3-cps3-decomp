@@ -537,3 +537,40 @@ against main: applies.
 - Each hit restarts the 95-frame slow-down, so a long combo plays in slow motion all the way.
 - The round clock also slows while it plays.
 - Throws don't go through `Player_damage`, so they don't slow the game (unless they KO).
+
+## The round timer never runs out
+
+**Source diff:** `patches/round-timer-stops-at-1.diff`
+**BPS:** `sf3_ggpatch/round-timer-stops-at-1/` (simm1.0-.3)
+**Changes:** 28 bytes. 06700000-0670001B: the new `count_cont_main`. 06096D85: its address in the literal
+pool of `Time_Control`.
+**Recorded:** 2026-11-15 20:08:52
+
+**Mechanism:** The 3rd Strike version of SMB3 "Time running out doesn't kill the Player". The round clock
+is `Counter_hi` (99 down to 0), counted down by `counter_control` through `count_cont_main`
+(`src/count.c`), which `Time_Control` (`src/Game_Main.c`) calls each fight frame. `counter_control`
+copies it to `round_timer`, and the round ends by time over when that reaches 0 (`src/plcntset_2.c`):
+
+```c
+if ((will_die() != 0) && (round_timer.size.full == 0)) {
+    ...
+    Conclusion_Type = CONCLUSION_TIME_OVER;
+```
+
+This is a hook: the new `count_cont_main` only runs the original while `Counter_hi > 1`, so the clock
+counts down as usual and then stays at 01.
+
+**Evidence:** `count_cont_main` is only called from `Time_Control`. The bonus stages use their own
+clock (`bcount_cont_main`), which is not changed. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- A round only ends by KO.
+- The clock may stay in its last flash colour, since the flashing is also done by `counter_control`.
+- The time bonus after a win is 1 x 300 (`Time_Bonus += round_timer * 300`).
+- The CPU's "the clock is low" behaviour (`Counter_hi < 0xF` in `src/Com_Sub.c`) stays on once the clock
+  is under 15.

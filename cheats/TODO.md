@@ -57,7 +57,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Every hit plays the KO slow motion (SMW "Bullet Time for Banzai Bill"): `set_conclusion_slow`
 - [ ] The game runs 1.25 or 1.5 times as fast (OoT "The game runs 1.5 times as fast"): run the fight
       frame more than once per frame
-- [ ] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
+- [x] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
       `Time_Control` (`src/Game_Main.c`), `Check_Time_Over` (`src/manage_2.c`)
 - [ ] L pauses, R steps one frame (ALTTP "L pauses the game, R steps one frame"): the 3rd Strike
       version would use spare buttons or player 2's inputs
@@ -137,3 +137,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Time moves only while any controller input is held
 - [ ] Player 1 freezes the opponent by holding Start
 - [ ] Every hit plays the KO slow motion
+- [ ] The round timer never runs out

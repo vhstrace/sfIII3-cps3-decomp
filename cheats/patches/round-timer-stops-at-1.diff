@@ -1,0 +1,27 @@
+diff --git a/src/count.c b/src/count.c
+index a496d66..c8c3f5f 100644
+--- a/src/count.c
++++ b/src/count.c
+@@ -66,7 +66,7 @@ void count_cont_reset(void) {
+ 
+ 
+ 
+-void count_cont_main(void) {
++void count_cont_main_orig(void) {
+     if (!Break_Into && !sa_stop_check() && !EXE_flag && !Game_pause) {
+         counter_control();
+     }
+@@ -231,3 +231,13 @@ s32 bcounter_down(u8 stop) {
+     }
+     return Counter_hi;
+ }
++
++
++#pragma section CHEAT
++/* The round clock counts down to 1 and stops there, so time never runs out. */
++void count_cont_main(void) {
++    if (Counter_hi > 1) {
++        count_cont_main_orig();
++    }
++}
++#pragma section
