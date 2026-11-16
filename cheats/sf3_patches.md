@@ -656,6 +656,8 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 literal pool of `nm_18000`.
 **Recorded:** 2026-11-15 20:12:08
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the Metroid, SMB2, SMB3 and Super Metroid "Jump again in
 mid-air". `nm_18000` (`src/PLS00.c`) checks a jumping fighter's inputs each frame, and last calls
 `check_air_jump` (`src/PLS01.c`). That starts the air jump only for the characters that have one
@@ -684,7 +686,7 @@ code or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - No limit: pressing up again and again climbs to the top of the screen.
 - Only when `nm_18000` gets to `check_air_jump`: not during an air attack, and an attack or special
   input in the same frame comes first. Up must be pressed again (holding it does nothing).
