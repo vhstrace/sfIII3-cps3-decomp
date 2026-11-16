@@ -495,6 +495,8 @@ applies.
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:06:45
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of OoT "Freeze time for enemies by holding L". Start is the only
 spare button in a fight. `player_mv_4000` (`src/PLMAIN.c`) is a fighter's whole frame once the round has
 started: it reads the lever (or the CPU's virtual lever), runs hit stop or the current state through
@@ -516,7 +518,7 @@ main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Player 2 (human or CPU) stops in place, in mid-air too, with the animation held. Player 2 can still
   be hit: the hit lands, and the reaction plays when Start is let go.
 - Player 2's projectiles and other effects keep moving.
