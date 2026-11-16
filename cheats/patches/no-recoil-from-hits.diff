@@ -1,0 +1,31 @@
+diff --git a/src/PLS02.c b/src/PLS02.c
+index 12dfb59..7d43c5f 100644
+--- a/src/PLS02.c
++++ b/src/PLS02.c
+@@ -252,7 +252,7 @@ void remake_mvxy_PoGR(WORK* wk) {
+ 
+ 
+ 
+-void check_body_touch(void) {
++void check_body_touch_orig(void) {
+     PLW* p1w = &plw[0];
+     PLW* p2w = &plw[1];
+     s16 meri;
+@@ -592,3 +592,17 @@ s32 cal_attdir(WORK* wk) {
+ s16 cal_attdir_flip(s16 index) {
+     return dir16_rl_conv[index];
+ }
++
++
++#pragma section CHEAT
++/* No recoil from hits: when a hit pushes the opponent into the edge of the screen, the push that is
++   left over (hosei_amari) is not passed on to the attacker. Throws keep it. check_damage_hosei runs
++   right after this in Player_control. */
++void check_body_touch(void) {
++    check_body_touch_orig();
++    if (Bonus_Game_Flag == 0 && plw[0].tsukami_f == 0 && plw[1].tsukami_f == 0) {
++        plw[0].hosei_amari = 0;
++        plw[1].hosei_amari = 0;
++    }
++}
++#pragma section
