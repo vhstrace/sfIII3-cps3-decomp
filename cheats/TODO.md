@@ -20,13 +20,12 @@ spawning and copies; and the Tetris piece cheats.
 Allow players and/or the CPU to use these:
 
 - [x] Att_TENSHINSENKYUUTAI_OLD, an older version of a move that replaced it.
-- [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
+- [x] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
   - [x] Att_PL10_MACH_SLIDE: "Yang's Kaihou uses its old, unused version".
   - [x] Att_RESURRECTION2: "Urien's SA II refills his health (his unused resurrection)".
-  - [ ] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): no clean cheat (2026-11-15). Both wait for
-        animation cues 1 and 8 (and 10), but none of Ibuki's special-move animations has them
-        (their cues are 20, 21, 30, 64 and 88). Put in her move table, the move would stop at its
-        first step until the animation ends.
+  - [x] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): "Ibuki's light and medium Hien do her two
+        unused jumps". None of her animations has cues 1, 8 and 10, so the cheat adds new animation
+        scripts made from her jump and landing frames.
 - [x] Normal_air_paring, a separate air-parry state.
 - [ ] check_paring_attack and check_lever_up_attack. No clean cheat (2026-11-15): their tables
       (`asstbl_paring_att`, `asstbl_lever_up_att`) start animations 0-5 ("UP P GUARD") and 18-23

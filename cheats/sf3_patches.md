@@ -1918,3 +1918,80 @@ check (`set_field_hosei_flag`) and the push between fighters still run on the po
 - Also runs in the round intro and win poses. The bonus stages use `Player_move_bonus` and are not
   changed.
 - Can't be built together with "The floor is a conveyor belt", which hooks `Player_move` too.
+
+## Ibuki's light and medium Hien do her two unused jumps (bound jump and hop jump)
+
+**Source diff:** `patches/ibuki-bound-and-hop-jumps.diff`
+**BPS:** `sf3_ggpatch/ibuki-bound-and-hop-jumps/` (simm1.0-.3)
+**Changes:** 715 bytes. 06700000-06700927: the four new animation scripts (`cheat_bound_jump`,
+`cheat_bound_land`, `cheat_hop_jump`, `cheat_hop_land`). 21 bytes outside: `p7_cmd_30` (Hien's
+routine numbers for LK and MK), `ibuki_saca` entries 74, 75, 77 and 78, `pl07_exatt_table` entries
+11 and 12, and Ibuki's Hien row in `asstbl_sa_ground`.
+**Recorded:** 2026-11-15 22:16:59
+
+**Mechanism:** `Att_PL07_BOUND_JUMP` and `Att_PL07_HOP_JUMP` (`src/PLPAT07.c`) are in the ROM but
+not in Ibuki's move table, and no animation was made for them. They step on animation cues:
+
+```c
+case BOUND_JUMP_CUE:                    /* cue 1: take off with jump row r_no */
+    char_move(&wk->wu);
+    if (wk->wu.cg_type == 1) {
+        setup_mvxy_data(&wk->wu, wk->wu.mvxy.index);
+...
+case BOUND_JUMP_MOVE:                   /* after landing and cue 10 */
+    ...
+    case 20: setup_mvxy_data(&wk->wu, 97);   /* bounce up */
+    case 30: setup_mvxy_data(&wk->wu, 98);   /* float down */
+```
+
+The bound jump: a hop (cue 1), cue 8 in the air, land, cue 10, then a high bounce with Ibuki's jump
+rows 97 (16 pixels a frame up, slowing to a stop at the top) and 98 (slow fall), and land again. The
+hop jump: a hop (cue 1); on landing it waits for cue 1 again and hops with the next row; cue 8 in
+the air makes the next landing the last.
+
+None of Ibuki's animations sends cues 1, 8 or 10. A donor animation can't be used as it is: Hien's
+(`ibuki_saca_028`, the best fit, with cue 20 at takeoff and cue 30 in the air) moves her itself with
+`CM_MVIX` commands and lands into a lever-branch script, so the routines would only replay Hien.
+So the cheat adds four new animation scripts in the CHEAT section of `data/ibuki_char.c`, made from
+her own frames: the jump crouch (`ibuki_nmca_012`), the front jump (`ibuki_nmca_014`) and the
+landing (`ibuki_exca_038`), with the cues where the routines wait for them. Each starts with a copy
+of Hien's header. A `CM_RJA` at the start of each script picks the next landing animation:
+
+- `cheat_bound_jump` (saca 74): crouch, take off with cue 1, cue 8 two frames later. Lands into 75.
+- `cheat_bound_land` (saca 75): land with cue 10, crouch, cue 20 (bounce), cue 30 18 frames later
+  (at the top), so she hangs and floats down. Lands into the normal landing (exca 38), which ends
+  the move.
+- `cheat_hop_jump` (saca 77): crouch, take off with cue 1, no cue 8. Lands into 78.
+- `cheat_hop_land` (saca 78): land, crouch, take off with cue 1, cue 8 on the next frame. Lands into
+  exca 38.
+
+The routines go into the empty slots 11 and 12 of `pl07_exatt_table` (routines 27 and 28, were
+`Att_DUMMY`). Hien's command (`p7_cmd_30`, 421+K) now starts routine 27 with LK and 28 with MK
+(HK and EX are unchanged). Its rows in `asstbl_sa_ground` give them the new animations and their
+first jump rows: LK `{ 76, 74, 0 }` (row 76: Hien LK's own hop), MK `{ 124, 77, 0 }` (rows 124
+then 125: a small hop, then a longer one). All in place; the routines themselves are not changed.
+
+**Evidence:** cue lists of all of Ibuki's `saca` scripts (from `data/ibuki_char.c`): only 20, 21,
+30, 40, 64, 88 and 255. `saca` slots 74 and 75 (scripts that only return) and 77 and 78 (copies of 76)
+are not started by any table, script (`CM_JSR`/`CM_JMP`/`CM_RJA` with 5, 74-78) or code.
+`jumping_union_process` (`src/PLS01.c`) lands by setting `routine_no[3]` and starting the
+`CM_RJA` animation (`char_move_cmja`). `exca_038` ends with cue 255, which is how Hien's own landing
+ends. `cal_mvxy_speed` mode 1 stops a speed at 0, so row 97 stops at the top of the bounce after 16
+frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 32-bit words).
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Light and medium Hien are gone; HK and EX Hien still work. The CPU's Ibuki gets the new moves too
+  when it picks light or medium Hien.
+- Neither jump attacks: no attack boxes, as the routines have no attack step. Hurt boxes are the ones
+  from her normal jump frames.
+- The animation is made up from her jump and landing frames, not art made for these moves. The
+  timing (frame lengths, where the cues fall) is a guess.
+- The bounce hangs at the top for a moment and then falls slowly (row 98 only has a small
+  gravity), so the bound jump is long and easy to punish.
+- If the first bound-jump hop lands before cue 8 (it shouldn't: cue 8 comes 2 frames after takeoff),
+  the routine waits for cue 1 in the landing script, which has none, and the move ends after it.

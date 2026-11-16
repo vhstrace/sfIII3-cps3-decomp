@@ -1,0 +1,203 @@
+diff --git a/data/PLPAT07_tbl.c b/data/PLPAT07_tbl.c
+index 3b3dc2b..16aaccb 100644
+--- a/data/PLPAT07_tbl.c
++++ b/data/PLPAT07_tbl.c
+@@ -18,6 +18,8 @@ extern void Att_METAMOR_WAIT();
+ extern void Att_PL07_AT1();
+ extern void Att_PL07_AT2();
+ extern void Att_PL07_AT3();
++extern void Att_PL07_BOUND_JUMP();
++extern void Att_PL07_HOP_JUMP();
+ extern void Att_PL07_SA2();
+ extern void Att_PL07_SA3();
+ extern void Att_PL07_TOKUSHUKOUDOU();
+@@ -27,7 +29,7 @@ extern void Att_SLIDE_and_JUMP();
+ void (*const pl07_exatt_table[18])() = {
+     Att_SHOURYUUKEN,         Att_PL07_AT1,            Att_CHOUCHUURENGEKI,     Att_SLIDE_and_JUMP,  /* 0 */
+     Att_CHOUCHUURENGEKI,     Att_PL07_SA2,            Att_PL07_AT2,            Att_PL07_AT3,  /* 4 */
+-    Att_PL07_SA3,            Att_SLIDE_and_JUMP,      Att_HOMING_JUMP,         Att_DUMMY,  /* 8 */
+-    Att_DUMMY,               Att_DUMMY,               Att_PL07_TOKUSHUKOUDOU,  Att_DUMMY,  /* 12 */
++    Att_PL07_SA3,            Att_SLIDE_and_JUMP,      Att_HOMING_JUMP,         Att_PL07_BOUND_JUMP,  /* 8: cheat, 11 was Att_DUMMY */
++    Att_PL07_HOP_JUMP,       Att_DUMMY,  /* cheat: 12 was Att_DUMMY */               Att_PL07_TOKUSHUKOUDOU,  Att_DUMMY,  /* 12 */
+     Att_METAMOR_WAIT,        Att_METAMOR_REBIRTH,  /* 16 */
+ };
+diff --git a/data/asstbl.c b/data/asstbl.c
+index a994ea3..7e91b01 100644
+--- a/data/asstbl.c
++++ b/data/asstbl.c
+@@ -1444,7 +1444,7 @@ const AS_ROW asstbl_sa_ground[24][18][4] = {
+         { { { 0, 0, 0 }, 1 }, { { 0, 0, 0 }, 1 }, { { 0, 0, 0 }, 1 }, { { 0, 0, 0 }, 1 } },
+         { { { 43, 24, 47 }, 1 }, { { 44, 25, 48 }, 1 }, { { 45, 26, 49 }, 1 }, { { 46, 27, 50 }, 1 } },
+         { { { 105, 32, 0 }, 1 }, { { 107, 33, 0 }, 1 }, { { 109, 34, 0 }, 1 }, { { 109, 34, 0 }, 1 } },
+-        { { { 76, 28, 0 }, 1 }, { { 79, 29, 0 }, 1 }, { { 82, 30, 0 }, 1 }, { { 2, 31, 118 }, 1 } },
++        { { { 76, 74, 0 }, 1 }, { { 124, 77, 0 }, 1 }, { { 82, 30, 0 }, 1 }, { { 2, 31, 118 }, 1 } },  /* cheat: was 76, 28 and 79, 29 */
+         { { { 128, 107, 0 }, 1 }, { { 129, 108, 0 }, 1 }, { { 130, 109, 0 }, 1 }, { { 131, 110, 0 }, 1 } },
+         { { { 67, 40, 85 }, 1 }, { { 70, 41, 86 }, 1 }, { { 73, 42, 87 }, 1 }, { { 121, 102, 87 }, 1 } },
+         { { { 51, 36, 52 }, 1 }, { { 54, 37, 55 }, 1 }, { { 57, 38, 58 }, 1 }, { { 60, 39, 61 }, 1 } },
+diff --git a/data/cmd_data.c b/data/cmd_data.c
+index 48422fa..a5c6c7a 100644
+--- a/data/cmd_data.c
++++ b/data/cmd_data.c
+@@ -768,7 +768,7 @@ const s16 p7_cmd_29[25] = {  /* Ibuki: Raida, 63214+P */
+     CMD_END,
+ };
+ const s16 p7_cmd_30[25] = {  /* Ibuki: Hien, 421+K */
+-    CMD_RESET, CMD_LV_UP, 0, CMD_WAZA_EX(IBUKI_HIEN, IBUKI_HIEN_EX), CMD_BT_CHG | CMD_BT_EX, CMD_EX_KICKS,
++    CMD_RESET, CMD_LV_UP, 0, 27, 28, IBUKI_HIEN, IBUKI_HIEN_EX, CMD_BT_CHG | CMD_BT_EX, CMD_EX_KICKS,  /* cheat: LK bound jump, MK hop jump */
+     CMD_LEVER(0, CMD_LV_BACK),
+     CMD_LEVER(10, CMD_LV_DOWN),
+     CMD_LEVER(10, CMD_LV_DOWN | CMD_LV_BACK),
+diff --git a/data/ibuki_char.c b/data/ibuki_char.c
+index e276ee7..652f65e 100644
+--- a/data/ibuki_char.c
++++ b/data/ibuki_char.c
+@@ -374,6 +374,7 @@ extern const u16 ibuki_exca_076_head[];
+ extern const u16 ibuki_exca_077_head[];
+ extern const u16 ibuki_exca_078_head[];
+ extern const u16 ibuki_saca_000[], ibuki_saca_001[], ibuki_saca_002[], ibuki_saca_024[], ibuki_saca_025[], ibuki_saca_026[], ibuki_saca_027[], ibuki_saca_028[], ibuki_saca_029[], ibuki_saca_030[], ibuki_saca_031[], ibuki_saca_032[], ibuki_saca_033[], ibuki_saca_034[], ibuki_saca_036[], ibuki_saca_037[], ibuki_saca_038[], ibuki_saca_039[], ibuki_saca_040[], ibuki_saca_041[], ibuki_saca_042[], ibuki_saca_043[], ibuki_saca_044[], ibuki_saca_048[], ibuki_saca_049[], ibuki_saca_050[], ibuki_saca_051[], ibuki_saca_052[], ibuki_saca_053[], ibuki_saca_054[], ibuki_saca_055[], ibuki_saca_056[], ibuki_saca_060[], ibuki_saca_061[], ibuki_saca_062[], ibuki_saca_064[], ibuki_saca_065[], ibuki_saca_066[], ibuki_saca_067[], ibuki_saca_068[], ibuki_saca_069[], ibuki_saca_070[], ibuki_saca_071[], ibuki_saca_072[], ibuki_saca_073[], ibuki_saca_074[], ibuki_saca_075[], ibuki_saca_076[], ibuki_saca_080[], ibuki_saca_092[], ibuki_saca_096[], ibuki_saca_097[], ibuki_saca_098[], ibuki_saca_099[], ibuki_saca_102[], ibuki_saca_103[], ibuki_saca_104[], ibuki_saca_105[], ibuki_saca_106[], ibuki_saca_107[], ibuki_saca_108[], ibuki_saca_109[], ibuki_saca_111[], ibuki_saca_112[], ibuki_saca_113[], ibuki_saca_115[], ibuki_saca_116[];
++extern const u16 cheat_bound_jump[], cheat_bound_land[], cheat_hop_jump[], cheat_hop_land[];
+ extern const u16 ibuki_saca_000_head[];
+ extern const u16 ibuki_saca_001_head[];
+ extern const u16 ibuki_saca_002_head[];
+@@ -13618,11 +13619,11 @@ const u32 ibuki_saca[118] = {
+     (u32)ibuki_saca_071,  /* 71 ATTACK 12 SP: after SA I air 23623+P (routine Att_PL07_SA3) */
+     (u32)ibuki_saca_072,  /* 72 ATTACK 13 S: after SA I air 23623+P (routine Att_PL07_SA3) */
+     (u32)ibuki_saca_073,  /* 73 ATTACK 13 M: after SA I air 23623+P (routine Att_PL07_SA3) */
+-    (u32)ibuki_saca_074,  /* 74 ATTACK 13 L: not started by a command */
+-    (u32)ibuki_saca_075,  /* 75 ATTACK 13 SP: not started by a command */
++    (u32)(cheat_bound_jump + 4),  /* 74 cheat: bound jump (was ibuki_saca_074) */
++    (u32)(cheat_bound_land + 4),  /* 75 cheat: bound jump landing (was ibuki_saca_075) */
+     (u32)ibuki_saca_076,  /* 76 not started by a command */
+-    (u32)ibuki_saca_076,  /* 77 not started by a command */
+-    (u32)ibuki_saca_076,  /* 78 not started by a command */
++    (u32)(cheat_hop_jump + 4),  /* 77 cheat: hop jump (was ibuki_saca_076) */
++    (u32)(cheat_hop_land + 4),  /* 78 cheat: hop jump landing (was ibuki_saca_076) */
+     (u32)ibuki_saca_076,  /* 79 not started by a command */
+     (u32)ibuki_saca_080,  /* 80 not started by a command */
+     (u32)ibuki_saca_080,  /* 81 not started by a command */
+@@ -16251,3 +16252,125 @@ const u16 ibuki_cbca_065[16] = {
+     CMD(CM_RJA3, 7, 52, 1),
+     CMD(CM_RET, 0, 0, 0),
+ };
++
++
++#pragma section CHEAT
++/* Cheat: animation scripts for Att_PL07_BOUND_JUMP and Att_PL07_HOP_JUMP, which no animation was
++   made for. Built from the front jump (ibuki_nmca_014) and landing (ibuki_exca_038) frames, with the
++   cues the routines wait for. Each starts with a copy of Hien's header (ibuki_saca_028_head). */
++/* saca 74: crouch, take off (cue 1: first hop, row r_no), cue 8 in the air; lands into saca 75 */
++const u16 cheat_bound_jump[] = {
++    HEAD(6, 20, 9, 13, 2, 0, 27),
++    CMD(CM_RJA, 5, 75, 1), 0, 0, 0, 0, 0, 0, 0, 0,
++    L6(3, 0, 0, 0, 0, 199, 0, 0x2A45, 0, 299, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 1, 281, 0, 0, 201, 0, 0x2A6D, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 202, 0, 0x2A6E, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 8, 0, 0, 0, 203, 0, 0x2A6F, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 204, 0, 0x2A70, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 205, 0, 0x2A71, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 206, 0, 0x2A72, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 207, 0, 0x2A73, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 208, 0, 0x2A74, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 209, 0, 0x2A75, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 210, 0, 0x2A76, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 211, 0, 0x2A77, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 212, 0, 0x2A78, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 213, 0, 0x2A79, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 214, 0, 0x2A7A, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 215, 0, 0x2A7B, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 216, 0, 0x2A7C, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 217, 0, 0x2A7D, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 218, 0, 0x2A7E, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 219, 0, 0x2A7F, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(250, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    CMD(CM_ROA, 0, 0, 0),
++};
++/* saca 75: land (cue 10), crouch, bounce up (cue 20: row 97), float down at the top (cue 30: row 98); lands into exca 38 */
++const u16 cheat_bound_land[] = {
++    HEAD(6, 20, 9, 13, 2, 0, 27),
++    CMD(CM_RJA, 7, 38, 1), 0, 0, 0, 0, 0, 0, 0, 0,
++    L6(2, 10, 273, 0, 0, 147, 0, 0x2A3D, 0, 2, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 148, 0, 0x2A3E, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 149, 0, 0x2A3F, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 20, 281, 0, 0, 201, 0, 0x2A6D, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 202, 0, 0x2A6E, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 203, 0, 0x2A6F, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(4, 0, 0, 0, 0, 204, 0, 0x2A70, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(4, 0, 0, 0, 0, 205, 0, 0x2A71, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(4, 0, 0, 0, 0, 206, 0, 0x2A72, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 30, 0, 0, 0, 207, 0, 0x2A73, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 208, 0, 0x2A74, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 209, 0, 0x2A75, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 210, 0, 0x2A76, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 211, 0, 0x2A77, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 212, 0, 0x2A78, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 213, 0, 0x2A79, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 214, 0, 0x2A7A, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 215, 0, 0x2A7B, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 216, 0, 0x2A7C, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 217, 0, 0x2A7D, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 218, 0, 0x2A7E, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 219, 0, 0x2A7F, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(250, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    CMD(CM_ROA, 0, 0, 0),
++};
++/* saca 77: crouch, take off (cue 1: first hop, row r_no); lands into saca 78 */
++const u16 cheat_hop_jump[] = {
++    HEAD(6, 20, 9, 13, 2, 0, 27),
++    CMD(CM_RJA, 5, 78, 1), 0, 0, 0, 0, 0, 0, 0, 0,
++    L6(3, 0, 0, 0, 0, 199, 0, 0x2A45, 0, 299, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 1, 281, 0, 0, 201, 0, 0x2A6D, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 202, 0, 0x2A6E, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 203, 0, 0x2A6F, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 204, 0, 0x2A70, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 205, 0, 0x2A71, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 206, 0, 0x2A72, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 207, 0, 0x2A73, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 208, 0, 0x2A74, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 209, 0, 0x2A75, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 210, 0, 0x2A76, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 211, 0, 0x2A77, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 212, 0, 0x2A78, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 213, 0, 0x2A79, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 214, 0, 0x2A7A, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 215, 0, 0x2A7B, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 216, 0, 0x2A7C, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 217, 0, 0x2A7D, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 218, 0, 0x2A7E, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 219, 0, 0x2A7F, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(250, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    CMD(CM_ROA, 0, 0, 0),
++};
++/* saca 78: land, crouch, take off again (cue 1: row r_no + 1), cue 8 in the air; lands into exca 38 */
++const u16 cheat_hop_land[] = {
++    HEAD(6, 20, 9, 13, 2, 0, 27),
++    CMD(CM_RJA, 7, 38, 1), 0, 0, 0, 0, 0, 0, 0, 0,
++    L6(2, 0, 273, 0, 0, 147, 0, 0x2A3D, 0, 2, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 148, 0, 0x2A3E, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 1, 281, 0, 0, 201, 0, 0x2A6D, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 8, 0, 0, 0, 202, 0, 0x2A6E, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 203, 0, 0x2A6F, 0, 406, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 204, 0, 0x2A70, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 205, 0, 0x2A71, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(2, 0, 0, 0, 0, 206, 0, 0x2A72, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 207, 0, 0x2A73, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 208, 0, 0x2A74, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 209, 0, 0x2A75, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 210, 0, 0x2A76, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 211, 0, 0x2A77, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 212, 0, 0x2A78, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 213, 0, 0x2A79, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 214, 0, 0x2A7A, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 215, 0, 0x2A7B, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 216, 0, 0x2A7C, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 217, 0, 0x2A7D, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 218, 0, 0x2A7E, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 219, 0, 0x2A7F, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(1, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    L6(250, 0, 0, 0, 0, 220, 0, 0x2A80, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
++    CMD(CM_ROA, 0, 0, 0),
++};
++#pragma section
