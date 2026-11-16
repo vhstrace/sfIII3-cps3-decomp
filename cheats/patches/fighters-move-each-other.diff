@@ -1,0 +1,46 @@
+diff --git a/src/PLMAIN.c b/src/PLMAIN.c
+index 2038cb4..5d7a336 100644
+--- a/src/PLMAIN.c
++++ b/src/PLMAIN.c
+@@ -70,7 +70,7 @@
+ #define EX_READY        1       /* enough for an EX move (ex) */
+ #define EX_USED         2       /* an EX move was started: take its gauge */
+ 
+-void Player_move(PLW* wk, u16 lv_data) {
++void Player_move_orig(PLW* wk, u16 lv_data) {
+     s16 i;
+     if (Demo_Lever_Play != 0xFF) {
+         if (wk->wu.operator) {
+@@ -751,3 +751,32 @@ void clear_tk_flags(PLW* wk) {
+     wk->att_plus = 8;
+     wk->def_plus = 8;
+ }
++
++
++#pragma section CHEAT
++/* Each fighter's movement moves the other one. A fighter's own move still runs as usual, then its
++   change in X is undone and added to the other fighter's X instead. Height can't work by deltas (a
++   jump checks its own height to land), so each fighter keeps its "own" height in pt_free (unused),
++   jumps and falls there, and the other fighter is drawn and hit at that height. Not during throws,
++   where the thrower places the thrown fighter itself. */
++void Player_move(PLW* wk, u16 lv_data) {
++    PLW* em = (wk == &plw[0]) ? &plw[1] : &plw[0];
++    s16* own_y = (s16*)wk->pt_free;
++    s16 x, y;
++
++    if (plw[0].tsukami_f || plw[0].tsukamare_f || plw[1].tsukami_f || plw[1].tsukamare_f) {
++        Player_move_orig(wk, lv_data);
++        *own_y = wk->wu.xyz[1].disp.pos;
++        return;
++    }
++    x = wk->wu.xyz[0].disp.pos;
++    y = wk->wu.xyz[1].disp.pos;
++    wk->wu.xyz[1].disp.pos = *own_y;
++    Player_move_orig(wk, lv_data);
++    em->wu.xyz[0].disp.pos += wk->wu.xyz[0].disp.pos - x;
++    *own_y = wk->wu.xyz[1].disp.pos;
++    em->wu.xyz[1].disp.pos = *own_y;
++    wk->wu.xyz[0].disp.pos = x;
++    wk->wu.xyz[1].disp.pos = y;
++}
++#pragma section

@@ -1854,3 +1854,67 @@ shorter, which moved the code after it. `sf3_cheat.py` found no moved code or da
 - `Jump_Air_Guard` doesn't wait for the AI's `Combo_Speed` delay before jumping.
 - The guard check holds the lever back (and down) in the air. Few attacks can be guarded in the air
   in 3rd Strike, so the guarding may not show.
+
+## Each fighter's movement moves the other fighter
+
+**Source diff:** `patches/fighters-move-each-other.diff`
+**BPS:** `sf3_ggpatch/fighters-move-each-other/` (simm1.0-.3)
+**Changes:** 178 bytes. 06700000-067000AF: the new `Player_move`. 06117989, 06117AB9: its address in the
+literal pools of `move_P1_move_P2` and `move_P2_move_P1` (3 bytes each).
+**Recorded:** 2026-11-15 21:57:44
+
+**Mechanism:** Each frame `move_player_work` (`src/plcntset_2.c`) runs `Player_move` (`src/PLMAIN.c`)
+for each fighter. That runs the fighter's input and current move, which change its own position
+`wu.xyz[0].disp.pos` (X) and `wu.xyz[1].disp.pos` (height).
+
+This is a hook: `Player_move` is renamed `Player_move_orig`, and the new `Player_move` in the CHEAT
+section runs it, then:
+
+- **X:** the fighter's change in X this frame is undone and added to the other fighter's X.
+- **Height:** this can't be done with changes per frame. A jump checks its own height to land, so if
+  its height were undone each frame, it would land at the top of the jump and the other fighter would
+  stay in the air. So each fighter keeps its "own" height in `pt_free` (20 unused bytes at the end of
+  `PLW`, `include/structs.h`, used nowhere in the code). Its move runs at that height, and the other
+  fighter is put at that height. So when player 1 jumps, player 2 goes up and comes down along the same
+  arc, and player 1 stays where player 2's own height is.
+
+```c
+x = wk->wu.xyz[0].disp.pos;
+y = wk->wu.xyz[1].disp.pos;
+wk->wu.xyz[1].disp.pos = *own_y;
+Player_move_orig(wk, lv_data);
+em->wu.xyz[0].disp.pos += wk->wu.xyz[0].disp.pos - x;
+*own_y = wk->wu.xyz[1].disp.pos;
+em->wu.xyz[1].disp.pos = *own_y;
+wk->wu.xyz[0].disp.pos = x;
+wk->wu.xyz[1].disp.pos = y;
+```
+
+While either fighter is throwing or being thrown (`tsukami_f`, `tsukamare_f`), nothing is swapped and
+each fighter's own height is set to its real height, because the thrower places the thrown fighter
+itself.
+
+**Evidence:** `Player_move` is only called from `move_P1_move_P2` and `move_P2_move_P1`
+(`src/plcntset_2.c`), for `plw[0]` and `plw[1]`. `Player_move_orig` already saves `old_pos` before the
+move, as before. `pt_free` follows the `s16 reserv_add_y`, so it is 2-byte aligned. `pli_0000` clears
+both `PLW`s at the start of each round, so the own heights start at 0 (the floor). The screen-edge
+check (`set_field_hosei_flag`) and the push between fighters still run on the positions you see.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Screen X, not "forward": pushing right on player 1's side moves player 2 right. Walking toward the
+  opponent moves the opponent the same way, so it walks away from you.
+- Everything a fighter's own move does moves the other one: dashes, the forward motion of attacks,
+  knockback and knock-downs. A fighter who gets hit sends the attacker flying back.
+- Your own move still runs where you appear to stand, so hits, throws and facing use where you appear.
+  The height your own move thinks it is at is not the one shown, so a jumping fighter's air attacks
+  come out at the other fighter's height.
+- A fighter can end up off the ground (standing in the air) or float for a moment after a throw ends,
+  when the swapped heights jump to new values.
+- Also runs in the round intro and win poses. The bonus stages use `Player_move_bonus` and are not
+  changed.
+- Can't be built together with "The floor is a conveyor belt", which hooks `Player_move` too.
