@@ -1188,47 +1188,6 @@ against main: applies.
 - Can't be built together with the other cheats that hook `Player_damage` ("Player 1 never takes
   damage", "Every hit stuns at once", "Stun never builds up", "Every hit plays the KO slow motion").
 
-## No recoil from hits
-
-**Source diff:** `patches/no-recoil-from-hits.diff`
-**BPS:** `sf3_ggpatch/no-recoil-from-hits/` (simm1.0-.3)
-**Changes:** 78 bytes. 06700000-0670004B: the new `check_body_touch`. 0611684D, 06118939: its address in
-the literal pools of `Player_control` and `Player_control_bonus`.
-**Recorded:** 2026-11-15 20:23:59
-
-**Mechanism:** When a hit pushes the opponent into the edge of the screen, `set_field_hosei_flag`
-(`src/PLS02.c`) stops them there and keeps the push that is left over in `hosei_amari`. Then
-`check_damage_hosei` (`src/plcntset_2.c`) passes it on to the attacker, who is pushed back instead:
-
-```c
-void check_damage_hosei_dageki(PLW* w1, PLW* w2) {
-    if ((w1->dm_hos_flag != 0) && (w2->wu.hit_stop == 0)) {
-        w2->wu.xyz[0].disp.pos += w1->hosei_amari;
-```
-
-`check_damage_hosei` and `check_damage_hosei_dageki` are only called from their own file, so they
-can't be hooked without moving code. `Player_control` calls `check_body_touch` (`src/PLS02.c`) just
-before `check_damage_hosei`, so that is hooked instead: the new `check_body_touch` runs the original,
-then sets both fighters' `hosei_amari` to 0, unless one of them is throwing (`tsukami_f`), since
-throws use it to move the thrower. So the attacker stays where they are when hitting a cornered
-opponent.
-
-**Evidence:** In `Player_control`, `check_body_touch()` is followed directly by
-`check_damage_hosei()`, which sets `hosei_amari` back to 0 at the end, so nothing else reads the
-cleared values (`muriyari_ugoku` is copied from it there and used by effect 02 to follow the
-fighter). Not in bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` against
-main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- Both fighters. Corner pressure is much stronger: an attacker can keep hitting a cornered opponent
-  from close range.
-- The fighters' own knockback in open space is not changed (see "No knockback from hits").
-- Can't be built together with "Fighters walk through each other" (both hook `check_body_touch`).
-
 ## Blocking works holding either way
 
 **Source diff:** `patches/block-holding-either-way.diff`
