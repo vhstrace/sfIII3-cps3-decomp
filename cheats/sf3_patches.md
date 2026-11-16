@@ -2212,3 +2212,41 @@ applies.
 - Both fighters, player or CPU.
 - Can't be built together with "Ground special moves work in the air", which also hooks
   `Player_attack`, without merging the diffs by hand.
+
+## Special moves travel 1.5 times as far sideways
+
+**Source diff:** `patches/specials-travel-1-5x-as-far.diff`
+**BPS:** `sf3_ggpatch/specials-travel-1-5x-as-far/` (simm1.0-.3)
+**Changes:** 235 bytes. 06700000-067000EF: the new `Player_attack`. 065EAF95: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-16 01:17:18
+
+**Mechanism:** The same hook as "Special moves travel twice as far sideways", with half the extra
+movement. The new `Player_attack` (`src/PLPAT.c`) notes the fighter's x position (`xyz[0].cal`,
+16.16), runs the original, and adds half of that frame's sideways movement again:
+
+```c
+wk->wu.xyz[0].cal += (wk->wu.xyz[0].cal - x0) / 2;
+```
+
+The move lasts as long as before, so it is 1.5 times as fast and goes 1.5 times as far. Only special
+moves (`wk->as` in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`), not super arts, command
+normals or leap attacks. Height is not changed.
+
+**Evidence:** As for the twice-as-far version: `Player_attack` is only called through
+`plmain_lv_02`, not during hit stop; walls and pushing are checked after it in `move_player_work`.
+Not while throwing or being thrown, and not in bonus stages. The division rounds toward 0, so a
+leftward move gets the same extra as a rightward one. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Moves that don't travel (most fireballs) change little. Projectiles are not changed.
+- Fast moves may pass the opponent between their active frames, less often than at 2 times.
+- Teleports and follow-ups that move to the opponent go 1.5 times as far from where they started.
+- Both fighters, player or CPU.
+- Can't be built together with "Special moves travel twice as far sideways" or "Ground special moves
+  work in the air" (all three hook `Player_attack`) without merging the diffs by hand.
