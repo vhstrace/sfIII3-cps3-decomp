@@ -2013,6 +2013,8 @@ frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 
 **Changes:** 47 bytes, all in `ibuki_movexy_table` rows 43-50 (06463028-06463085).
 **Recorded:** 2026-11-15 22:43:32
 
+Tags: `demo-ready` `curated` `play-start`
+
 **Mechanism:** Kazekiri (623+K) is `Att_SHOURYUUKEN` (`src/PLPATUNI.c`). Its row in
 `asstbl_sa_ground` gives each strength a rising row (`r_no`: 43 LK, 44 MK, 45 HK, 46 EX) and a
 falling row (`data_ix`: 47-50):
@@ -2054,7 +2056,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - The animation and hit boxes are still the uppercut's: an upward kick that now travels sideways. It
   hits less high, so it is a worse anti-air.
 - The flight distances are worked out from the rows, not measured.
