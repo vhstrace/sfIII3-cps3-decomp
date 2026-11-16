@@ -1638,3 +1638,42 @@ code or data. `git apply --check` against main: applies.
   routines (Gill's and Twelve's change colours, `metamor_color_restore`; the ending's
   `load_player_color_fade`) are not changed.
 - The debug menu's colour viewers are changed too.
+
+## Yang's Senkyuutai uses its old, unused version
+
+**Source diff:** `patches/yang-old-senkyuutai.diff`
+**BPS:** `sf3_ggpatch/yang-old-senkyuutai/` (simm1.2 and .3 only)
+**Changes:** 4 bytes, in place: 065ED256 and 065ED266, two entries of `pl10_exatt_table`.
+**Recorded:** 2026-11-15 20:40:14
+
+**Mechanism:** Yang's 236+K (Senkyuutai, also EX) and his SA II (Tenshin Senkyuutai) run
+`Att_TENSHINSENKYUUTAI` (`src/PLPATUNI.c`), from entries 1 and 5 of his move table
+`pl10_exatt_table` (`data/plpat10_tbl.c`). The ROM also has `Att_TENSHINSENKYUUTAI_OLD`, which
+nothing uses. It is the same except that it lacks the newer version's contact step:
+
+```c
+if (wk->wu.routine_no[3] != TENSHINSENKYUU2_MOVE2 && wk->hos_fi_flag | wk->hos_em_flag) {
+    char_move_cmj4(&wk->wu);
+    wk->wu.routine_no[3] = TENSHINSENKYUU2_MOVE2;
+}
+```
+
+(when Yang is pushed by the opponent's body or a wall during the move, the new version skips the
+animation ahead and moves on to a second phase; the script's cue 50 does the same). This is an
+in-place change: the two table entries point to `Att_TENSHINSENKYUUTAI_OLD`.
+
+**Evidence:** `Att_TENSHINSENKYUUTAI_OLD` is in the ROM (061278A8 in `functions.tsv`) and is not
+referenced. `pl10_exatt_table` is Yang's only use of either routine. Only the low half of each
+4-byte pointer changed (2 bytes each), so only chips simm1.2 and .3 change. `sf3_cheat.py` found no
+moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The difference only shows when Yang runs into the opponent or a wall during the move: the old
+  version keeps playing the move's animation instead of cutting to its follow-up. This may make the
+  move miss, hit differently, or look odd.
+- Uses no cheat code space, so this patch can be applied on top of one other cheat's patches, as long
+  as that cheat doesn't change `data/plpat10_tbl.c`.
