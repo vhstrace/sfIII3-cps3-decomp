@@ -169,4 +169,9 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] All music plays 1.5 times as fast
 - [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
+
+## To test: new cheats from the to-do items
+
+Added on 2026-11-15 while working through the unchecked items above. Built but not tested yet.
+
 - [ ] Yang's Kaihou uses its old, unused version
