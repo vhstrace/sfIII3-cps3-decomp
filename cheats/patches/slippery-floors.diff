@@ -1,41 +1,57 @@
-diff --git a/src/PLPNM.c b/src/PLPNM.c
-index 0c1bad9..3a4ea6f 100644
---- a/src/PLPNM.c
-+++ b/src/PLPNM.c
-@@ -83,7 +83,7 @@ void Normal_00000(PLW* wk) {
- }
+diff --git a/src/PLMAIN.c b/src/PLMAIN.c
+index 2038cb4..db9cd67 100644
+--- a/src/PLMAIN.c
++++ b/src/PLMAIN.c
+@@ -247,7 +247,7 @@ void player_mv_3000(PLW* wk) {
  
  
--void Normal_01000(PLW* wk) {
-+void Normal_01000_orig(PLW* wk) {
-     if (wk->the_same_players) {
-         wk->wu.next_z = wk->wu.my_priority + 1;
-     }
-@@ -97,3 +97,27 @@ void Normal_01000(PLW* wk) {
-         break;
-     }
+ 
+-void player_mv_4000(PLW* wk) {
++void player_mv_4000_orig(PLW* wk) {   /* was player_mv_4000: unchanged */
+     wk->permited_koa = 0;
+     check_extra_jump_timer(wk);
+     if (wk->sa_stop_flag != 1) {
+@@ -751,3 +751,43 @@ void clear_tk_flags(PLW* wk) {
+     wk->att_plus = 8;
+     wk->def_plus = 8;
  }
 +
 +
 +#pragma section CHEAT
-+/* Slippery floors: a standing fighter keeps the sideways speed of the walk, dash, jump or move before,
-+   and slows down by 1/16 of it each frame. */
-+void Normal_01000(PLW* wk) {
-+    s32 sp;
-+    Normal_01000_orig(wk);
-+    if (wk->wu.xyz[1].disp.pos != 0) {
++/* Slippery floors: on the ground, a fighter's sideways speed only eases toward the speed the game
++   moves them at. It catches up by 1/4 of the difference a frame when speeding up, and by 1/16 when
++   slowing down or turning, so a fighter slides on after a walk, dash, landing or hit. The speed is
++   kept in pt_free[8-9], in 1/256 pixels a frame. */
++void player_mv_4000(PLW* wk) {
++    s16* v = (s16*)&wk->pt_free[8];
++    s32 x0 = wk->wu.xyz[0].cal;
++    s32 dx;
++    s32 d;
++    player_mv_4000_orig(wk);
++    if (Bonus_Game_Flag || wk->tsukami_f || wk->tsukamare_f) {
++        *v = 0;
 +        return;
 +    }
-+    sp = wk->wu.mvxy.a[0].sp;
-+    if (wk->wu.rl_flag) {
-+        wk->wu.xyz[0].cal += sp;
++    if (wk->wu.hit_stop || wk->wu.dm_stop) {
++        return;
++    }
++    dx = (wk->wu.xyz[0].cal - x0) >> 8;
++    if (dx > 0x2000 || dx < -0x2000) {
++        *v = 0;
++        return;
++    }
++    if (wk->wu.xyz[1].disp.pos > 0) {
++        *v = dx;
++        return;
++    }
++    d = dx - *v;
++    if (d > -16 && d < 16) {
++        *v = dx;
++    } else if ((*v >= 0 && d > 0 && dx > 0) || (*v <= 0 && d < 0 && dx < 0)) {
++        *v += d / 4;
 +    } else {
-+        wk->wu.xyz[0].cal -= sp;
++        *v += d / 16;
 +    }
-+    sp -= sp >> 4;
-+    if (sp < 0x1000 && sp > -0x1000) {
-+        sp = 0;
-+    }
-+    wk->wu.mvxy.a[0].sp = sp;
++    wk->wu.xyz[0].cal = x0 + ((s32)*v << 8);
 +}
 +#pragma section
