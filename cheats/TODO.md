@@ -23,8 +23,17 @@ Allow players and/or the CPU to use these:
 - [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
   - [x] Att_PL10_MACH_SLIDE: "Yang's Kaihou uses its old, unused version".
   - [x] Att_RESURRECTION2: "Urien's SA II refills his health (his unused resurrection)".
+  - [ ] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): no clean cheat (2026-11-15). Both wait for
+        animation cues 1 and 8 (and 10), but none of Ibuki's special-move animations has them
+        (their cues are 20, 21, 30, 64 and 88). Put in her move table, the move would stop at its
+        first step until the animation ends.
 - [x] Normal_air_paring, a separate air-parry state.
-- [ ] check_paring_attack and check_lever_up_attack.
+- [ ] check_paring_attack and check_lever_up_attack. No clean cheat (2026-11-15): their tables
+      (`asstbl_paring_att`, `asstbl_lever_up_att`) start animations 0-5 ("UP P GUARD") and 18-23
+      ("OKIAGARI", attacks while getting up). For every fighter these are placeholders: one
+      frame of a blank sprite (script 2, or 18 for Twelve and Shin Gouki), or a few frames of an
+      unrelated non-attack animation (scripts 0 and 1). Shin Gouki's 0-5 are reused for his
+      Raging Demon. Calling the checks would start a move that shows nothing and ends at once.
 - [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
 - [x] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
 
