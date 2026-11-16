@@ -229,8 +229,8 @@ command code keeps only the newest parry flag). Projectiles hitting a fighter ar
 
 - Not tested.
 - Player 2 still can't parry where the game forbids it: while dizzy (`py->flag`), in moves that set the
-  `spmv_ng_flag` parry bits, when `guard_flag & 2`, or against attacks without parry bits in
-  `att.guard` (throws, most supers' later hits are still parryable as usual).
+  `spmv_ng_flag` parry bits, when `guard_flag & 2`, or against attacks whose `att.guard` has no parry
+  bits (such as throws).
 - Throws: `check_blocking_flag` also reads `waza_flag[3]` and `[4]`, so player 2 counts as "parrying"
   when a throw lands and can't tech it (`hazusenai_flag`).
 - Player 2 gets the parry score, Super Art gauge and grade points for every parry.
