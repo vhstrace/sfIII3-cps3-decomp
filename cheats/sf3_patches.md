@@ -1256,3 +1256,33 @@ word; the original also returns 0 when the fight doesn't allow input (`Allow_a_b
 - The CPU never blocks, parries, attacks, gets up quickly or techs throws.
 - Gill's resurrection and other automatic things that don't need input still happen.
 - The attract-mode demo and the bonus stages play as usual.
+- Can't be built together with "The CPU opponent keeps running away" (both hook `CPU_Sub`).
+
+## The CPU opponent keeps running away
+
+**Source diff:** `patches/cpu-keeps-running-away.diff`
+**BPS:** `sf3_ggpatch/cpu-keeps-running-away/` (simm1.0-.3)
+**Changes:** 81 bytes. The new `CPU_Sub` at 06700000. 06119639: its address in the literal pool of
+`Player_move`.
+**Recorded:** 2026-11-15 20:26:54
+
+**Mechanism:** The 3rd Strike version of EarthBound "Enemies on the map always run away from Ness" and
+SMB2 "Enemies face and walk away". Same place as "The CPU opponent stands still": `CPU_Sub`
+(`src/Com_Pl.c`) gives `Player_move` the CPU's input for the frame. This is a hook: in a paid game
+(`Demo_Flag` set), outside bonus stages, and while the fight allows input (the same
+`Allow_a_battle_f` and `pcon_dp_flag` test the original starts with), the new `CPU_Sub` returns
+`LEVER_LEFT` if the CPU is left of its opponent and `LEVER_RIGHT` otherwise, without running the AI.
+
+**Evidence:** `CPU_Sub` is only called from `Player_move`, which passes its result through
+`processed_lvbt` like a player's `p1sw_0`. Lever bits from `include/work.h`. `sf3_cheat.py` found no
+moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The CPU walks backward until it reaches the edge of the screen, then stays there.
+- Holding back also blocks, so the CPU blocks every high and mid attack (but not lows or throws).
+- Can't be built together with "The CPU opponent stands still" (both hook `CPU_Sub`).
+- The attract-mode demo and the bonus stages play as usual.
