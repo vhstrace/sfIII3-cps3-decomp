@@ -1034,3 +1034,35 @@ against main: applies.
 - The animation runs at its normal rate. A shell's lifetime is in frames, so slow shells that end by
   time go twice as far.
 - Homing shells (kind 6) turn at their normal rate, so they may miss more.
+- Can't be built together with "Projectiles stay where they appear" (both hook `effect_13_move`).
+
+## Projectiles stay where they appear
+
+**Source diff:** `patches/projectiles-stay-where-they-appear.diff`
+**BPS:** `sf3_ggpatch/projectiles-stay-where-they-appear/` (simm1.0-.3)
+**Changes:** 97 bytes. 06700000-06700060: the new `effect_13_move`. 061B8871: its entry in the effect
+jump table `effmovejptbl` (`data/EFFECT_tbl.c`).
+**Recorded:** 2026-11-15 20:21:21
+
+**Mechanism:** The 3rd Strike version of ALTTP "Sword beams stay where they appear". Same place as
+"Projectiles fly twice as fast": each frame `effect_13_move` (`src/EFF13.c`) runs the shell's process,
+which moves it in its flight state (`routine_no[1] == R1_MOVE`). This is a hook: the new
+`effect_13_move` saves the shell's position (`xyz[0].cal`, `xyz[1].cal`), runs the original, and if
+the shell was and still is in flight, puts the position back. The shell still animates, counts down
+its lifetime and can hit.
+
+**Evidence:** `effect_13_move` is reached only through `effmovejptbl`. The hit, end and explosion
+states (`R1_HIT`, `R1_VANISH`) are not changed, so a shell that hits or runs out plays its end
+pattern as usual. `sf3_cheat.py` found no moved code or data. `git apply --check` against main:
+applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- A fireball hangs in front of the fighter who threw it until it hits or its lifetime ends (999
+  frames, about 16 seconds, for Ryu's). Most characters can't throw another one until then.
+- All kinds of shell, including ones that work differently (Oro's tengu stones, falling shells); those
+  stay where they are made too, which may look odd.
+- Can't be built together with "Projectiles fly twice as fast" (both hook `effect_13_move`).

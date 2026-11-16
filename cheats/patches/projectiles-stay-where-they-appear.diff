@@ -1,0 +1,33 @@
+diff --git a/src/EFF13.c b/src/EFF13.c
+index 1a7de5a..2a87f9c 100644
+--- a/src/EFF13.c
++++ b/src/EFF13.c
+@@ -89,7 +89,7 @@ s32 erase_my_shell_ix(WORK* wk, s16 ix);
+ #define R1_LAND         2       /* play the landing pattern, then finish */
+ 
+ 
+-void effect_13_move(WORK_Other* ewk) {
++void effect_13_move_orig(WORK_Other* ewk) {
+     TAMA* tama = (TAMA*)ewk->wu.my_effadrs;
+     PLW* mwk;
+     PLW* emwk;
+@@ -1682,3 +1682,19 @@ u8 data;
+     }
+     return 0;
+ }
++
++
++#pragma section CHEAT
++/* Projectiles stay where they appear: while a shell is in normal flight, its position is put back
++   after its process has moved it. */
++void effect_13_move(WORK_Other* ewk) {
++    s32 x = ewk->wu.xyz[0].cal;
++    s32 y = ewk->wu.xyz[1].cal;
++    s32 run = (ewk->wu.routine_no[0] == R0_MOVE && ewk->wu.routine_no[1] == R1_MOVE);
++    effect_13_move_orig(ewk);
++    if (run && ewk->wu.routine_no[0] == R0_MOVE && ewk->wu.routine_no[1] == R1_MOVE) {
++        ewk->wu.xyz[0].cal = x;
++        ewk->wu.xyz[1].cal = y;
++    }
++}
++#pragma section
