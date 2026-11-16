@@ -122,7 +122,7 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 ## Graphics
 
-- [ ] Fighters use colours from past the end of the colour table (Tetris "Level palettes are read from
+- [x] Fighters use colours from past the end of the colour table (Tetris "Level palettes are read from
       past the end of color table"): `Setup_PL_Color` (`src/next_cpu.c`)
 
 ## To test
@@ -166,3 +166,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Music, sound effects and voices play 2 whole tones higher
 - [ ] Every sound effect is the next one in the list
 - [ ] All music plays 1.5 times as fast
+- [ ] Fighters use colours from past the end of their colour table
