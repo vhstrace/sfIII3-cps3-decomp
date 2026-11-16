@@ -145,3 +145,43 @@ applies.
 - Player 2 gets no score for hitting player 1, since `Additinal_Score_DM` only runs when `dm_vital` is not 0.
 - Throw damage was not traced separately; if a throw takes health some other way, it still does.
 - Player 2 takes damage as normal.
+
+## Health drains slowly during a round
+
+**Source diff:** `patches/health-drains-slowly.diff`
+**BPS:** `sf3_ggpatch/health-drains-slowly/` (simm1.0-.3)
+**Changes:** 159 bytes. 06700000-0670009F: the new `vital_cont_main`. 06095C21: its address in the literal
+pool of `Game2_1` (`sf3_cheat.py` names the nearest symbol, `Game2_3`).
+**Recorded:** 2026-11-15 19:59:03
+
+**Mechanism:** The 3rd Strike version of the OoT "Link loses a quarter heart every 20 seconds" drain (and
+the Metroid, Zelda 1 and ALTTP drains). `vital_cont_main` (`src/VITAL.c`) runs once per fight frame
+from `Game2_1` and redraws the health bars from `plw[pl].wu.vital_new`. This is a hook: the original is
+renamed `vital_cont_main_orig`, and the new one first takes 1 point from each fighter every 30 frames:
+
+```c
+if (Allow_a_battle_f && Bonus_Game_Flag == 0 && !EXE_flag && !Game_pause && (Game_timer % 30) == 0) {
+    for (i = 0; i < 2; i++) {
+        if (plw[i].dead_flag == 0 && plw[i].wu.vital_new > 1 && plw[i].wu.vital_new <= VITAL_FULL) {
+            plw[i].wu.vital_new--;
+        }
+    }
+}
+vital_cont_main_orig();
+```
+
+`Allow_a_battle_f` is the flag `Time_Control` uses to run the round clock, so the drain stops before
+"Fight!" and after the round ends. `EXE_flag` stops it in the KO slow motion.
+
+**Evidence:** `Game_timer` (u16) counts fight frames in `Game2_1`. A full bar is 160 points
+(`VITAL_FULL`), so a full bar drains in 80 seconds; a round lasts 99 counts of 60 frames on the default
+timer speed. `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The drain stops at 1 point, so it never KOs; the next hit does.
+- Both fighters drain the same, so on time over the one who took less damage still wins.
+- The red "recent damage" part of the bar should follow the drain, as it does for chip damage.
