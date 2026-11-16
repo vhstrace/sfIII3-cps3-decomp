@@ -927,8 +927,8 @@ itself moved them.
 
 **Evidence:** `hit_check_main_process` is only called from other files (`src/Game_Main.c`, the
 `debug_play` routines). Box layout (x, width, y, height) from `hit_check_subroutine` and
-`include/structs.h`. The hit check doesn't draw anything, and the fighter is back in place before
-`add_next_position` sets the drawing position. Only during a battle (`Allow_a_battle_f`) and not in
+`include/structs.h`. The hit check doesn't draw anything, and the drawing position (`position_x`) was
+already set by `add_next_position` in `Player_control`, earlier in the frame. Only during a battle (`Allow_a_battle_f`) and not in
 bonus stages. `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
