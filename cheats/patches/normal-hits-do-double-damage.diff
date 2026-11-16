@@ -1,0 +1,25 @@
+diff --git a/src/pow_pow.c b/src/pow_pow.c
+index b6ff80f..e9aab14 100644
+--- a/src/pow_pow.c
++++ b/src/pow_pow.c
+@@ -68,7 +68,7 @@
+ 
+ 
+ 
+-void cal_damage_vitality(PLW* as, PLW* ds) {
++void cal_damage_vitality_orig(PLW* as, PLW* ds) {
+     u16 att_pow = as->wu.att.pow;
+     s16 rate;
+     s16 power = Power_Data[att_pow];
+@@ -194,3 +194,11 @@ void Score_Sub(void) {
+         score8x16_put(Score_X_Pos_Data[1][Game_setting.Screen_Mode], 0, 16, num);
+     }
+ }
++
++
++#pragma section CHEAT
++void cal_damage_vitality(PLW* as, PLW* ds) {
++    cal_damage_vitality_orig(as, ds);
++    ds->wu.dm_vital = ds->wu.dm_vital * 2;
++}
++#pragma section
