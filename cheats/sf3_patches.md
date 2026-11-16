@@ -991,3 +991,46 @@ a fighter in hit stun, `tsukamarenai_flag`, and so on). `sf3_cheat.py` found no 
 - The thrown fighter may jump across the screen in one frame.
 - Can't be built together with the other cheats that hook `hit_check_main_process` ("Player 2
   automatically parries every attack", "Every attack hits the opponent no matter where they are").
+
+## Projectiles fly twice as fast
+
+**Source diff:** `patches/projectiles-fly-twice-as-fast.diff`
+**BPS:** `sf3_ggpatch/projectiles-fly-twice-as-fast/` (simm1.0-.3)
+**Changes:** 148 bytes. 06700000-06700097: the new `effect_13_move`. 061B8871: its entry in the effect
+jump table `effmovejptbl` (`data/EFFECT_tbl.c`).
+**Recorded:** 2026-11-15 20:20:25
+
+**Mechanism:** The 3rd Strike version of the SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast"
+cheats. Projectiles are effect 13 (`src/EFF13.c`, see "Worked example: Ryu throws a fireball" in
+`docs/HOW_THE_GAME_WORKS.md`). Each frame `effect_13_move` runs the shell's own process from
+`kind_of_tama_process`; most of them move the shell in their flight state like `kotp_00000`:
+
+```c
+case R1_MOVE:
+    ...
+    } else {
+        add_mvxy_speed(&ewk->wu);
+    }
+    cal_mvxy_speed(&ewk->wu);
+```
+
+This is a hook: the new `effect_13_move` runs the original, and if the shell is still in flight
+(`routine_no[1] == R1_MOVE`, no hit stop) and is a kind whose flight step is `add_mvxy_speed`
+(kinds 0, 3, 5-9, 12, 15 and 16), calls `add_mvxy_speed` once more, so it moves twice as far each
+frame.
+
+**Evidence:** `effect_13_move` is reached only through `effmovejptbl`. The kinds were found by reading
+each `kotp_*` routine's `R1_MOVE` case. Only on frames where the original moved the shell
+(`EXE_flag` and `Game_pause` clear). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters' projectiles. Kinds 1, 2 (Q? Oro's tengu stones), 4, 10, 11, 13 and 14 are not changed;
+  which characters use which kind was not checked.
+- The animation runs at its normal rate. A shell's lifetime is in frames, so slow shells that end by
+  time go twice as far.
+- Homing shells (kind 6) turn at their normal rate, so they may miss more.

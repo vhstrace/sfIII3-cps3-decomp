@@ -1,0 +1,32 @@
+diff --git a/src/EFF13.c b/src/EFF13.c
+index 1a7de5a..3aa3eff 100644
+--- a/src/EFF13.c
++++ b/src/EFF13.c
+@@ -89,7 +89,7 @@ s32 erase_my_shell_ix(WORK* wk, s16 ix);
+ #define R1_LAND         2       /* play the landing pattern, then finish */
+ 
+ 
+-void effect_13_move(WORK_Other* ewk) {
++void effect_13_move_orig(WORK_Other* ewk) {
+     TAMA* tama = (TAMA*)ewk->wu.my_effadrs;
+     PLW* mwk;
+     PLW* emwk;
+@@ -1682,3 +1682,18 @@ u8 data;
+     }
+     return 0;
+ }
++
++
++#pragma section CHEAT
++/* Projectiles fly twice as fast: a shell in normal flight moves by its speed a second time each frame.
++   Only the kinds of shell whose flight step is add_mvxy_speed (kotp 0, 3, 5-9, 12, 15, 16). */
++void effect_13_move(WORK_Other* ewk) {
++    TAMA* tama = (TAMA*)ewk->wu.my_effadrs;
++    s32 run = (ewk->wu.routine_no[0] == R0_MOVE && EXE_flag == 0 && Game_pause == 0);
++    effect_13_move_orig(ewk);
++    if (run && ewk->wu.routine_no[0] == R0_MOVE && ewk->wu.routine_no[1] == R1_MOVE &&
++        ewk->wu.hit_stop == 0 && ((0x193E9 >> tama->kind_of_tama) & 1)) {
++        add_mvxy_speed(&ewk->wu);
++    }
++}
++#pragma section
