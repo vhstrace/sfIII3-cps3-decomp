@@ -1807,3 +1807,50 @@ main: applies.
   is less time to attack back in the air.
 - For both players and the CPU. Ground parries are not changed.
 - Uses no cheat code space.
+
+## The CPU opponent only jumps backward and guards in the air (unused CPU AI)
+
+**Source diff:** `patches/cpu-jumps-back-and-guards.diff`
+**BPS:** `sf3_ggpatch/cpu-jumps-back-and-guards/` (simm1.0-.3)
+**Changes:** 267 bytes. The new `Jump` at 06700000. Its address in 86 literal pools, all in the CPU
+AI's `Passive*`, `Active*`, `Pattern*` and `Shell*` routines (`src/Com_*.c`, `src/active*.c` and
+the rest).
+**Recorded:** 2026-11-15 20:53:15
+
+**Mechanism:** The CPU AI jumps with `Jump(wk, Jump_Dir)` (`src/Com_Sub.c`), which picks the jump
+direction and checks once, as the CPU leaves the ground, whether to guard (`Check_Air_Guard`). The
+ROM also has `Jump_Air_Guard`, which nothing uses:
+
+```c
+case 0:
+    ...
+    Free_Lever[wk->wu.id] = Setup_Guard_Lever(wk, Lever);   /* Lever 1: away from the opponent */
+case 1:
+    Lever_Buff[wk->wu.id] = Free_Lever[wk->wu.id] | 1;      /* up and away */
+    ...
+default:
+    Check_Air_Guard(wk);                                     /* every frame in the air */
+    Lever_Buff[wk->wu.id] = Lever_LR[wk->wu.id];
+```
+
+This is a hook: `Jump` is renamed `Jump_orig`, and the new `Jump` in the CHEAT section calls
+`Jump_Air_Guard(wk, 1)`. `Keep_Away` in the same file now calls `Jump_orig`, so its code stays the
+same size.
+
+**Evidence:** `Jump_Air_Guard` (0600BB08 in `functions.tsv`) is not referenced. Its steps use
+`CP_Index[id][1]` the same way `Jump` does, and end the AI step the same way when the CPU lands.
+`Keep_Away` was the only same-file caller; calling `Jump` from the CHEAT section made it 16 bytes
+shorter, which moved the code after it. `sf3_cheat.py` found no moved code or data. `git apply
+--check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only the CPU. Every jump its AI picks becomes a back jump; it no longer jumps in, except for its
+  high jumps (`Hi_Jump`), jump attacks (`Jump_Attack` and others) and the keep-away jump, which
+  are separate routines.
+- `Jump_Air_Guard` doesn't wait for the AI's `Combo_Speed` delay before jumping.
+- The guard check holds the lever back (and down) in the air. Few attacks can be guarded in the air
+  in 3rd Strike, so the guarding may not show.

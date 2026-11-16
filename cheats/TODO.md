@@ -26,7 +26,7 @@ Allow players and/or the CPU to use these:
 - [x] Normal_air_paring, a separate air-parry state.
 - [ ] check_paring_attack and check_lever_up_attack.
 - [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
-- [ ] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
+- [x] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
 
 ## Damage and health
 
@@ -178,3 +178,4 @@ Added on 2026-11-15 while working through the unchecked items above. Built but n
 - [ ] Yang's Kaihou uses its old, unused version
 - [ ] Urien's SA II refills his health (his unused resurrection)
 - [ ] Air parries knock you backward (the old, unused air parry)
+- [ ] The CPU opponent only jumps backward and guards in the air (unused CPU AI)
