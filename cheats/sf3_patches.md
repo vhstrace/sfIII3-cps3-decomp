@@ -334,3 +334,54 @@ found no moved code or data. `git apply --check` against main: applies.
 - While dizzy (`py->flag`), no stun is added, so a dizzy fighter can be hit freely; the next stun
   comes with the first stunning hit after they recover.
 - Mashing still shortens the dizzy time as usual.
+
+## Stun never builds up
+
+**Source diff:** `patches/stun-never-builds-up.diff`
+**BPS:** `sf3_ggpatch/stun-never-builds-up/` (simm1.0-.3)
+**Changes:** 100 bytes. 06700000-06700063: the new `setup_catch_atthit`, `Player_damage` and
+`subtract_dm_vital_aiuchi`. 065EAF89: the `Player_damage` entry of the jump table in `data/PLMAIN_tbl.c`.
+06125A01, 06116F05, 06118CF1: the addresses of `setup_catch_atthit` and `subtract_dm_vital_aiuchi` in
+the literal pools of `catch_cg_type_check`, `plcnt_move` and `plcnt_b_move` (3 bytes each).
+**Recorded:** 2026-11-15 20:04:14
+
+**Mechanism:** The opposite of "Every hit stuns at once", with the same hooks. Stun is added to the stun gauge (`py->now.quantity.h`) in three
+places, and a fighter becomes dizzy when it reaches `py->genkai`:
+
+```c
+} else if (wk->py->flag == 0) {
+    wk->py->now.quantity.h += wk->wu.dm_piyo;
+    if (wk->py->now.quantity.h >= wk->py->genkai) {
+        wk->py->now.timer = 0;
+        wk->py->flag = 1;
+    }
+}
+```
+
+That is `subtract_dm_vital` and `subtract_dm_vital_aiuchi` (`src/PLPDM.c`, hits and trades) and
+`subtract_cu_vital` (`src/PLPCA.c`, throws). `dm_piyo` is set earlier by the hit check
+(`set_damage_and_piyo`, `effect_at_vs_player_dm`) and by `setup_catch_atthit` for throws. Those functions
+and `subtract_dm_vital` and `subtract_cu_vital` have short calls from their own files, so the hooks are
+on the functions around them, the same three as in "Player 1 never takes damage": `Player_damage`
+(reached only from the jump table in `data/PLMAIN_tbl.c`; on the first frame of a hit, before it calls
+`subtract_dm_vital`), `subtract_dm_vital_aiuchi`, and `setup_catch_atthit` (after the original). Each does:
+
+```c
+if (wk->wu.dm_piyo != 0) {
+    wk->wu.dm_piyo = 0;
+}
+```
+
+Hits that add no stun (guarded and parried hits set `dm_piyo = 0`) are left alone.
+
+**Evidence:** `grep` finds `quantity.h += wk->wu.dm_piyo` only in those three functions. `sf3_cheat.py`
+found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU. Nobody can be dizzied, and the stun gauge stays empty.
+- This uses the same hooks as "Player 1 never takes damage" and "Every hit stuns at once", so it can't be
+  built together with them as is.

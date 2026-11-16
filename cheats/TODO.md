@@ -43,7 +43,7 @@ Allow players and/or the CPU to use these:
       PP", Metroid "Energy pickups refill all of Samus's energy"): `src/spgauge.c`
 - [x] Every hit stuns at once (EarthBound "Every enemy starts each battle feeling strange"): the stun
       value `dm_piyo` in `set_damage_and_piyo` (`src/HITCHECK.c`)
-- [ ] Stun never builds up: the same place
+- [x] Stun never builds up: the same place
 
 ## Speed and time
 
@@ -132,3 +132,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Player 2 automatically parries every attack
 - [ ] The Super Art gauge is always full
 - [ ] Every hit stuns at once
+- [ ] Stun never builds up
