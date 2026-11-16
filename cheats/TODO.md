@@ -136,7 +136,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
 - [ ] Projectiles pass through each other
-- [ ] Blocking works holding either way
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast

@@ -1196,6 +1196,8 @@ address in the literal pools of `set_caught_status`, `player_at_vs_player_dm` an
 `effect_at_vs_player_dm`.
 **Recorded:** 2026-11-15 20:25:06
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** The 3rd Strike version of Zelda 1 and ALTTP "Shield blocks shots from any direction". When
 a hit lands, `get_guard_direction` (`src/PLS02.c`) works out which way the defender must hold the
 lever to block: 1 or 2 (away from the attacker), or 3 (either way). `defense_ground` and
@@ -1221,7 +1223,7 @@ returns 3 for a projectile that comes from behind.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Both fighters, player or CPU.
 - The fighter still needs to be able to block (not attacking or in the air without air block), and
   high/low still matters.
