@@ -1719,3 +1719,49 @@ referenced. `cmd_data.c` names routine 23 `YANG_KAIHOU`, and `pl10_exatt_table` 
   may rise or sink during the old slide. He may also slide differently when he reaches the opponent.
 - It changes the same table line as "Yang's Senkyuutai uses its old, unused version", so the two
   diffs can't be combined as they are. Uses no cheat code space.
+
+## Urien's SA II refills his health (his unused resurrection)
+
+**Source diff:** `patches/urien-sa2-resurrection.diff`
+**BPS:** `sf3_ggpatch/urien-sa2-resurrection/` (simm1.1-.3)
+**Changes:** 10 bytes, in place: 065ED39E (entry 5 of `pl13_exatt_table`) and 8 bytes of Urien's
+SA II row in `asstbl_sa_ground` (065F1831-065F184B).
+**Recorded:** 2026-11-15 20:50:39
+
+**Mechanism:** Gill's Resurrection is `Att_RESURRECTION` (`src/PLPAT00.c`), with animation 53. Urien
+was built from Gill, and the ROM still has his copy: `Att_RESURRECTION2` (`src/PLPAT13.c`), its
+refill table `glap_table2` (`data/plpat13_tbl.c`), and an animation 53 ("not started by a command",
+`urien_saca_053`) with the same cues (26, 24, 22) as Gill's. Nothing starts them:
+
+```c
+case RESURRECTION2_CUE:
+    char_move(&wk->wu);
+    if (wk->wu.cg_type) {
+        wk->wu.direction = get_life_add_point2(wk->wu.cg_type, wk->wu.direction);
+    ...
+    wk->wu.vital_new += wk->wu.direction;
+    if (wk->wu.vital_new < wk->wu.vitality) {
+        return;
+```
+
+(cue 26 refills 4 points a frame, 24 three and 22 two, until the bar is full). This cheat puts the
+move on Urien's SA II, Temporal Thunder (236236+P), two in-place changes: entry 5 of
+`pl13_exatt_table` (attack routine 21, `URIEN_TEMPORAL_THUNDER`) points to `Att_RESURRECTION2`, and
+Urien's SA II row of `asstbl_sa_ground` (read by `execute_super_arts`, `src/PLS03.c`) starts
+animation 53 instead of 66-69, the same row values as Gill's `{ 0, 53, 0 }`.
+
+**Evidence:** `Att_RESURRECTION2` (0612AAE8 in `functions.tsv`) is not referenced. Routine 21 is
+only Temporal Thunder for Urien (`cmd_data.c`). The other SA rows and table entries are unchanged.
+`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only when Urien picks SA II. He loses Temporal Thunder. The super still uses a gauge stock.
+- Gill's resurrection runs automatically on a KO through his rebirth gauge. This one is started by
+  hand, while Urien is alive, so the refill works like a heal. With a full health bar the move ends
+  at once (a small hop to the ground).
+- Gill's glow effect (`EFFJ7.c`) checks for Gill only, so Urien may not glow.
+- A CPU Urien with SA II uses it too.
