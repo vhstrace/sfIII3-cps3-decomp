@@ -1090,6 +1090,8 @@ against main: applies.
 jump table `effmovejptbl` (`data/EFFECT_tbl.c`).
 **Recorded:** 2026-11-15 20:21:21
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of ALTTP "Sword beams stay where they appear". Same place as
 "Projectiles fly twice as fast": each frame `effect_13_move` (`src/EFF13.c`) runs the shell's process,
 which moves it in its flight state (`routine_no[1] == R1_MOVE`). This is a hook: the new
@@ -1106,7 +1108,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - A fireball hangs in front of the fighter who threw it until it hits or its lifetime ends (999
   frames, about 16 seconds, for Ryu's). Most characters can't throw another one until then.
 - All kinds of shell, including ones that work differently (Oro's tengu stones, falling shells); those
