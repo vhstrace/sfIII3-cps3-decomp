@@ -66,6 +66,8 @@ fighter's attack hitting the other fighter), `player_at_vs_effect_dm` (`src/HITP
 of `plcnt_move` and `plcnt_b_move` (3 bytes each).
 **Recorded:** 2026-11-15 19:58:07
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** The EarthBound "Enemies never hurt the party" and SMB3 "Enemies and spikes never hurt the
 Player" idea. Health only goes down in `subtract_dm_vital`, `subtract_dm_vital_aiuchi` (`src/PLPDM.c`)
 and `subtract_cu_vital` (`src/PLPCA.c`, throws):
@@ -102,7 +104,7 @@ applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Player 1 still reacts to hits (hit stun, knockdown) and the stun gauge still fills, so player 1 can
   be dizzied. Only the health bar stays full.
 - Player 2 gets no score for hitting player 1, since `Additinal_Score_DM` only runs when `dm_vital` is not 0.
@@ -1822,7 +1824,7 @@ shorter, which moved the code after it. `sf3_cheat.py` found no moved code or da
 literal pools of `move_P1_move_P2` and `move_P2_move_P1` (3 bytes each).
 **Recorded:** 2026-11-15 21:57:44
 
-Tags: `interesting` `demo-ready` `video-ready`
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
 
 **Mechanism:** Each frame `move_player_work` (`src/plcntset_2.c`) runs `Player_move` (`src/PLMAIN.c`)
 for each fighter. That runs the fighter's input and current move, which change its own position
