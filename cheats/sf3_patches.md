@@ -161,6 +161,8 @@ applies.
 pool of `Game2_1` (`sf3_cheat.py` names the nearest symbol, `Game2_3`).
 **Recorded:** 2026-11-15 19:59:03
 
+Tags: `demo-ready` `curated` `play-start`
+
 **Mechanism:** The 3rd Strike version of the OoT "Link loses a quarter heart every 20 seconds" drain (and
 the Metroid, Zelda 1 and ALTTP drains). `vital_cont_main` (`src/VITAL.c`) runs once per fight frame
 from `Game2_1` and redraws the health bars from `plw[pl].wu.vital_new`. This is a hook: the original is
@@ -188,7 +190,7 @@ timer speed. `sf3_cheat.py` found no moved code or data. `git apply --check` aga
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - The drain stops at 1 point, so it never KOs; the next hit does.
 - Both fighters drain the same, so on time over the one who took less damage still wins.
 - The red "recent damage" part of the bar should follow the drain, as it does for chip damage.
@@ -2001,3 +2003,58 @@ frames. The new scripts are at 8-byte-aligned addresses (the game reads them as 
   gravity), so the bound jump is long and easy to punish.
 - If the first bound-jump hop lands before cue 8 (it shouldn't: cue 8 comes 2 frames after takeoff),
   the routine waits for cue 1 in the landing script, which has none, and the move ends after it.
+
+## Ibuki's Kazekiri flies forward instead of up (farther with stronger kicks)
+
+**Source diff:** `patches/kazekiri-flies-forward.diff`
+**BPS:** `sf3_ggpatch/kazekiri-flies-forward/` (simm1.0-.3)
+**Changes:** 47 bytes, all in `ibuki_movexy_table` rows 43-50 (06463028-06463085).
+**Recorded:** 2026-11-15 22:43:32
+
+**Mechanism:** Kazekiri (623+K) is `Att_SHOURYUUKEN` (`src/PLPATUNI.c`). Its row in
+`asstbl_sa_ground` gives each strength a rising row (`r_no`: 43 LK, 44 MK, 45 HK, 46 EX) and a
+falling row (`data_ix`: 47-50):
+
+```c
+case 20:    /* takeoff */
+    setup_mvxy_data(&wk->wu, wk->wu.mvxy.index);        /* rows 43-46 */
+...
+case 30:    /* top of the kick */
+    setup_mvxy_data(&wk->wu, wk->as->data_ix);           /* rows 47-50, then fall until landing */
+```
+
+The rising rows were a fast climb (y speed 2048-3168, gravity -256) with a small forward drift
+(416-480, slowing down). The cheat changes the 8 rows in place (`data/ibuki_move.c`):
+
+| Row | Was (x spd, x acc, mode, y spd, y acc, mode) | Now |
+| --- | --- | --- |
+| 43 LK rise | 416, -8, 1, 2048, -256, 1 | 1024, 0, 1, 1024, -128, 1 |
+| 44 MK rise | 416, -16, 1, 2624, -256, 1 | 1536, 0, 1, 1024, -128, 1 |
+| 45 HK rise | 480, -20, 1, 3168, -256, 1 | 2048, 0, 1, 1024, -128, 1 |
+| 46 EX rise | 480, -20, 1, 3168, -256, 0 | 2560, 0, 1, 1024, -128, 1 |
+| 47 LK fall | 128, -6, 1, 0, -128, 0 | 1024, 0, 1, 0, -128, 0 |
+| 48 MK fall | 128, -6, 1, 0, -112, 0 | 1536, 0, 1, 0, -112, 0 |
+| 49 HK fall | 128, -6, 1, 0, -112, 0 | 2048, 0, 1, 0, -128, 0 |
+| 50 EX fall | 288, -6, 1, 0, -120, 0 | 2560, 0, 1, 0, -128, 0 |
+
+Every strength now rises only about 18 pixels (8 frames, then the y speed stops at 0 because of
+mode 1), flies flat until cue 30, and drops for about 9 frames. The forward speed stays the same the
+whole time: 4, 6, 8 and 10 pixels a frame. With about 19-20 frames in the air that is about 75, 115,
+160 and 200 pixels (the original went about 20-30 pixels forward).
+
+**Evidence:** rows 43-50 are only named by Ibuki's Kazekiri row in `asstbl_sa_ground` (`{ 43, 24, 47 }`
+... `{ 46, 27, 50 }`), no other Ibuki row in `data/asstbl.c`, and no `CM_MVIX` in
+`data/ibuki_char.c`. Cue 20 to cue 30 is 10 frames for LK and MK (`ibuki_saca_024`, `025`) and 11
+for HK and EX (`026`, `027`). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The animation and hit boxes are still the uppercut's: an upward kick that now travels sideways. It
+  hits less high, so it is a worse anti-air.
+- The flight distances are worked out from the rows, not measured.
+- The EX version's follow-up after a hit (`CM_HJMP` in `ibuki_saca_027`) is not changed.
+- The CPU's Ibuki uses the new Kazekiri too.
