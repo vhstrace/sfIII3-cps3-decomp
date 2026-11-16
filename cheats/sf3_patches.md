@@ -249,13 +249,15 @@ command code keeps only the newest parry flag). Projectiles hitting a fighter ar
 - Can't be built together with "Every attack hits the opponent no matter where they are" (both hook
   `hit_check_main_process`).
 
-## The Super Art gauge is always full
+## Can always do a super art
 
-**Source diff:** `patches/super-art-gauge-always-full.diff`
-**BPS:** `sf3_ggpatch/super-art-gauge-always-full/` (simm1.0-.3)
+**Source diff:** `patches/can-always-do-a-super-art.diff`
+**BPS:** `sf3_ggpatch/can-always-do-a-super-art/` (simm1.0-.3)
 **Changes:** 101 bytes. 06700000-06700053: the new `Player_control`. 21 bytes outside: its address in the literal
 pools of `Game2_1` and the `debug_play*_move` routines.
 **Recorded:** 2026-11-15 20:01:48
+
+Tags: `demo-ready` `play-start`
 
 **Mechanism:** The 3rd Strike version of FF2 "Spells cost no MP in battle" and EarthBound "PSI costs no
 PP". Each fighter's gauge is a `SA_WORK` in `super_arts[2]`: `store` is the number of full stocks (up to
@@ -285,7 +287,7 @@ It does nothing in bonus stages (`Bonus_Game_Flag`), where the game gives no gau
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-15): works.
 - Both fighters, player or CPU, have full gauges, so the CPU uses Super Arts and EX moves all the time.
 - Timer-type arts (`SA_GAUGE_TIMER`, such as Yun's Genei-Jin) still drain while running; the bar is full again as soon as they end.
 - The gauge flash and "MAX" lettering should play once when the gauge is first filled, then stay.

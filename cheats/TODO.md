@@ -49,7 +49,7 @@ Allow players and/or the CPU to use these:
 
 ## Gauges
 
-- [x] The Super Art gauge is always full (FF2 "Spells cost no MP in battle", EarthBound "PSI costs no
+- [x] Can always do a super art (FF2 "Spells cost no MP in battle", EarthBound "PSI costs no
       PP", Metroid "Energy pickups refill all of Samus's energy"): `src/spgauge.c`
 - [x] Every hit stuns at once (EarthBound "Every enemy starts each battle feeling strange"): the stun
       value `dm_piyo` in `set_damage_and_piyo` (`src/HITCHECK.c`)
@@ -138,7 +138,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] The Super Art gauge is always full
 - [ ] Every hit stuns at once
 - [ ] Stun never builds up
 - [ ] The game runs at half speed
