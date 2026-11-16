@@ -21,6 +21,7 @@ Allow players and/or the CPU to use these:
 
 - [x] Att_TENSHINSENKYUUTAI_OLD, an older version of a move that replaced it.
 - [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
+  - [x] Att_PL10_MACH_SLIDE: "Yang's Kaihou uses its old, unused version".
 - [ ] Normal_air_paring, a separate air-parry state.
 - [ ] check_paring_attack and check_lever_up_attack.
 - [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
@@ -168,3 +169,4 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] All music plays 1.5 times as fast
 - [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
+- [ ] Yang's Kaihou uses its old, unused version
