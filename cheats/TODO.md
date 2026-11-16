@@ -188,3 +188,4 @@ Added on 2026-11-15 while working through the unchecked items above. Built but n
 - [ ] Urien's SA II refills his health (his unused resurrection)
 - [ ] Air parries knock you backward (the old, unused air parry)
 - [ ] The CPU opponent only jumps backward and guards in the air (unused CPU AI)
+- [ ] Each fighter's movement moves the other fighter
