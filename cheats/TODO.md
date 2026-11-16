@@ -15,21 +15,27 @@ spawning and copies; and the Tetris piece cheats.
 - [ ] Find free RAM for cheat variables (`DCHEAT`/`BCHEAT`), so hooks can keep state.
 - [ ] Give each cheat its own code address, so single-cheat patches can be stacked.
 
+## Dead code
+
+Allow players and/or the CPU to use these:
+
+- [ ] Att_TENSHINSENKYUUTAI_OLD, an older version of a move that replaced it.
+- [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
+- [ ] Normal_air_paring, a separate air-parry state.
+- [ ] check_paring_attack and check_lever_up_attack.
+- [ ] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
+- [ ] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
+
 ## Damage and health
 
 - [x] Normal hits do double damage (Super Metroid "Samus takes double damage", FF2 "The party's weapon
       attacks do 4 times the damage")
-- [ ] Projectiles do double damage too: the same hook on `cal_damage_vitality_eff` (`src/pow_pow.c`)
-- [ ] Every hit is a KO (Metroid, ALTTP, OoT and Super Metroid "Every enemy dies in one hit"): set
-      `dm_vital` to the full health bar in the `cal_damage_vitality*` hooks
+- [x] Projectiles do double damage: the same hook on `cal_damage_vitality_eff` (`src/pow_pow.c`)
 - [ ] Player 1 never takes damage (EarthBound "Enemies never hurt the party", SMB3 "Enemies and spikes
       never hurt the Player"): hook the damage routines, check which side `ds` is
-- [ ] The opponent's attacks always miss (FF2 "Enemy weapon attacks always miss the party",
-      EarthBound "Enemy attacks always miss"): hit checking in `src/HITCHECK.c`
-- [ ] A fighter can't be KO'd: health stops at 1 (Metroid "Samus can't die: her energy stays at 0
-      instead"): `src/VITAL.c`, or where damage is taken off
 - [ ] Health drains slowly during a round (OoT "Link loses a quarter heart every 20 seconds", the
       Metroid, Zelda 1 and ALTTP drains): the fight frame in `src/Game_Main.c`, health in `src/VITAL.c`
+- [ ] Player 2 automatically parries every attack
 
 ## Gauges
 
@@ -46,11 +52,10 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 - [ ] The game runs at half speed (Tetris, SMB3, Metroid, ALTTP, Super Metroid and OoT): keep
       `SLOW_flag` at 1
-- [ ] Time moves only while a button is held (Metroid, SMB3, ALTTP, SMW and SM64 "Superhot"): set
-      `EXE_flag` from the inputs
+- [ ] Time moves only while any controller input is held
 - [ ] Freeze the opponent while a button is held (OoT "Freeze time for enemies by holding L")
 - [ ] Every hit plays the KO slow motion (SMW "Bullet Time for Banzai Bill"): `set_conclusion_slow`
-- [ ] The game runs 1.5 or 2 times as fast (OoT "The game runs 1.5 times as fast"): run the fight
+- [ ] The game runs 1.25 or 1.5 times as fast (OoT "The game runs 1.5 times as fast"): run the fight
       frame more than once per frame
 - [ ] The round timer never runs out (SMB3 "Time running out doesn't kill the Player"):
       `Time_Control` (`src/Game_Main.c`), `Check_Time_Over` (`src/manage_2.c`)
@@ -73,23 +78,19 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 ## Attacks and projectiles
 
-- [ ] Every attack reaches across the screen (Zelda 1 "Sword hits every enemy on the screen", ALTTP and
+- [ ] Every attack hits the opponent no matter where they are (Zelda 1 "Sword hits every enemy on the screen", ALTTP and
       OoT "Sword hits enemies across most of the screen"): the attack hit boxes ("Hit boxes" in
       `docs/HOW_THE_GAME_WORKS.md`)
+- [ ] Every throw grabs the opponent no matter where they are
 - [ ] Projectiles fly twice as fast (SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast")
 - [ ] Projectiles crawl or stand still (ALTTP "Sword beams fly at quarter speed" and "stay where they
       appear", Zelda 1 "Sword beams and Magical Rod shots crawl")
 - [ ] Projectiles pass through each other (SMB1, SMB3, SMW and ALTTP "fly through enemies"):
       `effect_at_vs_effect_dm` (`src/HITEFEF.c`)
-- [ ] Hits don't push fighters back (ALTTP and OoT "Enemies don't knock Link back")
+- [ ] no position change from hits
+- [ ] no recoil from hits
 - [ ] Blocking works facing either way (Zelda 1 and ALTTP "Shield blocks shots from any direction"):
       `Check_Guard_Type` and the guard checks
-- [ ] Throws reach across the screen (ALTTP "Thrown objects hit enemies anywhere"): `Check_Catch`
-      (`src/Ck_Pass.c`)
-- [ ] Every hit is a SMAAAASH (EarthBound): every hit counts as a counter hit
-- [ ] The CPU opponent fires projectiles all the time (ALTTP "Fireballs continuously shot by most
-      enemy types", OoT "Every enemy near Link shoots glowing balls", SMW "Bullet Bills fire
-      constantly", Zelda 1 "Most walking monsters shoot fireballs"): the CPU logic in `src/Com_Pl.c`
 
 ## CPU opponent
 
@@ -99,9 +100,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       SMB2 "Enemies face and walk away")
 - [ ] The CPU opponent moves twice as fast (Metroid "Most enemies move twice as fast", ALTTP "Soldiers
       chase Link at double speed")
-- [ ] Every opponent is the final boss, or the next CPU opponent in the list (FF2 "Every battle is the
-      one 32 places later", FF2 "rarest enemy group", SMW "Every level is populated with the next
-      level's enemies"): "Your path through the CPU opponents" in the tour, `src/next_cpu.c`
 
 ## Characters and start-up
 
@@ -109,15 +107,11 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
       party"): `src/sel_pl.c`
 - [ ] Skip the logos and the attract mode (EarthBound "Skip the logos and the title screen", Super
       Metroid "New games skip the opening cinematic", Metroid "Skip the start jingle")
-- [ ] Turn on the debug menu (ALTTP "Turn on the controller 2 debug features", SMW "Free-roaming debug
-      mode"): `debug_*` in `src/CMD_MAIN.c`, `src/Entry_dbg.c`
-- [ ] Free play (FF2 "Shops sell everything for 0 gil"): "Coins and free play" in the tour
+- [ ] Turn on all debug features
 
 ## Sound
 
 - [ ] No music (Metroid, SMB3, ALTTP, Super Metroid, OoT, FF2 and EarthBound)
-- [ ] Every stage plays the next song (SMB2, SMB3 and FF2 "Every song plays the next song")
-- [ ] Every song plays with the next instrument (FF2, ALTTP, SMW and OoT)
 - [ ] Music and sound effects play 2 whole tones higher (FF2, ALTTP and SMW): `sound_note_to_pitch`
       (`src/sound_voice_2.c`)
 - [ ] Every sound effect is the next one in the list (FF2, ALTTP and OoT)
@@ -128,5 +122,8 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 
 - [ ] Fighters use colours from past the end of the colour table (Tetris "Level palettes are read from
       past the end of color table"): `Setup_PL_Color` (`src/next_cpu.c`)
-- [ ] Fighters are drawn behind the stage (SMW "Ordinary levels draw sprites (and Mario) behind the
-      scenery")
+
+## To test
+
+Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
+- [ ] Projectiles do double damage
