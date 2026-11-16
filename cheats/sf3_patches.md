@@ -2223,6 +2223,8 @@ applies.
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-16 01:17:18
 
+Tags: `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** The same hook as "Special moves travel twice as far sideways", with half the extra
 movement. The new `Player_attack` (`src/PLPAT.c`) notes the fighter's x position (`xyz[0].cal`,
 16.16), runs the original, and adds half of that frame's sideways movement again:
@@ -2245,7 +2247,7 @@ leftward move gets the same extra as a rightward one. `sf3_cheat.py` found no mo
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-16): works.
 - Moves that don't travel (most fireballs) change little. Projectiles are not changed.
 - Fast moves may pass the opponent between their active frames, less often than at 2 times.
 - Teleports and follow-ups that move to the opponent go 1.5 times as far from where they started.
