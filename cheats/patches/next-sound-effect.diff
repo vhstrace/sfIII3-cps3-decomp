@@ -1,0 +1,61 @@
+diff --git a/src/textsound_2.c b/src/textsound_2.c
+index 0a7deb3..1566190 100644
+--- a/src/textsound_2.c
++++ b/src/textsound_2.c
+@@ -141,7 +141,7 @@ void sound_init(u8* data, SNDSAMPLE* sample, u8** bank_b, u8 stereo, u8 volume,
+ 
+ 
+ /* provisional name */
+-s32 sound_request(s32 code) {
++s32 sound_request_orig(s32 code) {
+     return sound_seq_start(code, -1);
+ }
+ 
+@@ -359,7 +359,7 @@ s32 sound_seq_start(u16 code, s16 ramp) {
+ 
+ 
+ /* provisional name */
+-void sound_request_pan(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {
++void sound_request_pan_orig(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {
+     if (vol_l < 0) {
+         vol_l = 0;
+     } else if (vol_l > 127) {
+@@ -536,3 +536,38 @@ void sound_driver_tick(void) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* Every sound effect is the next one in the list: when a sound code is a sound effect (its sequence
++   header byte is 1-0x7F) and the next code is one too, play the next code instead. Music (header 0),
++   the 0x80-0xFF control sequences and empty codes are left alone. */
++s32 cheat_se_header(u16 code) {
++    u32 ofs;
++    while (code >= snd_seq_max) {
++        code -= snd_seq_max;
++    }
++    ofs = snd_seq_data[code + 1];
++    if (ofs == 0) {
++        return 0;
++    }
++    return *(u8*)((u32)snd_seq_data + ofs);
++}
++
++u16 cheat_next_se(u16 code) {
++    s32 a = cheat_se_header(code);
++    s32 b = cheat_se_header(code + 1);
++    if (a >= 1 && a <= 0x7F && b >= 1 && b <= 0x7F) {
++        return code + 1;
++    }
++    return code;
++}
++
++s32 sound_request(s32 code) {
++    return sound_request_orig(cheat_next_se(code));
++}
++
++void sound_request_pan(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {
++    sound_request_pan_orig(cheat_next_se(code), vol_l, vol_r, time, ramp);
++}
++#pragma section

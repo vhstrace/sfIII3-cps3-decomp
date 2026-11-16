@@ -1480,6 +1480,8 @@ main: applies.
 - Not tested.
 - Music in the test mode's sound test is silent too.
 - A short jingle that is a music sequence (not a sound effect) is silent too.
+- Can't be built together with "Every sound effect is the next one in the list" (both add to the end of
+  `src/textsound_2.c`).
 
 ## Music, sound effects and voices play 2 whole tones higher
 
@@ -1517,3 +1519,42 @@ for the 16 music voices and the 16 effect voices. Field types (all `s32`) from `
   like chipmunks.
 - The pitch register is 16 bits. A note already near the top may wrap around and play very low.
 - The test mode's sound test is changed too.
+
+## Every sound effect is the next one in the list
+
+**Source diff:** `patches/next-sound-effect.diff`
+**BPS:** `sf3_ggpatch/next-sound-effect/` (simm1.0-.3)
+**Changes:** 269 bytes. The new code at 06700000 (`cheat_se_header`, `cheat_next_se`, `sound_request`,
+`sound_request_pan`). 24 literal-pool addresses in the callers (`Se_Shock`, `Se_Myself`, `Se_Let`,
+`Call_Se`, `Loop_Demo`, `Game_Manage_4th`, the sound test and others), 3 bytes each.
+**Recorded:** 2026-11-15 20:36:22
+
+**Mechanism:** The 3rd Strike version of the FF2, ALTTP and OoT "Every sound effect is the next one"
+cheats. Every sound goes through `sound_request` (menus and `Sound_SE`) or `sound_request_pan` (fight
+sounds and voices, from the `Se_` handlers in `src/se_3.c`). Both pass a code to `sound_seq_start`
+(`src/textsound_2.c`), whose first sequence byte says what it is: 0 is music, 1-0x7F a sound effect
+with that priority, 0x80 and up a control sequence:
+
+```c
+hdr = *p++;
+if (!hdr) {
+    bgm_stop();
+```
+
+This is a hook on both: the new versions play code + 1 when both the code and the next one are sound
+effects (header 1-0x7F), and the original code otherwise. So no sound effect starts a song, and music
+and control codes are not changed.
+
+**Evidence:** Neither function is called from its own file (`sound_seq_start` is, so it is not
+hooked). Codes wrap at `snd_seq_max` as in `sound_seq_start`; each character's voices are 0x300 codes
+apart, so code + 1 is usually that character's next voice or sound. `sf3_cheat.py` found no moved
+code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- A fighter's voice lines often become the next voice line (a different move's shout).
+- The test mode's sound test plays the next effect too.
+- Can't be built together with "No music" (both add to the end of `src/textsound_2.c`).
