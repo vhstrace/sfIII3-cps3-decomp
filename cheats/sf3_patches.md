@@ -1765,3 +1765,45 @@ only Temporal Thunder for Urien (`cmd_data.c`). The other SA rows and table entr
   at once (a small hop to the ground).
 - Gill's glow effect (`EFFJ7.c`) checks for Gill only, so Urien may not glow.
 - A CPU Urien with SA II uses it too.
+
+## Air parries knock you backward (the old, unused air parry)
+
+**Source diff:** `patches/old-air-parry.diff`
+**BPS:** `sf3_ggpatch/old-air-parry/` (simm1.2 and .3 only)
+**Changes:** 4 bytes, in place: 065EBBBE and 065EBBC2, entries 34 and 35 of `plpnm_lv_00`.
+**Recorded:** 2026-11-15 20:51:16
+
+**Mechanism:** A parry in the air sets the fighter's state to 34 or 35 (`defense_sky`,
+`src/HITCHECK.c`), and both run `Normal_35000` (`src/PLNORMAL.c`) from the state table
+`plpnm_lv_00` (`data/PLPNM_tbl.c`). The ROM also has `Normal_air_paring`, which nothing uses. It is
+the same except for how it changes the fighter's speed. The used one only turns a fall into a small
+rise:
+
+```c
+void remake_mvxy_PoSB(WORK* wk) {          /* Normal_35000 */
+    if (wk->mvxy.a[1].sp < 0) {
+        wk->mvxy.a[1].sp = wk->mvxy.a[1].sp * 30 / 100;
+        wk->mvxy.a[1].sp = -wk->mvxy.a[1].sp;
+    }
+}
+```
+
+The old one (`setup_air_paring_mvxy`, `src/PLS02.c`) cuts the forward speed to 60% and the up or down
+speed to 40%, then turns forward motion around so the fighter always moves backward, at least 2
+pixels a frame. This is an in-place change: entries 34 and 35 point to `Normal_air_paring`.
+
+**Evidence:** `Normal_air_paring` is in the ROM (06121F52 in `functions.tsv`) and is not
+referenced. `plpnm_lv_00` is the only use of `Normal_35000`. Both routines read `guard_kind` the
+same way and use the same animation (27). Only the low half of each pointer changed, so only chips
+simm1.2 and .3 change. `sf3_cheat.py` found no moved code or data. `git apply --check` against
+main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- A fighter who parries while falling keeps falling (40% as fast) instead of popping up, so there
+  is less time to attack back in the air.
+- For both players and the CPU. Ground parries are not changed.
+- Uses no cheat code space.

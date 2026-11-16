@@ -23,7 +23,7 @@ Allow players and/or the CPU to use these:
 - [ ] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
   - [x] Att_PL10_MACH_SLIDE: "Yang's Kaihou uses its old, unused version".
   - [x] Att_RESURRECTION2: "Urien's SA II refills his health (his unused resurrection)".
-- [ ] Normal_air_paring, a separate air-parry state.
+- [x] Normal_air_paring, a separate air-parry state.
 - [ ] check_paring_attack and check_lever_up_attack.
 - [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
 - [ ] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
@@ -177,3 +177,4 @@ Added on 2026-11-15 while working through the unchecked items above. Built but n
 
 - [ ] Yang's Kaihou uses its old, unused version
 - [ ] Urien's SA II refills his health (his unused resurrection)
+- [ ] Air parries knock you backward (the old, unused air parry)
