@@ -146,6 +146,5 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 
 Added on 2026-11-15 while working through the unchecked items above. Built but not tested yet.
 
-- [ ] Urien's super art II is his unused Resurrection move
 - [ ] Air parries knock you backward (the old, unused air parry)
 - [ ] The CPU opponent only jumps backward and guards in the air (unused CPU AI)

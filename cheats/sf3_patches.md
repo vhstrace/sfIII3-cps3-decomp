@@ -1686,6 +1686,8 @@ against main: applies.
 SA II row in `asstbl_sa_ground` (065F1831-065F184B).
 **Recorded:** 2026-11-15 20:50:39
 
+Tags: `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** Gill's Resurrection is `Att_RESURRECTION` (`src/PLPAT00.c`), with animation 53. Urien
 was built from Gill, and the ROM still has his copy: `Att_RESURRECTION2` (`src/PLPAT13.c`), its
 refill table `glap_table2` (`data/plpat13_tbl.c`), and an animation 53 ("not started by a command",
@@ -1716,7 +1718,7 @@ only Temporal Thunder for Urien (`cmd_data.c`). The other SA rows and table entr
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Only when Urien picks SA II. He loses Temporal Thunder. The super still uses a gauge stock.
 - Gill's resurrection runs automatically on a KO through his rebirth gauge. This one is started by
   hand, while Urien is alive, so the refill works like a heal. With a full health bar the move ends
