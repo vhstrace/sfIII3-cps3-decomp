@@ -2331,3 +2331,48 @@ against main: applies.
   game's chip KO), as before. Moves marked `no_death_attack` leave them at 0 health instead.
 - Parried hits still do no damage.
 - Both fighters, player or CPU.
+
+## Every character speaks with another character's voice
+
+**Source diff:** `patches/voices-from-another-character.diff`
+**BPS:** `sf3_ggpatch/voices-from-another-character/` (simm1.0-.3)
+**Changes:** 331 bytes. The new code at 06700000-06700113 (`cheat_voice_header`,
+`cheat_other_voice`, `sound_request`, `sound_request_pan`). 24 literal-pool addresses in the callers
+(`Se_Shock`, `Se_Myself`, `Se_Let`, `Call_Se`, `Check_Finish_SE`, `Loop_Demo`, `Game_Manage_4th`, the
+sound test and others), 3 bytes each.
+**Recorded:** 2026-11-17 23:38:31
+
+Tags: `demo-ready` `curated` `play-start` `video-ready`
+
+**Mechanism:** Built like "Every sound effect is the next one in the list". Every sound goes through
+`sound_request` or `sound_request_pan` (`src/textsound_2.c`), and both are hooks. Each character's
+voice lines are in their own block of 0x20 sound codes between 0x160 and 0x3DF. The `se` values in
+`data/*_char.c` show this: Ken 0x180, Chun-Li 0x1A0, Ryu 0x200, Remy 0x220, Elena 0x2A0, Akuma
+0x2C0, Q 0x300, Necro 0x320, Hugo 0x340, Dudley 0x380, and so on. Player 2's copies are 0x300
+higher (`uid * 0x300` in `src/se_3.c`). The new `cheat_other_voice` moves a code in 0x160-0x3DF
+(or 0x460-0x6DF for player 2) to the same place in the next block, so 0x3C0-0x3DF wraps to
+0x160. It does this only when both codes are sound effects: the first sequence byte is 1-0x7F, the
+same check `sound_seq_start` makes. Otherwise the original code plays. So Ken's lines come out in
+Chun-Li's voice, Chun-Li's in the voice of the character after her, Ryu's in Remy's, and so on.
+
+**Evidence:** The layout comes from `snd_seq_rom_data` (0678F000) in the reference program, which
+has 18-32 sound effects in each block, and from the `se` values in the character scripts.
+`Check_Voice_SE` (the alternate voice setting, `Voice_SE_Data` in `data/SE_tbl2.c`) maps codes
+inside 0x140-0x3FF, before the hook runs, so it still works. The shared voice and hit sounds at
+0x100-0x15F, and the codes from 0x3E0 up (bonus stage, announcer and system sounds), are not
+changed. `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Tested by the user in MAME (2026-11-17): works.
+- The blocks don't line up exactly with characters. Some characters use two blocks (Yang, Makoto,
+  Oro), and a few blocks hold lines of two characters, so a character can speak in two other
+  voices.
+- Each character's lines are not in the same order, so a line usually comes out as a different
+  shout (a special's name, a grunt or a win line) in the other voice.
+- Where the next block has no sound at that place, the original line plays.
+- The test mode's sound test also plays the moved code.
+- Can't be built together with "Every sound effect is the next one in the list", "No music" or "All
+  music plays 1.5 times as fast" (all add to the end of `src/textsound_2.c`).
