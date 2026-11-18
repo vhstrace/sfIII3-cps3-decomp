@@ -1565,6 +1565,8 @@ main: applies.
 literal pool of `sound_driver_tick`.
 **Recorded:** 2026-11-15 20:34:47
 
+Tags: `demo-ready` `curated` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the FF2, ALTTP and SMW "2 whole tones higher" cheats. At the end
 of `voice_process_secondary` (`src/sound_voice_2.c`), each voice's pitch register is set from its
 pitch (3072 units an octave, 256 a semitone):
@@ -1588,7 +1590,7 @@ for the 16 music voices and the 16 effect voices. Field types (all `s32`) from `
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - The CPS3 plays samples, so higher pitch also means faster: voices and effects are shorter and sound
   like chipmunks.
 - The pitch register is 16 bits. A note already near the top may wrap around and play very low.
