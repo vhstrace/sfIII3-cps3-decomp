@@ -2366,6 +2366,8 @@ against main: applies.
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 00:04:45
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** The same hook as "Special moves travel 1.5 times as far sideways", for height. The
 new `Player_attack` (`src/PLPAT.c`) notes the fighter's height (`xyz[1].cal`, 16.16), runs the
 original, and takes a quarter of that frame's up or down movement off again:
@@ -2389,7 +2391,7 @@ moved code or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Rising specials (Ken's and Ryu's Shoryuken, Chun-Li's Spinning Bird Kick and the like) peak 25%
   lower. Their hit boxes move with the fighter, so some may miss high opponents they used to hit.
 - A special done in the air that only goes down (a dive kick) comes down 25% slower, so it lasts
