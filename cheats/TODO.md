@@ -133,7 +133,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
 - [ ] Slippery floors: random falls after landings and dashes (added 2026-11-17)
-- [ ] Combo hits fall in pitch (added 2026-11-17)
 - [ ] Jumps are 25% lower (added 2026-11-18)
 - [ ] Special moves go 50% less high (added 2026-11-18)
 - [ ] Special moves go 75% less high (added 2026-11-18)
