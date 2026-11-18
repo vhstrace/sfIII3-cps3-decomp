@@ -2396,7 +2396,7 @@ against main: applies.
 
 **Source diff:** `patches/specials-move-25-less-vertically.diff`
 **BPS:** `sf3_ggpatch/specials-move-25-less-vertically/` (simm1.0-.3)
-**Changes:** 245 bytes. 06700000-067000F1: the new `Player_attack`. 065EAF95: its entry in the
+**Changes:** 245 bytes. 06700000-067000FB: the new `Player_attack`. 065EAF95: its entry in the
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 00:04:45
 
