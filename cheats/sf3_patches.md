@@ -1678,50 +1678,6 @@ against main: applies.
 - Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
   same hook, or the end of the same file).
 
-## Fighters use colours from past the end of their colour table
-
-**Source diff:** `patches/colours-past-the-end.diff`
-**BPS:** `sf3_ggpatch/colours-past-the-end/` (simm1.0-.3)
-**Changes:** 453 bytes. The new `load_player_color` at 06700000. Its address in 9 literal pools: the
-fight's colour load (06118635, in `src/PLCNTDAT.c`; the nearest symbol is `set_kizetsu_status`) and 8 in
-the debug menu.
-**Recorded:** 2026-11-15 20:39:04
-
-**Mechanism:** The 3rd Strike version of Tetris "Level palettes are read from past the end of color
-table". `load_player_color` (`src/color3rd.c`) copies a fighter's palette parts from the colour ROM to
-colour RAM, using `player_color_tbl[fighter][side][colour 0-6]` (14 parts of source, destination and
-size, `data/end_sub_tbl_b.c`):
-
-```c
-const XFER* p = player_color_tbl[a][b][c];
-...
-col_trans_result = col_dma_request(p->src, p->dst, p->size, 0, 0, 0);
-```
-
-Each part's source goes up by a fixed step from one colour to the next (0x100 for most parts, 0 for
-parts all colours share). This is a hook: the new `load_player_color` loads each part from 7 steps on
-(the step is colour 1 minus colour 0), that is, from where colours 7 to 13 would be, into the fighter's
-own colour RAM. A colour number outside 0-6 goes to the original.
-
-**Evidence:** `load_player_color` is not called from its own file. A check of all 19 x 2 x 14 parts in
-the table: the step is the same from colour to colour for every part except Gill's (his colour 6
-repeats colour 5, which is why the step comes from colours 0 and 1). Every new source stays inside the
-colour data (0x3300700-0x336B680; the table spans 0x3300000-0x336B700), and 3612 of the 3668 are the
-start of some fighter's real palette part, mostly the next fighter's. `sf3_cheat.py` found no moved
-code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- Most fighters get palettes made for a different fighter, so the colours land on the wrong body
-  parts. The colour button still picks which of 7 such colourings you get.
-- The select-screen and VS-screen portraits, the super-art background, and colours loaded by other
-  routines (Gill's and Twelve's change colours, `metamor_color_restore`; the ending's
-  `load_player_color_fade`) are not changed.
-- The debug menu's colour viewers are changed too.
-
 ## Yang's Senkyuutai uses its old, unused version
 
 **Source diff:** `patches/yang-old-senkyuutai.diff`

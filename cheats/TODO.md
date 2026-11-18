@@ -127,11 +127,6 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] All music plays faster (SMB1 "All music plays at hurry-up speed"): `bgm_tempo_set`
       (`src/textsound_2.c`)
 
-## Graphics
-
-- [x] Fighters use colours from past the end of the colour table (Tetris "Level palettes are read from
-      past the end of color table"): `Setup_PL_Color` (`src/next_cpu.c`)
-
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
@@ -139,7 +134,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
 - [ ] Blocked special moves do full damage (added 2026-11-17)
 - [ ] Slippery floors: random falls after landings and dashes (added 2026-11-17)
