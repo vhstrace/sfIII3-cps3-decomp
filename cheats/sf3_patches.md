@@ -2378,3 +2378,101 @@ changed. `sf3_cheat.py` found no moved code or data. `git apply --check` against
 - The test mode's sound test also plays the moved code.
 - Can't be built together with "Every sound effect is the next one in the list", "No music" or "All
   music plays 1.5 times as fast" (all add to the end of `src/textsound_2.c`).
+
+## Combo hits rise in pitch
+
+**Source diff:** `patches/combo-hits-rise-in-pitch.diff`
+**BPS:** `sf3_ggpatch/combo-hits-rise-in-pitch/` (simm1.0-.3)
+**Changes:** 707 bytes. The new code at 06700000-06700257 (`Se_Shock`, `cheat_clear_pitch_marks`,
+`cheat_save_cursors`, `sound_request`, `sound_request_pan`, `voice_process_secondary`) and the
+scale at 06700258-06700266. Outside: 13 `Se_Shock` slots in the sound request table
+`sound_effect_request` (0618D0E5-0618D169), `voice_process_secondary`'s address in
+`sound_driver_tick` (0613A6A5), and the 24 literal-pool addresses of `sound_request` and
+`sound_request_pan` in their callers (`Se_Shock_orig`, `Se_Myself`, `Se_Let`, `Call_Se`, the
+sound test and others), 3 bytes each.
+**Recorded:** 2026-11-17 23:56:33
+
+**Mechanism:** Hit and block sounds are played by `Se_Shock` (`src/se_3.c`), through
+`sound_effect_request` (`data/Se_Data.c`), when the hit spark effect starts (`effect_02_move`,
+`src/EFF02.c`). By then `add_combo_work` (`src/HITCHECK.c`) has counted the hit in the
+defender's `cb->total`, the hits of the current combo (cleared by `combo_hensuu_clear` in
+`src/cmb_cont.c` when the combo ends). Three hooks:
+
+- The new `Se_Shock` notes each sound effect voice's `cursor`, runs the original, and gives
+  every voice whose cursor changed (the voices the hit sound just started) a pitch step in
+  `reserved_71[0]`, a spare byte at the end of `SNDVOICE` that no code uses. The step is
+  `cb->total - 1` places up a major scale: 0, 2, 4, 5, 7, 9, 11, 12 ... 24 semitones, so the
+  first hit is normal, the 8th is an octave up, and the 15th and later are 2 octaves up.
+- The new `sound_request` and `sound_request_pan` (`src/textsound_2.c`) clear `reserved_71[0]`
+  on any voice that starts a new sound, so a voice that played a hit sound doesn't keep the step.
+  `Se_Shock`'s hook sets it again after this. (Hooking `sound_seq_start` instead moved code:
+  its own file calls it with short calls.)
+- The new `voice_process_secondary` (`src/sound_voice_2.c`) adds `reserved_71[0] * 256` (256 a
+  semitone) to a sound effect voice's pitches while the original writes the pitch register, then
+  takes it off again, the same way as "Music and sound effects high-pitched".
+
+**Evidence:** `Se_Shock` is only reached through `sound_effect_request`. `sound_request` and
+`sound_request_pan` are only called from other files; `sound_seq_start` is only called from
+`src/textsound_2.c`. `voice_process_secondary` is only called from `sound_driver_tick`.
+`reserved_71` is not used anywhere in the source. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU. A blocked hit plays at normal pitch, since blocks don't add to
+  the combo count.
+- Every sound `Se_Shock` plays rises, including the few move sounds in its slots (codes 0x100-0x107,
+  0x11D-0x121), when they play during a combo.
+- The step is the combo count when the sound starts, so a hit that lands between combos (after the
+  game ends the combo) starts again from the bottom.
+- Can't be built together with "Music and sound effects high-pitched", "Slow-motion sound in hit
+  stop" (both hook `voice_process_secondary`), "Every sound effect is the next one in the list",
+  "No music", "All music plays 1.5 times as fast" or "Every character speaks with another
+  character's voice" (the end of `src/textsound_2.c`).
+
+## Slow-motion sound in hit stop
+
+**Source diff:** `patches/slow-motion-sound-in-hit-stop.diff`
+**BPS:** `sf3_ggpatch/slow-motion-sound-in-hit-stop/` (simm1.0-.3)
+**Changes:** 255 bytes. The new `voice_process_secondary` at 06700000-06700103. 0613A6A5: its
+address in the literal pool of `sound_driver_tick`.
+**Recorded:** 2026-11-17 23:56:52
+
+**Mechanism:** On a hit, the game freezes both fighters for a few frames (hit stop): the attacker's
+`hit_stop` and the defender's `dm_stop`, counted down by `check_hit_stop` (`src/PLMAIN.c`). A
+KO starts a 95-frame slow motion (`set_conclusion_slow`, `src/SLOWF.c`): `SLOW_flag` is 3 (the
+game runs every 4th frame) for most of it, then 2 and 1 (`slow_timer_to_flag`). This is a hook on
+`voice_process_secondary` (`src/sound_voice_2.c`), which writes each sound voice's pitch register
+once a frame. For sound effect voices only, it lowers the pitch by:
+
+- half a semitone (128) for each frame of hit stop left on either fighter (the larger of
+  `hit_stop` and `dm_stop`, either sign, at most 16 frames: 8 semitones), so a heavy hit's
+  sound starts deep and slides back up as the freeze runs out; or
+- during the KO slow motion, 4 semitones (1024) for each step of `SLOW_flag` (an octave at
+  1/4 speed), if that is more. The sound's sequence also runs at the game's speed then:
+  `se_tick_step` is divided by `SLOW_flag + 1` for the call.
+
+The pitches and `se_tick_step` are put back after the original runs, the same way as "Music and
+sound effects high-pitched". The hit sound itself starts in the frame after the hit, when the hit
+stop is already set.
+
+**Evidence:** `voice_process_secondary` is only called from `sound_driver_tick` (vblank).
+`plw`, `SLOW_flag` and `se_tick_step` are globals (`include/work.h`). `se_tick_step` is only
+set by the sequence's tempo command in `voice_process_primary` and used in
+`voice_process_secondary`. `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The music is not changed.
+- Every sound effect playing at the time is lowered, not just the hit's: voices and other sounds
+  too. Blocks and parries have hit stop too, so they are lowered as well.
+- If the game is paused during hit stop, sounds stay low until it goes on.
+- Can't be built together with "Music and sound effects high-pitched" or "Combo hits rise in
+  pitch" (all hook `voice_process_secondary`).

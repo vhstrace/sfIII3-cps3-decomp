@@ -1,0 +1,74 @@
+diff --git a/src/sound_voice_2.c b/src/sound_voice_2.c
+index c442f43..a830364 100644
+--- a/src/sound_voice_2.c
++++ b/src/sound_voice_2.c
+@@ -123,7 +123,7 @@ u16 sound_voice_volume_compute(u16 level, u32 pan_scale, s8 vol_offset, SNDVOICE
+     } while (0)
+ 
+ /* provisional name */
+-void voice_process_secondary(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {
++void voice_process_secondary_orig(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {   /* was voice_process_secondary: unchanged */
+     u8 owns_hardware_voice = 1;
+     SNDREGS* regs;
+     s32 next;
+@@ -450,3 +450,60 @@ void sound_reg_write_verify(s16 *reg, u16 value) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* Slow-motion sound: while either fighter is in hit stop (the freeze on a hit, hit_stop or
++   dm_stop), sound effects play lower, by half a semitone for each frame of the freeze left (8
++   semitones at most), so they slide back up as it runs out. During the KO slow motion (SLOW_flag
++   1-3: the game runs at 1/2-1/4 speed) they play 4 semitones lower for each step of SLOW_flag
++   (an octave at 1/4 speed), and their sequences run at the game's speed too. The pitches are
++   lowered while the original writes the pitch register, then put back, as in "Music and sound
++   effects high-pitched". */
++void voice_process_secondary(SNDVOICE* voice, u8 voice_index, u8 is_bgm) {
++    s32 d = 0;
++    s32 stop = 0;
++    s32 s;
++    s32 i;
++    u32 step;
++    if (is_bgm) {
++        voice_process_secondary_orig(voice, voice_index, is_bgm);
++        return;
++    }
++    for (i = 0; i < 2; i++) {
++        s = plw[i].wu.hit_stop;
++        if (s < 0) {
++            s = -s;
++        }
++        if (s > stop) {
++            stop = s;
++        }
++        s = plw[i].wu.dm_stop;
++        if (s < 0) {
++            s = -s;
++        }
++        if (s > stop) {
++            stop = s;
++        }
++    }
++    if (stop > 16) {
++        stop = 16;
++    }
++    d = stop * 128;
++    if (SLOW_flag > 0 && SLOW_flag * 1024 > d) {
++        d = SLOW_flag * 1024;
++    }
++    step = se_tick_step[voice_index];
++    if (SLOW_flag > 0) {
++        se_tick_step[voice_index] = step / (SLOW_flag + 1);
++    }
++    voice->current_pitch -= d;
++    voice->target_pitch -= d;
++    voice->decoded_pitch -= d;
++    voice_process_secondary_orig(voice, voice_index, is_bgm);
++    voice->current_pitch += d;
++    voice->target_pitch += d;
++    voice->decoded_pitch += d;
++    se_tick_step[voice_index] = step;
++}
++#pragma section
