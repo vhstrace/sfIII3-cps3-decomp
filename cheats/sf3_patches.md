@@ -2320,6 +2320,8 @@ defender's `cb->total`, the hits of the current combo (cleared by `combo_hensuu_
 address in the literal pool of `sound_driver_tick`.
 **Recorded:** 2026-11-17 23:56:52
 
+Tags: `interesting` `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** On a hit, the game freezes both fighters for a few frames (hit stop): the attacker's
 `hit_stop` and the defender's `dm_stop`, counted down by `check_hit_stop` (`src/PLMAIN.c`). A
 KO starts a 95-frame slow motion (`set_conclusion_slow`, `src/SLOWF.c`): `SLOW_flag` is 3 (the
@@ -2348,7 +2350,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - The music is not changed.
 - Every sound effect playing at the time is lowered, not just the hit's: voices and other sounds
   too. Blocks and parries have hit stop too, so they are lowered as well.
