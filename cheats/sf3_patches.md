@@ -1557,10 +1557,10 @@ main: applies.
   `src/textsound_2.c`).
 - Can't be built together with "All music plays 1.5 times as fast" (the end of `src/textsound_2.c`).
 
-## Music, sound effects and voices play 2 whole tones higher
+## Music and sound effects high-pitched
 
-**Source diff:** `patches/two-tones-higher.diff`
-**BPS:** `sf3_ggpatch/two-tones-higher/` (simm1.0-.3)
+**Source diff:** `patches/music-and-sound-effects-high-pitched.diff`
+**BPS:** `sf3_ggpatch/music-and-sound-effects-high-pitched/` (simm1.0-.3)
 **Changes:** 67 bytes. The new `voice_process_secondary` at 06700000. 0613A6A5: its address in the
 literal pool of `sound_driver_tick`.
 **Recorded:** 2026-11-15 20:34:47
