@@ -140,6 +140,7 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Jumps are 25% lower (added 2026-11-18)
 - [ ] Special moves go 50% less high (added 2026-11-18)
 - [ ] Special moves go 75% less high (added 2026-11-18)
+- [ ] Jumps are 50% lower (added 2026-11-18)
 
 ## To test: new cheats from the to-do items
 

@@ -2562,3 +2562,34 @@ not super arts, command normals, jumps or leap attacks. Sideways movement is not
 - Can't be built together with the other "Special moves go ... less high" versions, the two
   "Special moves travel ... sideways" cheats or "Ground special moves work in the air" (all hook
   `Player_attack`) without merging the diffs by hand.
+
+## Jumps are 50% lower
+
+**Source diff:** `patches/jumps-50-lower.diff`
+**BPS:** `sf3_ggpatch/jumps-50-lower/` (simm1.0-.3)
+**Changes:** 219 bytes. 06700000-067000BF: `cheat_lower_jump` and the new `Normal_18000`,
+`Normal_18000_init_unit` and `Normal_53000`. Outside: their slots in `plpnm_lv_00`
+(065EBB7D-065EBB9D, 065EBC09) and `Normal_18000_init_unit`'s address in the literal pools of
+`Attack_03000` (06126535) and `hoken_muriyari_chakuchi` (06126E4D), 3 bytes each.
+**Recorded:** 2026-11-18 00:08:59
+
+**Mechanism:** The same hooks as "Jumps are 25% lower", with a bigger cut. At takeoff,
+`cheat_lower_jump` halves the upward speed (`mvxy.a[1]`) and the gravity (`mvxy.d[1]`), and
+takes back half of the takeoff frame's rise. The arc is half as high, but the jump lasts as many
+frames and goes as far sideways. Jump attacks follow the lower arc.
+
+**Evidence:** As for the 25% version. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU.
+- Ibuki's wall jump is not hooked. It keeps the halved gravity of the jump before it; when it sets a
+  fresh upward speed it goes about twice as high as the normal wall jump, and when it builds on the
+  current upward speed it stays about half as high.
+- Special moves that jump, dashes, hops, Ibuki's bound and knockdowns are not changed.
+- Air attacks have half the height to come out in, so some may land before they hit.
+- Can't be built together with "Jumps are 25% lower" (same hooks).
