@@ -839,7 +839,7 @@ applies.
 
 **Source diff:** `patches/slippery-floors.diff`
 **BPS:** `sf3_ggpatch/slippery-floors/` (simm1.0-.3)
-**Changes:** 567 bytes. 06700000-06700247: the new `player_mv_4000`. 065EAF81: its entry in the
+**Changes:** 559 bytes. 06700000-0670023D: the new `player_mv_4000`. 065EAF81: its entry in the
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:15:30
 
@@ -874,21 +874,22 @@ difference a frame; now it is 1/16 like slowing down, so walks start slowly too.
 - a fighter in a forward or back dash (`PLAYER_NORMAL`, `routine_no[2]` 5 or 6, `Normal_05000` /
   `Normal_06000`) leaves the dash state while still on the ground.
 
-The roll uses each fighter's own random number, kept in `pt_free[10-11]`: a 16-bit LCG,
-`r = r * 25173 + 13849 + system_timer`, and a fall when `(r >> 8) % 10 == 0` (26 of 256, about
-1 in 10). The first version used the CPU's random table (`random_32_com`, `src/PLS02.c`, two
-calls in a row). Only 10 of its 128 positions gave a fall, and the CPU's AI moves through that
-table on its own schedule, so a fighter could go a long time without falling: the user saw
-only the CPU fall (2026-11-17). Changed the same day. On a hit, the fighter is put in the damage
-state the way `setup_kuzureochi` (`src/PLPDM.c`) does it, with damage reaction 89, the one a
-sweep uses (Ryu's `KAGAMI K A`, `data/ryu_attr.c` row 25). On the next frame `Player_damage` runs
-`get_damage_reaction_data`, which picks `dm_reaction_table[89]` (`Damage_16000`, knocked off the
-feet, then down and getting up). The hook fills in what a hit would: `dmg_adrs` = the other
-fighter, `dm_attlv` 2, `dm_butt_type` 1, `dm_plnum` = the fighter's own player number (for
-`parabora_own_table`), `dm_zuru` 7, `dm_koa` 0 (quick rise allowed), `dm_rl` set so the fighter
-keeps facing the same way and falls backward, and no hit stop or shake. `dm_vital` is set to 0 so
-`subtract_dm_vital` adds no score; the hook takes 6 off `vital_new` itself (chip damage, about the
-chip of a heavy special; full life is 160 or 192), but never below 0, so a fall can't KO.
+The roll uses each fighter's own random number, kept in `pt_free[10-11]`: a 16-bit LCG, `r = r *
+25173 + 13849 + system_timer`, and a fall when `(r >> 8) < 10` (10 of 256, about 1 in 25; it was `%
+10 == 0`, about 1 in 10, until the user asked for 1 in 25 on 2026-11-17). The first version used the
+CPU's random table (`random_32_com`, `src/PLS02.c`, two calls in a row). Only 10 of its 128
+positions gave a fall, and the CPU's AI moves through that table on its own schedule, so a fighter
+could go a long time without falling: the user saw only the CPU fall (2026-11-17). Changed the same
+day. On a hit, the fighter is put in the damage state the way `setup_kuzureochi` (`src/PLPDM.c`)
+does it, with damage reaction 89, the one a sweep uses (Ryu's `KAGAMI K A`, `data/ryu_attr.c` row
+25). On the next frame `Player_damage` runs `get_damage_reaction_data`, which picks
+`dm_reaction_table[89]` (`Damage_16000`, knocked off the feet, then down and getting up). The hook
+fills in what a hit would: `dmg_adrs` = the other fighter, `dm_attlv` 2, `dm_butt_type` 1,
+`dm_plnum` = the fighter's own player number (for `parabora_own_table`), `dm_zuru` 7, `dm_koa` 0
+(quick rise allowed), `dm_rl` set so the fighter keeps facing the same way and falls backward, and
+no hit stop or shake. `dm_vital` is set to 0 so `subtract_dm_vital` adds no score; the hook takes 6
+off `vital_new` itself (chip damage, about the chip of a heavy special; full life is 160 or 192),
+but never below 0, so a fall can't KO.
 
 Only while `Allow_a_battle_f` is set and neither fighter is KO'd (`dead_flag`), not during a
 parry (`atemi_flag`) or hit stop.
