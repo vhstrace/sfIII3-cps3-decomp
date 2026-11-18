@@ -132,7 +132,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] Special moves are 25% faster (added 2026-11-18)
 - [ ] Special moves are 50% faster (added 2026-11-18)
 
 ## To test: new cheats from the to-do items

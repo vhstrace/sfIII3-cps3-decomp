@@ -2566,6 +2566,8 @@ moved code or data. `git apply --check` against main: applies.
 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 00:30:16
 
+Tags: `demo-ready` `play-start` `curated`
+
 **Mechanism:** `Player_attack` (`src/PLPAT.c`) runs a fighter's attack for one frame: it steps the
 move's animation script and moves the fighter. The new `Player_attack` runs the original, and on
 every 4th frame of a special move runs it a second time, so the move's animation, movement and
@@ -2584,7 +2586,7 @@ data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Only special and EX moves, for both fighters, player or CPU. Super arts, normals, command throws
   (while holding or held) and projectiles already flying are not changed. A fireball still comes
   out of the faster animation, so it comes out sooner.
