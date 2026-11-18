@@ -2694,3 +2694,62 @@ data. `git apply --check` against main: applies.
 - Uses `pt_free[12]`. Can't be built together with the other cheats that hook `Player_attack`
   ("Special moves are ... faster", "Special moves travel ... sideways", "Special moves go ... less
   high", "Ground special moves work in the air") without merging the diffs by hand.
+
+## Special moves swap their sideways and up-down movement
+
+**Source diff:** `patches/specials-swap-x-and-y.diff`
+**BPS:** `sf3_ggpatch/specials-swap-x-and-y/` (simm1.0-.3)
+**Changes:** 589 bytes. 06700000-0670025B: `cheat_in_special`, `cheat_get32`, `cheat_put32` and the
+new `Player_attack`. 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02`
+(`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 15:30:35
+
+**Mechanism:** A hook on `Player_attack` (`src/PLPAT.c`), which runs a fighter's attack for one
+frame. During a special move, forward movement becomes upward, backward becomes downward (stopping
+at the ground), upward becomes forward and downward becomes backward. A Shoryuken flies forward and
+comes back; a Hurricane Kick or a dashing punch rises into the air.
+
+Swapping each frame's movement alone would break the moves, since they check their own height (a
+Shoryuken would land on its first falling frame). So the move runs on its own, unswapped position:
+
+- Kept per fighter: the move's distance from its start, forward and up (16.16, in
+  `pt_free[12-15]` and `pt_free[16-19]`), the start height (`pt_free[0-3]`), and whether a
+  special is running (`pt_free[4]`). They start again at 0 on a move's first frame
+  (`routine_no[3] == RN3_START`).
+- Before the original runs, the fighter is put at the move's own position: the start plus the
+  unswapped distance. The start's sideways position is worked out from where the fighter is shown,
+  so walls and pushing from the frame before still count.
+- After it runs, the new distance is saved, and the fighter is shown at the start plus the swapped
+  distance (height at least 0).
+- If the special has ended (the fighter is back in `PLAYER_NORMAL`) with the fighter above the
+  ground, they are put in the falling part of a neutral jump: `routine_no[2]` 22 (`Normal_18000`,
+  `src/PLNORMAL.c`), `routine_no[3]` 1 (`N18_AIR`), the neutral jump's animation and gravity
+  (`jpdat_tbl[4]`), and no speed. They drop and land through `jumping_union_process` as usual.
+
+Forward is set by `rl_flag`, as in `add_mvxy_speed` (`src/PLS02.c`). A special move is `wk->as`
+in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`, as in the other special-move cheats.
+
+**Evidence:** `Player_attack` is only called through `plmain_lv_02`, not during hit stop.
+`position_x`/`position_y` are set from `xyz` each frame in `src/plcntset_2.c`, after the
+fighters move. `pt_free` is not used in the original source; slippery floors reads it as 16-bit
+values, so it is 2-byte aligned. `sf3_cheat.py` found no moved code or data. `git apply
+--check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only special and EX moves, for both fighters, player or CPU. Not super arts, normals, command
+  throws (while holding or held), or projectiles once they are out.
+- Ground specials that travel can leave the fighter high up when they end; they then fall from
+  there in a neutral jump pose, and can be hit as in a jump. A fighter hit while floating during
+  the special gets the game's usual air hit reaction.
+- Moves that go backward stay on the ground (they can't go below it), so their sideways part is lost.
+- A move that turns the fighter around partway (`rl_flag` changes) may jump a little that frame.
+- The hit boxes follow the swapped position, so many specials will miss where they used to hit,
+  and hit where they used to miss.
+- If a wall stops the fighter, the move's own position doesn't know: the move still goes on in its
+  own count.
+- Uses `pt_free[0-4]` and `[12-19]`. Can't be built together with the other cheats that hook
+  `Player_attack` without merging the diffs by hand.
