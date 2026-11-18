@@ -2601,3 +2601,79 @@ moved code or data. `git apply --check` against main: applies.
   spark, so blocked specials show the normal block spark and sound instead.
 - Both fighters, player or CPU.
 - Can't be built together with "Blocked special moves do full damage" (same table).
+
+## Special moves are 25% faster
+
+**Source diff:** `patches/specials-25-faster.diff`
+**BPS:** `sf3_ggpatch/specials-25-faster/` (simm1.0-.3)
+**Changes:** 293 bytes. 06700000-0670012F: `cheat_in_special` and the new `Player_attack`.
+065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 00:30:16
+
+**Mechanism:** `Player_attack` (`src/PLPAT.c`) runs a fighter's attack for one frame: it steps the
+move's animation script and moves the fighter. The new `Player_attack` runs the original, and on
+every 4th frame of a special move runs it a second time, so the move's animation, movement and
+timing (startup, active frames and recovery) all go 25% faster. The count is kept in
+`pt_free[12]` (unused by the game) and starts again with each move. A frame counts as a special
+move when `wk->as` is in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`, as in "Special
+moves travel twice as far sideways". The second run is skipped if the first one ended the special
+or started a new move, or if the fighter is in hit stop.
+
+**Evidence:** `Player_attack` is only called through `plmain_lv_02`, and not during hit stop.
+`pt_free` is not used anywhere in the original source. Hit checks run once a frame after all
+fighters move, so they see the fighter after both runs. `sf3_cheat.py` found no moved code or
+data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only special and EX moves, for both fighters, player or CPU. Super arts, normals, command throws
+  (while holding or held) and projectiles already flying are not changed. A fireball still comes
+  out of the faster animation, so it comes out sooner.
+- On a doubled frame the hit check only sees the second step. A move whose hit box is out for
+  only 1 frame can skip it and miss.
+- Anything a move does once a frame (cancel windows, timers, sounds started by the script) runs at
+  the faster rate too.
+- Uses `pt_free[12]`. Can't be built together with the other cheats that hook `Player_attack`
+  ("Special moves are ... faster", "Special moves travel ... sideways", "Special moves go ... less
+  high", "Ground special moves work in the air") without merging the diffs by hand.
+
+## Special moves are 50% faster
+
+**Source diff:** `patches/specials-50-faster.diff`
+**BPS:** `sf3_ggpatch/specials-50-faster/` (simm1.0-.3)
+**Changes:** 293 bytes. 06700000-0670012F: `cheat_in_special` and the new `Player_attack`.
+065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 00:30:16
+
+**Mechanism:** `Player_attack` (`src/PLPAT.c`) runs a fighter's attack for one frame: it steps the
+move's animation script and moves the fighter. The new `Player_attack` runs the original, and on
+every 2nd frame of a special move runs it a second time, so the move's animation, movement and
+timing (startup, active frames and recovery) all go 50% faster. The count is kept in
+`pt_free[12]` (unused by the game) and starts again with each move. A frame counts as a special
+move when `wk->as` is in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`, as in "Special
+moves travel twice as far sideways". The second run is skipped if the first one ended the special
+or started a new move, or if the fighter is in hit stop.
+
+**Evidence:** `Player_attack` is only called through `plmain_lv_02`, and not during hit stop.
+`pt_free` is not used anywhere in the original source. Hit checks run once a frame after all
+fighters move, so they see the fighter after both runs. `sf3_cheat.py` found no moved code or
+data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only special and EX moves, for both fighters, player or CPU. Super arts, normals, command throws
+  (while holding or held) and projectiles already flying are not changed. A fireball still comes
+  out of the faster animation, so it comes out sooner.
+- On a doubled frame the hit check only sees the second step. A move whose hit box is out for
+  only 1 frame can skip it and miss, which is more likely here than at 25%.
+- Anything a move does once a frame (cancel windows, timers, sounds started by the script) runs at
+  the faster rate too.
+- Uses `pt_free[12]`. Can't be built together with the other cheats that hook `Player_attack`
+  ("Special moves are ... faster", "Special moves travel ... sideways", "Special moves go ... less
+  high", "Ground special moves work in the air") without merging the diffs by hand.

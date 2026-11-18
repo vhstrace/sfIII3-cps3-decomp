@@ -139,6 +139,8 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Special moves go 75% less high (added 2026-11-18)
 - [ ] Jumps are 50% lower (added 2026-11-18)
 - [ ] No chip damage from blocked special moves (added 2026-11-18)
+- [ ] Special moves are 25% faster (added 2026-11-18)
+- [ ] Special moves are 50% faster (added 2026-11-18)
 
 ## To test: new cheats from the to-do items
 
