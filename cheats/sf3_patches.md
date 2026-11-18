@@ -1678,46 +1678,6 @@ against main: applies.
 - Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
   same hook, or the end of the same file).
 
-## Yang's Kaihou uses its old, unused version
-
-**Source diff:** `patches/yang-old-kaihou.diff`
-**BPS:** `sf3_ggpatch/yang-old-kaihou/` (simm1.2 and .3 only)
-**Changes:** 2 bytes, in place: 065ED26E, entry 7 of `pl10_exatt_table`.
-**Recorded:** 2026-11-15 20:49:48
-
-**Mechanism:** Yang's 623+K (Kaihou, the slide) runs `Att_PL10_MACH_SLIDE2` (`src/plpat10.c`), from
-entry 7 of his move table `pl10_exatt_table` (`data/plpat10_tbl.c`). The ROM also has
-`Att_PL10_MACH_SLIDE`, which nothing uses. Both start the slide on the animation's cue 30 and stop
-it on cue 21, which Yang's three Kaihou scripts (`yang_saca_102` to `104`) have. The newer version
-also:
-
-```c
-wk->wu.mvxy.a[1].sp = wk->wu.mvxy.d[1].sp = wk->wu.mvxy.kop[1] = 0;   /* no up or down speed */
-...
-if (wk->micchaku_flag) {   /* touching the opponent */
-    char_move_z(&wk->wu);
-} else {
-    return;
-}
-```
-
-The old version keeps the slide data's up and down speed, only checks for the cues after moving
-(no wait for contact), and uses `char_move_z` when Yang has stopped moving (`old_pos_data`). This
-is an in-place change: the table entry points to `Att_PL10_MACH_SLIDE`.
-
-**Evidence:** `Att_PL10_MACH_SLIDE` is in the ROM (0612A340 in `functions.tsv`) and is not
-referenced. `cmd_data.c` names routine 23 `YANG_KAIHOU`, and `pl10_exatt_table` is the only use of
-`Att_PL10_MACH_SLIDE2`. Only the low half of the 4-byte pointer changed, so only chips simm1.2 and
-.3 change. `sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- The newer version clears the vertical speed, which suggests the slide data has some. If so, Yang
-  may rise or sink during the old slide. He may also slide differently when he reaches the opponent.
-
 ## Urien's SA II refills his health (his unused resurrection)
 
 **Source diff:** `patches/urien-sa2-resurrection.diff`
