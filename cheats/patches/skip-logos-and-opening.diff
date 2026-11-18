@@ -52,3 +52,108 @@ index 193650a..36f7629 100644
 +    return Title_orig();
 +}
 +#pragma section
+diff --git a/src/mode_init.c b/src/mode_init.c
+index e39562f..258b419 100644
+--- a/src/mode_init.c
++++ b/src/mode_init.c
+@@ -229,7 +229,7 @@ u32 game_cfg_default_tbl_tail[1] = {
+    region's warning screen (each can be cut short with a button), and finally
+    starts the per-frame tasks and ends itself. */
+ /* provisional name */
+-void mode_init_task(void) {
++void mode_init_task_orig(void) {   /* was mode_init_task: unchanged */
+     s16 wait;
+     u8 region;
+     s32 color;
+@@ -425,3 +425,91 @@ void display_mode_setup(void) {
+         Max_vitality = 0xA0;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Skip the boot screens: mode_init_task without the title screen (STREET FIGHTER III 3rd STRIKE,
++   990512 and the region) and the region's warning screen. Everything else is as before. */
++void mode_init_task(void) {
++
++    region_setup();
++    CC_Type = region_cc_type_tbl[Country - 1];
++    Setup_Difficult_V();
++    init_render_lists();
++    init_color_trans_req();
++    init_char_gfx_tables();
++    clear_scroll_layer_state_and_mask();
++    Scrn_Pos_Init();
++    Family_Init();
++    coin_work_init();
++    palette_bank_set(0x3FC00);
++    palette_write(0, sys_palette, 256);
++    tilemap_chunk_copy_16b((s16*)(SS_RAM + 0x8000), (char*)sys_font_cg, 140);
++    switch_work_clear(Cabinet_Type);
++    dispenser_init();
++    eeprom_config_load();
++    task_sleep(60);
++    Win_Point_Split = 1;
++    tilemap_fill_all(0, 32);
++    task_sleep(1);
++
++    test_flag = 0;
++    Cd_Error_Flag = 0;
++    Break_Into = 0;
++    Forbid_Break = 0;
++    Extra_Break = 0;
++    Fade_Half_Flag = 0;
++    Demo_Flag = 0;
++    Random_ix16_com = 0;
++    Random_ix32_com = 0;
++    unused_flag_a = 0;
++    judge_disp_all = 0;
++    unused_flag_b = 0;
++    unused_flag_c = 0;
++    test_sw_lock = 0;
++    PB_Music_Off = 0;
++    No_Death = 0;
++    Get_Demo_Index = Request_Break[0] = Request_Break[1] = 0;
++    Battle_Round[0] = Game_setting.Battle_Number & 3;
++    Battle_Round[1] = (Game_setting.Battle_Number / 16) & 3;
++    G_No0 = G_No1 = G_No2 = G_No3 = 0;
++    E_No0 = E_No1 = E_No2 = E_No3 = 0;
++    S_No = S_Sub_No = S_Sub2_No = S_Sub3_No = 0;
++    Fade_R_No0 = Fade_R_No1 = 0;
++    Fade_Flag = 0;
++    if (Free_Play) {
++        credit_1p = 9;
++        credit_2p = 9;
++    }
++    effect_work_init();
++    task_sleep(1);
++    while (create_task((void (*)())test_mode_task, 0, &task_tbl[4], 2, 0) == 0) {
++    }
++
++    /* cheat: no title screen (the name, "990512" and the region) and no warning screen */
++    cd_ready_flag = 0;
++    no_cd_flag = bios_cd_flags & 1;
++    display_mode_setup();
++    task_sleep(6);
++    tilemap_fill_all(0, 32);
++    load_char_gfx(0x9000, 1);
++    setup_kage_cells();
++    task_sleep(16);
++
++    tilemap_fill_all(0, 32);
++    Setup_Com_Max_Range();
++    load_any_color(2);
++    ToneDown(0);
++    Entry_Mes_X[0] = 2;
++    Entry_Mes_X[1] = 27;
++    Entry_Mes_Wide[0] = 16;
++    Entry_Mes_Wide[1] = 3;
++    dm17_to_nm23_flag = 0;
++    Ranking_Init();
++    while (create_task((void (*)())game_frame_task, 0, &task_tbl[3], 3, 0) == 0) {
++    }
++    while (create_task((void (*)())entry_task, 0, &task_tbl[2], 3, 0) == 0) {
++    }
++    destroy_current_task();
++}
++#pragma section

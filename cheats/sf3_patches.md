@@ -1408,12 +1408,15 @@ and `plcntset_2.c` handle Shin Gouki as a player. Fighter numbers from `include/
 - After a continue, the "same CPU opponent" check runs before the change.
 - Not in the attract demo.
 
-## Skip the logos and the opening movie
+## Skip the boot screens, the logos and the opening movie
 
 **Source diff:** `patches/skip-logos-and-opening.diff`
 **BPS:** `sf3_ggpatch/skip-logos-and-opening/` (simm1.0-.3)
-**Changes:** 44 bytes. The new `CAPCOM_Logo` and `Title` at 06700000. 0609501D and 06095025: their
-addresses in the literal pool of `Loop_Demo`.
+**Changes:** 895 bytes. The new `mode_init_task` at 06700000-0670038F, `CAPCOM_Logo` at
+06700390 and `Title` at 06700394-067003B7. 06004E7D (`text_clear_task_exit`), 060055E9
+(`test_mode_wait`) and 06005AF1 (`test_mode_exit`): `mode_init_task`'s address in their literal
+pools. 0609501D and 06095025: `CAPCOM_Logo`'s and `Title`'s addresses in the literal pool of
+`Loop_Demo`.
 **Recorded:** 2026-11-15 20:30:41
 
 **Mechanism:** The 3rd Strike version of EarthBound "Skip the logos and the title screen" and Super
@@ -1426,7 +1429,22 @@ runs `CAPCOM_Logo` (`src/demo00.c`: the warning, CAPCOM and other logo screens),
   `TT_DEMO` step (`opening_demo_tick`) by moving to `TT_HOLD` with a 1-frame timer, so it goes
   straight to the usual wipe into the demo fight.
 
-**Evidence:** Both functions are only called from `Loop_Demo`. A coin already leaves the attract loop
+Before that, the start-up task `mode_init_task` (`src/mode_init.c`) shows two screens of its own.
+The first is the title screen: `boot_title_str` (STREET FIGHTER III, 3rd STRIKE, 990512, the
+program's date) and `boot_region_str` (the region, here JAPAN) in `data/Com_Pl_tbl.c`, for up to
+166 frames. The second is the region's legal warning (`warning_mes[Country - 1]`) for up to 100
+frames. A button cuts either one short. Also a hook (added 2026-11-17): `mode_init_task` is
+renamed `mode_init_task_orig`, and the new `mode_init_task` is a copy of it without the two
+`tilemap_print_string` screens and their wait loops. It still runs everything else the same
+way and in the same order: `display_mode_setup`, `cd_ready_flag`/`no_cd_flag`, `load_char_gfx`,
+`setup_kage_cells`, and the 6- and 16-frame `task_sleep`s (now on a blank screen). Then it
+starts the frame and entry tasks as before.
+
+**Evidence:** `CAPCOM_Logo` and `Title` are only called from `Loop_Demo`. `mode_init_task`
+is only used by address: `boot_task` (`src/boot_task.c`) starts it at power-on, and the test
+menu restarts it (`src/test_mode.c`) and kills it by address (`kill_tasks_by_func`). All of
+these now get the new one. The parental advisory screen is `Logo_Warning`, inside
+`CAPCOM_Logo`, and was already skipped. A coin already leaves the attract loop
 from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin is a different routine
 (`Title_At_a_Dash`), which is not changed. `sf3_cheat.py` found no moved code or data.
 `git apply --check` against main: applies.
@@ -1439,6 +1457,9 @@ from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin 
 - The attract mode becomes demo fights and rankings only. The opening movie after a coin (in
   `Title_At_a_Dash`) still plays.
 - The CPS3 BIOS screens before the game starts are not part of this program and still show.
+- Start-up still takes about 1.5 seconds of blank screen (the 60-frame wait before the screens, and
+  the 6- and 16-frame waits kept for safety).
+- Leaving the test menu also skips the two boot screens.
 - The logo screens also cleared the screen and loaded backgrounds. If leftovers from a ranking screen
   show during the next demo fight, this is why.
 
