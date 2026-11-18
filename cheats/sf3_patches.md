@@ -1523,6 +1523,8 @@ data. `git apply --check` against main: applies.
 blank interrupt's literal pool (`src/intr.src`; the nearest symbol is `frt_overflow_intr`).
 **Recorded:** 2026-11-15 20:33:44
 
+Tags: `demo-ready` `play-start` `utility`
+
 **Mechanism:** The 3rd Strike version of the "No music" cheats in Metroid, SMB3, ALTTP, Super Metroid,
 OoT, FF2 and EarthBound. `sound_seq_start` (`src/textsound_2.c`) starts a music sequence (header byte
 0) on the 16 `bgm_voice`s and sets bit 2 of `bgm_state`. Sound effects and voices use the separate
@@ -1548,7 +1550,7 @@ main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - Music in the test mode's sound test is silent too.
 - A short jingle that is a music sequence (not a sound effect) is silent too.
 - Can't be built together with "Every sound effect is the next one in the list" (both add to the end of

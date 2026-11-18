@@ -139,7 +139,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] No music
 - [ ] Music, sound effects and voices play 2 whole tones higher
 - [ ] Every sound effect is the next one in the list
 - [ ] All music plays 1.5 times as fast
