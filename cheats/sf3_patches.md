@@ -2405,6 +2405,8 @@ when the height reaches 0, so landing is not changed. `sf3_cheat.py` found no mo
 `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 00:07:48
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The same hook as "Special moves go 25% less high", with a bigger cut. The new
 `Player_attack` (`src/PLPAT.c`) notes the fighter's height (`xyz[1].cal`, 16.16), runs the
 original, and keeps half of that frame's up or down movement off again:
@@ -2425,7 +2427,7 @@ not super arts, command normals, jumps or leap attacks. Sideways movement is not
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Rising specials (Shoryuken, Spinning Bird Kick and the like) peak 50% lower, so they miss high
   opponents more often than in the 25% version.
 - A special done in the air that only goes down (a dive kick) comes down 50% slower, so it lasts
