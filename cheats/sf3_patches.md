@@ -2360,7 +2360,7 @@ moved code or data. `git apply --check` against main: applies.
 `hoken_muriyari_chakuchi` (06126E4D), 3 bytes each.
 **Recorded:** 2026-11-18 00:07:48
 
-Tags: `demo-ready` `play-start` `curated`
+Tags: `demo-ready` `play-start`
 
 **Mechanism:** A jump takes off in `Normal_18000` (`src/PLNORMAL.c`, states 18-26: the
 neutral, forward and back jumps and high jumps), which loads the jump's speeds from `jpdat_tbl`:
@@ -2491,6 +2491,8 @@ not super arts, command normals, jumps or leap attacks. Sideways movement is not
 `Attack_03000` (06126535) and `hoken_muriyari_chakuchi` (06126E4D), 3 bytes each.
 **Recorded:** 2026-11-18 00:08:59
 
+Tags: `demo-ready` `play-start` `video-ready` `curated`
+
 **Mechanism:** The same hooks as "Jumps are 25% lower", with a bigger cut. At takeoff,
 `cheat_lower_jump` halves the upward speed (`mvxy.a[1]`) and the gravity (`mvxy.d[1]`), and
 takes back half of the takeoff frame's rise. The arc is half as high, but the jump lasts as many
@@ -2503,7 +2505,7 @@ frames and goes as far sideways. Jump attacks follow the lower arc.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Both fighters, player or CPU.
 - Ibuki's wall jump is not hooked. It keeps the halved gravity of the jump before it; when it sets a
   fresh upward speed it goes about twice as high as the normal wall jump, and when it builds on the
