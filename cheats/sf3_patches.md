@@ -2360,6 +2360,8 @@ moved code or data. `git apply --check` against main: applies.
 `hoken_muriyari_chakuchi` (06126E4D), 3 bytes each.
 **Recorded:** 2026-11-18 00:07:48
 
+Tags: `demo-ready` `play-start` `curated`
+
 **Mechanism:** A jump takes off in `Normal_18000` (`src/PLNORMAL.c`, states 18-26: the
 neutral, forward and back jumps and high jumps), which loads the jump's speeds from `jpdat_tbl`:
 
@@ -2384,7 +2386,7 @@ when the height reaches 0, so landing is not changed. `sf3_cheat.py` found no mo
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Both fighters, player or CPU.
 - Ibuki's wall jump (`Normal_52000`, `remake_sankaku_tobi_mvxy`) is not hooked. It keeps the
   lower gravity of the jump before it; when it sets a fresh upward speed it goes about 1/3 higher
