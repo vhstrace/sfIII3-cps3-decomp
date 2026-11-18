@@ -1605,6 +1605,8 @@ for the 16 music voices and the 16 effect voices. Field types (all `s32`) from `
 `Call_Se`, `Loop_Demo`, `Game_Manage_4th`, the sound test and others), 3 bytes each.
 **Recorded:** 2026-11-15 20:36:22
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The 3rd Strike version of the FF2, ALTTP and OoT "Every sound effect is the next one"
 cheats. Every sound goes through `sound_request` (menus and `Sound_SE`) or `sound_request_pan` (fight
 sounds and voices, from the `Se_` handlers in `src/se_3.c`). Both pass a code to `sound_seq_start`
@@ -1634,7 +1636,7 @@ code or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - A fighter's voice lines often become the next voice line (a different move's shout).
 - The test mode's sound test plays the next effect too.
 - Can't be built together with "No music" (both add to the end of `src/textsound_2.c`).

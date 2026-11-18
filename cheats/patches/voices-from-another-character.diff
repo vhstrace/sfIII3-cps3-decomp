@@ -1,0 +1,78 @@
+diff --git a/src/textsound_2.c b/src/textsound_2.c
+index 0a7deb3..81ef495 100644
+--- a/src/textsound_2.c
++++ b/src/textsound_2.c
+@@ -141,7 +141,7 @@ void sound_init(u8* data, SNDSAMPLE* sample, u8** bank_b, u8 stereo, u8 volume,
+ 
+ 
+ /* provisional name */
+-s32 sound_request(s32 code) {
++s32 sound_request_orig(s32 code) {   /* was sound_request: unchanged */
+     return sound_seq_start(code, -1);
+ }
+ 
+@@ -359,7 +359,7 @@ s32 sound_seq_start(u16 code, s16 ramp) {
+ 
+ 
+ /* provisional name */
+-void sound_request_pan(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {
++void sound_request_pan_orig(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {   /* was sound_request_pan: unchanged */
+     if (vol_l < 0) {
+         vol_l = 0;
+     } else if (vol_l > 127) {
+@@ -536,3 +536,55 @@ void sound_driver_tick(void) {
+         }
+     }
+ }
++
++
++#pragma section CHEAT
++/* Voices from another character: each character's voice lines are in their own block of 0x20 sound
++   codes between 0x160 and 0x3DF (player 2's copies are 0x300 higher). A code in that range plays
++   the code at the same place in the next block (the last block wraps to the first), when both are
++   sound effects (sequence header 1-0x7F). Everything else plays as before. */
++s32 cheat_voice_header(u16 code) {
++    u32 ofs;
++    while (code >= snd_seq_max) {
++        code -= snd_seq_max;
++    }
++    ofs = snd_seq_data[code + 1];
++    if (ofs == 0) {
++        return 0;
++    }
++    return *(u8*)((u32)snd_seq_data + ofs);
++}
++
++u16 cheat_other_voice(u16 code) {
++    u16 side = 0;
++    u16 c = code;
++    s32 a;
++    s32 b;
++    if (c >= 0x400 && c < 0x700) {
++        side = 0x300;
++        c -= 0x300;
++    }
++    if (c < 0x160 || c >= 0x3E0) {
++        return code;
++    }
++    c += 0x20;
++    if (c >= 0x3E0) {
++        c -= 0x280;
++    }
++    c += side;
++    a = cheat_voice_header(code);
++    b = cheat_voice_header(c);
++    if (a >= 1 && a <= 0x7F && b >= 1 && b <= 0x7F) {
++        return c;
++    }
++    return code;
++}
++
++s32 sound_request(s32 code) {
++    return sound_request_orig(cheat_other_voice(code));
++}
++
++void sound_request_pan(u16 code, s16 vol_l, s16 vol_r, s16 time, s16 ramp) {
++    sound_request_pan_orig(cheat_other_voice(code), vol_l, vol_r, time, ramp);
++}
++#pragma section

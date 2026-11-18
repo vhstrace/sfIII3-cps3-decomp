@@ -139,7 +139,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] Every sound effect is the next one in the list
 - [ ] All music plays 1.5 times as fast
 - [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
