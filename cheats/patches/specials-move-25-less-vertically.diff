@@ -1,0 +1,40 @@
+diff --git a/src/PLPAT.c b/src/PLPAT.c
+index ab0ffa1..b216229 100644
+--- a/src/PLPAT.c
++++ b/src/PLPAT.c
+@@ -194,7 +194,7 @@ const u8* cjdr_defense_table[24] = {
+ };
+ 
+ 
+-void Player_attack(PLW* wk) {
++void Player_attack_orig(PLW* wk) {   /* was Player_attack: unchanged */
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->py->flag = 0;
+@@ -809,3 +809,26 @@ void hoken_muriyari_chakuchi(PLW* wk) {
+         wk->wu.xyz[1].disp.pos = 0;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Cheat: special moves move 25% less up and down. A special move's animation row comes from rows 8-17
++   of asstbl_sa_ground or asstbl_sa_air (rows 0-7 are the super arts). Whatever the move's routine
++   moves the fighter up or down this frame, a quarter of it is taken off, while the fighter stays
++   above the ground (a landing that puts them at height 0 is kept). */
++void Player_attack(PLW* wk) {
++    s32 y0 = wk->wu.xyz[1].cal;
++    s32 sp = 0;
++    const AS* as = wk->as;
++    s16 pn = wk->player_number;
++    if (wk->wu.routine_no[2] >= ATTACK_SPECIAL && Bonus_Game_Flag == 0 &&
++        ((as >= &asstbl_sa_ground[pn][8][0].as && as <= &asstbl_sa_ground[pn][17][3].as) ||
++         (as >= &asstbl_sa_air[pn][8][0].as && as <= &asstbl_sa_air[pn][17][3].as))) {
++        sp = 1;
++    }
++    Player_attack_orig(wk);
++    if (sp && wk->tsukami_f == 0 && wk->tsukamare_f == 0 && wk->wu.xyz[1].cal > 0) {
++        wk->wu.xyz[1].cal -= (wk->wu.xyz[1].cal - y0) / 4;
++    }
++}
++#pragma section

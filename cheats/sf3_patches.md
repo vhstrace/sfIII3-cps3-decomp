@@ -2391,3 +2391,46 @@ against main: applies.
 - If the game is paused during hit stop, sounds stay low until it goes on.
 - Can't be built together with "Music and sound effects high-pitched" or "Combo hits rise in
   pitch" (all hook `voice_process_secondary`).
+
+## Special moves go 25% less high
+
+**Source diff:** `patches/specials-move-25-less-vertically.diff`
+**BPS:** `sf3_ggpatch/specials-move-25-less-vertically/` (simm1.0-.3)
+**Changes:** 245 bytes. 06700000-067000F1: the new `Player_attack`. 065EAF95: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 00:04:45
+
+**Mechanism:** The same hook as "Special moves travel 1.5 times as far sideways", for height. The
+new `Player_attack` (`src/PLPAT.c`) notes the fighter's height (`xyz[1].cal`, 16.16), runs the
+original, and takes a quarter of that frame's up or down movement off again:
+
+```c
+wk->wu.xyz[1].cal -= (wk->wu.xyz[1].cal - y0) / 4;
+```
+
+Since the move's routine moves the fighter by its speed each frame, the whole path is 3/4 as high,
+and the fighter comes back down on the same frame as before. It is skipped when the original put
+the fighter at or below the ground, so a landing still lands at height 0. Only special moves
+(`wk->as` in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`), not super arts, command
+normals, jumps or leap attacks. Sideways movement is not changed.
+
+**Evidence:** As for the sideways versions: `Player_attack` is only called through
+`plmain_lv_02`, not during hit stop. Not while throwing or being thrown, and not in bonus stages.
+The division rounds toward 0, so rising and falling get the same cut. `sf3_cheat.py` found no
+moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Rising specials (Ken's and Ryu's Shoryuken, Chun-Li's Spinning Bird Kick and the like) peak 25%
+  lower. Their hit boxes move with the fighter, so some may miss high opponents they used to hit.
+- A special done in the air that only goes down (a dive kick) comes down 25% slower, so it lasts
+  longer before it lands.
+- A move that sets the height to a fixed value instead of moving by a speed is cut by a quarter of
+  the jump, then goes back to normal on the next frame.
+- Projectiles are not changed. Both fighters, player or CPU.
+- Can't be built together with "Special moves travel twice as far sideways", "Special moves travel
+  1.5 times as far sideways" or "Ground special moves work in the air" (all hook `Player_attack`)
+  without merging the diffs by hand.
