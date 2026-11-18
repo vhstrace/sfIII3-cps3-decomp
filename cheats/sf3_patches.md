@@ -2521,6 +2521,8 @@ frames and goes as far sideways. Jump attacks follow the lower arc.
 **Changes:** 3 bytes. 0618A9CB, 0618A9CD, 0618A9CF: entries 1-3 of `kezuri_pow_table` (in place).
 **Recorded:** 2026-11-18 00:09:48
 
+Tags: `demo-ready` `play-start` `curated`
+
 **Mechanism:** The opposite of "Blocked special moves do full damage". When a hit is blocked,
 `check_dm_att_guard` (`src/HITCHECK.c`) does chip damage only if the attack has a chip divisor:
 
@@ -2548,7 +2550,7 @@ moved code or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Super arts too: they use the same table, so blocked supers do no damage either, and a block can't
   KO (no chip KO).
 - The hit spark effect (`effect_02`, `src/EFF02.c`) also reads `kezuri_pow` to choose the chip
