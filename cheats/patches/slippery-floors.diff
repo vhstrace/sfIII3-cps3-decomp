@@ -1,5 +1,5 @@
 diff --git a/src/PLMAIN.c b/src/PLMAIN.c
-index 2038cb4..d14e14c 100644
+index 2038cb4..1bbc4d1 100644
 --- a/src/PLMAIN.c
 +++ b/src/PLMAIN.c
 @@ -247,7 +247,7 @@ void player_mv_3000(PLW* wk) {
@@ -22,7 +22,7 @@ index 2038cb4..d14e14c 100644
 +   moves them at, by 1/16 of the difference a frame, so a fighter speeds up slowly into a walk or
 +   dash and slides on after it, a landing or a hit. The speed is kept in pt_free[8-9], in 1/256
 +   pixels a frame.
-+   Also, about 1 time in 25 that a fighter lands from a jump (or a normal jump attack) or comes out of a
++   Also, about 1 time in 20 that a fighter lands from a jump (or a normal jump attack) or comes out of a
 +   dash during a fight, their feet slip: they get a sweep's knockdown (damage reaction 89) and lose
 +   6 vitality, without a KO. The roll uses each fighter's own random number in pt_free[10-11]
 +   (a 16-bit LCG stepped with the system timer added), not the CPU's random table. */
@@ -48,7 +48,7 @@ index 2038cb4..d14e14c 100644
 +                && wk->wu.routine_no[2] != r2))
 +        && Allow_a_battle_f && wk->dead_flag == 0 && ((PLW*)wk->wu.target_adrs)->dead_flag == 0
 +        && wk->atemi_flag == 0 && wk->wu.hit_stop == 0 && wk->wu.dm_stop == 0
-+        && (*rs = (u16)(*rs * 25173 + 13849 + system_timer), (*rs >> 8) < 10)) {
++        && (*rs = (u16)(*rs * 25173 + 13849 + system_timer), (*rs >> 8) < 13)) {
 +        wk->wu.routine_no[1] = PLAYER_DAMAGE;
 +        wk->wu.routine_no[2] = 89;
 +        wk->wu.routine_no[3] = RN3_START;
