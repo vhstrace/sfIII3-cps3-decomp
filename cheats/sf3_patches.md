@@ -1726,7 +1726,7 @@ only Temporal Thunder for Urien (`cmd_data.c`). The other SA rows and table entr
 - Gill's glow effect (`EFFJ7.c`) checks for Gill only, so Urien may not glow.
 - A CPU Urien with SA II uses it too.
 
-## Air parries knock you backward (the old, unused air parry)
+## Restore unused air parry (knocks you backwards)
 
 **Source diff:** `patches/old-air-parry.diff`
 **BPS:** `sf3_ggpatch/old-air-parry/` (simm1.2 and .3 only)
