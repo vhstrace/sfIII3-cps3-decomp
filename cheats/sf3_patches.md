@@ -2218,3 +2218,44 @@ leftward move gets the same extra as a rightward one. `sf3_cheat.py` found no mo
 - Both fighters, player or CPU.
 - Can't be built together with "Special moves travel twice as far sideways" or "Ground special moves
   work in the air" (all three hook `Player_attack`) without merging the diffs by hand.
+
+## Blocked special moves do full damage
+
+**Source diff:** `patches/blocked-specials-full-damage.diff`
+**BPS:** `sf3_ggpatch/blocked-specials-full-damage/` (simm1.1 and simm1.3 only; the other two chips
+are not changed)
+**Changes:** 3 bytes. 0618A9CB, 0618A9CD, 0618A9CF: `kezuri_pow_table` entries 1-3 (in place).
+**Recorded:** 2026-11-17 20:18:11
+
+**Mechanism:** When a hit is blocked, `check_dm_att_guard` (`src/HITCHECK.c`) divides its damage by
+the attack's chip divisor (`kezuri_pow`):
+
+```c
+ds->dm_vital = ds->dm_vital / as->kezuri_pow;
+if (ds->dm_vital == 0) ds->dm_vital = 1;
+```
+
+`set_new_attnum` (`src/CHARMOVE.c`) picks the divisor from `kezuri_pow_table`
+(`data/CHARSET_tbl.c`) with the 2-bit `kez` column of the attack's row in `data/<name>_attr.c`:
+`{ 0, 4, 8, 16 }`, where 0 means no chip damage. The cheat changes the table in place to
+`{ 0, 1, 1, 1 }`, so a blocked attack that did 1/4, 1/8 or 1/16 damage now does all of it. Attacks
+with `kez` 0 (all normal attacks and throws) still do none.
+
+**Evidence:** Of the attack rows in all `data/*_attr.c` files, 912 have `kez` 1-3 (149, 315 and 448).
+Every one that a script uses belongs to a special move, an EX move or a super art. Fireballs use the
+same check. `kezuri_pow_table` is read only in `set_new_attnum` and in `setup_metamor_kezuri`
+(Twelve's X.C.O.P.Y., entry 3). `sf3_cheat.py` found no moved code or data. `git apply --check`
+against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Super arts too: their attack rows use the same table, so blocked supers do full damage as well.
+- The damage is the full hit's damage after the usual multipliers (difficulty, power-ups, combo
+  scaling). The blocker still blocks: block stun, no knockdown, no stun gauge.
+- If the damage is more than the blocker's health left, the block becomes a hit and KOs them (the
+  game's chip KO), as before. Moves marked `no_death_attack` leave them at 0 health instead.
+- Parried hits still do no damage.
+- Both fighters, player or CPU.
