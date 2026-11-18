@@ -1473,6 +1473,8 @@ from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin 
 `Main_Jmp_Tbl` (the nearest symbol is `grade_t_table`).
 **Recorded:** 2026-11-15 20:32:31
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** The game still has the developers' "OBJECT TEST" debug menu (`src/CMD_MAIN.c`): BG
 SELECT, OBJECT LOOK, OBJECT EDIT, OBJECT EDIT 2, HIT, ALL CHARACTER, PARTS, and pages named after staff
 (YOKOYAMA, NAKAI, YOSHIZUMI, YU, RAOH, INE, OHYA). Its top routine `debug_scene_outer_dispatch` is never
@@ -1502,7 +1504,7 @@ data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - In the menu, P1 moves the cursor (up and down) and LP picks. The pages use both controllers, and some
   read the DIP switches.
 - The source has no notes on how each page is used. Some may be unfinished or crash.
