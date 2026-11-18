@@ -2258,13 +2258,13 @@ changed. `sf3_cheat.py` found no moved code or data. `git apply --check` against
 - Can't be built together with "Every sound effect is the next one in the list", "No music" or "All
   music plays 1.5 times as fast" (all add to the end of `src/textsound_2.c`).
 
-## Combo hits rise in pitch
+## Combo hits fall in pitch
 
-**Source diff:** `patches/combo-hits-rise-in-pitch.diff`
-**BPS:** `sf3_ggpatch/combo-hits-rise-in-pitch/` (simm1.0-.3)
-**Changes:** 707 bytes. The new code at 06700000-06700257 (`Se_Shock`, `cheat_clear_pitch_marks`,
+**Source diff:** `patches/combo-hits-fall-in-pitch.diff`
+**BPS:** `sf3_ggpatch/combo-hits-fall-in-pitch/` (simm1.0-.3)
+**Changes:** 709 bytes. The new code at 06700000-0670025B (`Se_Shock`, `cheat_clear_pitch_marks`,
 `cheat_save_cursors`, `sound_request`, `sound_request_pan`, `voice_process_secondary`) and the
-scale at 06700258-06700266. Outside: 13 `Se_Shock` slots in the sound request table
+scale at 0670025C-0670026A. Outside: 13 `Se_Shock` slots in the sound request table
 `sound_effect_request` (0618D0E5-0618D169), `voice_process_secondary`'s address in
 `sound_driver_tick` (0613A6A5), and the 24 literal-pool addresses of `sound_request` and
 `sound_request_pan` in their callers (`Se_Shock_orig`, `Se_Myself`, `Se_Let`, `Call_Se`, the
@@ -2280,15 +2280,15 @@ defender's `cb->total`, the hits of the current combo (cleared by `combo_hensuu_
 - The new `Se_Shock` notes each sound effect voice's `cursor`, runs the original, and gives
   every voice whose cursor changed (the voices the hit sound just started) a pitch step in
   `reserved_71[0]`, a spare byte at the end of `SNDVOICE` that no code uses. The step is
-  `cb->total - 1` places up a major scale: 0, 2, 4, 5, 7, 9, 11, 12 ... 24 semitones, so the
-  first hit is normal, the 8th is an octave up, and the 15th and later are 2 octaves up.
+  `cb->total - 1` places down a major scale: 0, 1, 3, 5, 7, 8, 10, 12 ... 24 semitones, so the
+  first hit is normal, the 8th is an octave down, and the 15th and later are 2 octaves down.
 - The new `sound_request` and `sound_request_pan` (`src/textsound_2.c`) clear `reserved_71[0]`
   on any voice that starts a new sound, so a voice that played a hit sound doesn't keep the step.
   `Se_Shock`'s hook sets it again after this. (Hooking `sound_seq_start` instead moved code:
   its own file calls it with short calls.)
-- The new `voice_process_secondary` (`src/sound_voice_2.c`) adds `reserved_71[0] * 256` (256 a
-  semitone) to a sound effect voice's pitches while the original writes the pitch register, then
-  takes it off again, the same way as "Music and sound effects high-pitched".
+- The new `voice_process_secondary` (`src/sound_voice_2.c`) takes `reserved_71[0] * 256` (256 a
+  semitone) off a sound effect voice's pitches while the original writes the pitch register, then
+  puts it back, the same way as "Music and sound effects high-pitched".
 
 **Evidence:** `Se_Shock` is only reached through `sound_effect_request`. `sound_request` and
 `sound_request_pan` are only called from other files; `sound_seq_start` is only called from
@@ -2303,10 +2303,10 @@ defender's `cb->total`, the hits of the current combo (cleared by `combo_hensuu_
 - Not tested.
 - Both fighters, player or CPU. A blocked hit plays at normal pitch, since blocks don't add to
   the combo count.
-- Every sound `Se_Shock` plays rises, including the few move sounds in its slots (codes 0x100-0x107,
+- Every sound `Se_Shock` plays falls, including the few move sounds in its slots (codes 0x100-0x107,
   0x11D-0x121), when they play during a combo.
 - The step is the combo count when the sound starts, so a hit that lands between combos (after the
-  game ends the combo) starts again from the bottom.
+  game ends the combo) starts again from the top.
 - Can't be built together with "Music and sound effects high-pitched", "Slow-motion sound in hit
   stop" (both hook `voice_process_secondary`), "Every sound effect is the next one in the list",
   "No music", "All music plays 1.5 times as fast" or "Every character speaks with another
@@ -2353,7 +2353,7 @@ against main: applies.
 - Every sound effect playing at the time is lowered, not just the hit's: voices and other sounds
   too. Blocks and parries have hit stop too, so they are lowered as well.
 - If the game is paused during hit stop, sounds stay low until it goes on.
-- Can't be built together with "Music and sound effects high-pitched" or "Combo hits rise in
+- Can't be built together with "Music and sound effects high-pitched" or "Combo hits fall in
   pitch" (all hook `voice_process_secondary`).
 
 ## Special moves go 25% less high
