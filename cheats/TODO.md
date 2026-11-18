@@ -148,6 +148,7 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] Fighters use colours from past the end of their colour table
 - [ ] Yang's Senkyuutai uses its old, unused version
 - [ ] Blocked special moves do full damage (added 2026-11-17)
+- [ ] Slippery floors: random falls after landings and dashes (added 2026-11-17)
 
 ## To test: new cheats from the to-do items
 

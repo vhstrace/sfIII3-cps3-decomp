@@ -835,11 +835,11 @@ applies.
 - A fighter in the corner can't be pushed out by the other's body, and the other can walk into the
   corner past them.
 
-## Slippery floors: fighters slide after walking, dashing, jumping and getting hit
+## Slippery floors: fighters slide after walking, dashing, jumping and getting hit, and sometimes fall
 
 **Source diff:** `patches/slippery-floors.diff`
 **BPS:** `sf3_ggpatch/slippery-floors/` (simm1.0-.3)
-**Changes:** 195 bytes. 06700000-067000C3: the new `player_mv_4000`. 065EAF81: its entry in the
+**Changes:** 561 bytes. 06700000-06700243: the new `player_mv_4000`. 065EAF81: its entry in the
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-15 20:15:30
 
@@ -865,6 +865,30 @@ slid with the last `mvxy` speed. Walking moves by animation steps (`cg_add_xy`, 
 stopped dead and then slid off. Changed again the same day: speeding up first used 1/4 of the
 difference a frame; now it is 1/16 like slowing down, so walks start slowly too.)
 
+**Falls (added 2026-11-17):** the hook also notes `routine_no[1]`, `routine_no[2]` and the height
+(`xyz[1].disp.pos`) before running the original. A fall can happen when, in that frame:
+
+- a fighter in the normal state (`PLAYER_NORMAL`), or in a normal jump attack (`PLAYER_ATTACK`
+  with `routine_no[2] < ATTACK_SPECIAL`), goes from the air to the ground: a landing from a jump,
+  a jump attack, an air block or a back dash that leaves the ground; or
+- a fighter in a forward or back dash (`PLAYER_NORMAL`, `routine_no[2]` 5 or 6, `Normal_05000` /
+  `Normal_06000`) leaves the dash state while still on the ground.
+
+The roll is `(random_32_com() * 32 + random_32_com()) % 10 == 0` (`src/PLS02.c`, the game's
+0-31 random table, so 103 of 1024, about 1 in 10). On a hit, the fighter is put in the damage
+state the way `setup_kuzureochi` (`src/PLPDM.c`) does it, with damage reaction 89, the one a
+sweep uses (Ryu's `KAGAMI K A`, `data/ryu_attr.c` row 25). On the next frame `Player_damage` runs
+`get_damage_reaction_data`, which picks `dm_reaction_table[89]` (`Damage_16000`, knocked off the
+feet, then down and getting up). The hook fills in what a hit would: `dmg_adrs` = the other
+fighter, `dm_attlv` 2, `dm_butt_type` 1, `dm_plnum` = the fighter's own player number (for
+`parabora_own_table`), `dm_zuru` 7, `dm_koa` 0 (quick rise allowed), `dm_rl` set so the fighter
+keeps facing the same way and falls backward, and no hit stop or shake. `dm_vital` is set to 0 so
+`subtract_dm_vital` adds no score; the hook takes 6 off `vital_new` itself (chip damage, about the
+chip of a heavy special; full life is 160 or 192), but never below 0, so a fall can't KO.
+
+Only while `Allow_a_battle_f` is set and neither fighter is KO'd (`dead_flag`), not during a
+parry (`atemi_flag`) or hit stop.
+
 **Evidence:** `player_mv_4000` is only called through `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 `check_lever_data` (input) and the state routine both run inside it, before `move_player_work`
 (`src/plcntset_2.c`) pushes the fighters apart and keeps them on screen, so walls and the other
@@ -872,13 +896,22 @@ fighter still stop a slide. Not during hit stop (`hit_stop`, `dm_stop`; the spee
 while throwing or being thrown (`tsukami_f`, `tsukamare_f`; the speed is cleared), and not in bonus
 stages. A jump of more than 32 pixels in one frame (a reset of the position) clears the speed.
 No source uses `pt_free`. `sf3_cheat.py` found no moved code or data. `git apply --check` against
-main: applies.
+main: applies. For the falls: `Player_damage`, `get_damage_reaction_data`, `subtract_dm_vital`,
+`check_bullet_damage`, `Damage_16000`, `buttobi_add_y_check`, `setup_butt_own_data`
+(`src/PLS02.c`), `get_sky_dm_timer`, `dm_reaction_table` and `plpdm_lv_00`
+(`data/PLPDM_tbl.c`), `add_arts_gauge` (`data/gauge.c`), `Max_vitality` (`src/mode_init.c`).
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
 
 **Caveats:**
 
-- Tested by the user in MAME (2026-11-16): works.
+- Tested by the user in MAME (2026-11-16): works. The falls (added 2026-11-17) are not tested.
+- A fall comes one frame after the landing or dash end, so the landing pose may show for a frame.
+- Falls use the CPU's random table (`random_32_com`), so they shift the CPU's choices a little.
+- The fall is a damage state: it can be juggled or hit on the ground like after a real sweep, and
+  it counts as a hit for anything that checks the damage state. It doesn't add to the combo
+  counter.
+- Dashes that end in an attack or a jump (a cancel) don't roll.
 - Every ground movement is smoothed: walks, dashes, attacks that step forward, and pushback from
   hits and blocks. Dashes start much slower and slide further: a short dash may be mostly slide. Attacks that step forward may whiff
   where they used to hit.
