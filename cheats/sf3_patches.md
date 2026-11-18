@@ -911,7 +911,7 @@ main: applies. For the falls: `Player_damage`, `get_damage_reaction_data`, `subt
 - The fall is a damage state: it can be juggled or hit on the ground like after a real sweep, and
   it counts as a hit for anything that checks the damage state. It doesn't add to the combo
   counter.
-- Dashes that end in an attack or a jump (a cancel) don't roll.
+- A dash cut short by an attack doesn't roll (the fighter leaves the normal state).
 - Every ground movement is smoothed: walks, dashes, attacks that step forward, and pushback from
   hits and blocks. Dashes start much slower and slide further: a short dash may be mostly slide. Attacks that step forward may whiff
   where they used to hit.
