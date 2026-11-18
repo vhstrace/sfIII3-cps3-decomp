@@ -1,0 +1,13 @@
+diff --git a/data/CHARSET_tbl.c b/data/CHARSET_tbl.c
+index fce96f6..30e6e8f 100644
+--- a/data/CHARSET_tbl.c
++++ b/data/CHARSET_tbl.c
+@@ -148,7 +148,7 @@ const s16 jphos_table[16] = {
+ };
+ 
+ const s16 kezuri_pow_table[4] = {
+-    0, 4, 8, 16,
++    0, 0, 0, 0,  /* cheat: was 0, 4, 8, 16 */
+ };
+ 
+ void (*const comm_jmp_tbl[125])() = {

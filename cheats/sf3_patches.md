@@ -2593,3 +2593,45 @@ frames and goes as far sideways. Jump attacks follow the lower arc.
 - Special moves that jump, dashes, hops, Ibuki's bound and knockdowns are not changed.
 - Air attacks have half the height to come out in, so some may land before they hit.
 - Can't be built together with "Jumps are 25% lower" (same hooks).
+
+## No chip damage from blocked special moves
+
+**Source diff:** `patches/no-chip-damage.diff`
+**BPS:** `sf3_ggpatch/no-chip-damage/` (simm1.1 and simm1.3 only)
+**Changes:** 3 bytes. 0618A9CB, 0618A9CD, 0618A9CF: entries 1-3 of `kezuri_pow_table` (in place).
+**Recorded:** 2026-11-18 00:09:48
+
+**Mechanism:** The opposite of "Blocked special moves do full damage". When a hit is blocked,
+`check_dm_att_guard` (`src/HITCHECK.c`) does chip damage only if the attack has a chip divisor:
+
+```c
+if (as->kezuri_pow) {
+    ...
+    ds->dm_vital = ds->dm_vital / as->kezuri_pow;
+    ...
+} else {
+    ds->dm_vital = 0;
+}
+```
+
+`set_new_attnum` (`src/CHARMOVE.c`) picks the divisor from `kezuri_pow_table`
+(`data/CHARSET_tbl.c`), `{ 0, 4, 8, 16 }`. The cheat changes it in place to `{ 0, 0, 0, 0 }`, so
+every blocked attack takes the `else` path and does no damage. In place.
+
+**Evidence:** As for the full-damage cheat: every attack row with a nonzero chip column belongs to a
+special move, an EX move or a super art, and fireballs use the same check (and the one in
+`check_dm_att_blocking` for projectiles is also skipped when `kezuri_pow` is 0).
+`setup_metamor_kezuri` (Twelve's X.C.O.P.Y.) reads entry 3, now 0 too. `sf3_cheat.py` found no
+moved code or data. `git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Super arts too: they use the same table, so blocked supers do no damage either, and a block can't
+  KO (no chip KO).
+- The hit spark effect (`effect_02`, `src/EFF02.c`) also reads `kezuri_pow` to choose the chip
+  spark, so blocked specials show the normal block spark and sound instead.
+- Both fighters, player or CPU.
+- Can't be built together with "Blocked special moves do full damage" (same table).
