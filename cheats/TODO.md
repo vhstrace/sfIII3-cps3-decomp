@@ -20,7 +20,7 @@ spawning and copies; and the Tetris piece cheats.
 Allow players and/or the CPU to use these:
 
 - [x] Att_PL07_BOUND_JUMP, Att_PL10_MACH_SLIDE and Att_RESURRECTION2.
-  - [x] Att_RESURRECTION2: "Urien's SA II refills his health (his unused resurrection)".
+  - [x] Att_RESURRECTION2: "Urien's super art II is his unused Resurrection move".
   - [x] Att_PL07_BOUND_JUMP (and Att_PL07_HOP_JUMP): "Ibuki's light Hien does the hop jump and medium Hien the bound jump, her two
         unused jumps". None of her animations has cues 1, 8 and 10, so the cheat adds new animation
         scripts made from her jump and landing frames.
@@ -146,6 +146,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 
 Added on 2026-11-15 while working through the unchecked items above. Built but not tested yet.
 
-- [ ] Urien's SA II refills his health (his unused resurrection)
+- [ ] Urien's super art II is his unused Resurrection move
 - [ ] Air parries knock you backward (the old, unused air parry)
 - [ ] The CPU opponent only jumps backward and guards in the air (unused CPU AI)

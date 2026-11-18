@@ -1678,7 +1678,7 @@ against main: applies.
 - Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
   same hook, or the end of the same file).
 
-## Urien's SA II refills his health (his unused resurrection)
+## Urien's super art II is his unused Resurrection move
 
 **Source diff:** `patches/urien-sa2-resurrection.diff`
 **BPS:** `sf3_ggpatch/urien-sa2-resurrection/` (simm1.1-.3)
