@@ -1,0 +1,70 @@
+diff --git a/src/PLNORMAL.c b/src/PLNORMAL.c
+index b5cdd9c..452f8dc 100644
+--- a/src/PLNORMAL.c
++++ b/src/PLNORMAL.c
+@@ -559,7 +559,7 @@ void Normal_17000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_18000(PLW* wk) {
++void Normal_18000_orig(PLW* wk) {   /* was Normal_18000: unchanged */
+     if (wk->the_same_players) {
+         wk->wu.next_z = wk->wu.my_priority + 1;
+     }
+@@ -584,7 +584,7 @@ void Normal_18000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_18000_init_unit(wk, ps)
++void Normal_18000_init_unit_orig(wk, ps)   /* was Normal_18000_init_unit: unchanged */
+ PLW* wk;
+ u8 ps;
+ {
+@@ -994,7 +994,7 @@ void Normal_52000(PLW* wk) {
+ 
+ 
+ 
+-void Normal_53000(PLW* wk) {
++void Normal_53000_orig(PLW* wk) {   /* was Normal_53000: unchanged */
+     if (wk->the_same_players) wk->wu.next_z = wk->wu.my_priority + 1;
+     switch (wk->wu.routine_no[3]) {
+     case RN3_START:
+@@ -1214,3 +1214,38 @@ void Normal_58000(PLW* wk) {
+         break;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Cheat: jumps are 25% lower. When a jump takes off, its upward speed and its gravity
++   (mvxy.a[1] and mvxy.d[1], 16.16) are cut to 3/4, so the arc is 3/4 as high but lasts as long
++   and goes as far sideways. The takeoff frame already moved the fighter up by the full speed, so
++   a quarter of that is taken back. Jump attacks go on with the same speeds. */
++void cheat_lower_jump(PLW* wk) {
++    s32 sp = wk->wu.mvxy.a[1].sp;
++    wk->wu.xyz[1].cal -= sp / 4;
++    wk->wu.mvxy.a[1].sp = sp - sp / 4;
++    wk->wu.mvxy.d[1].sp -= wk->wu.mvxy.d[1].sp / 4;
++}
++
++void Normal_18000(PLW* wk) {
++    s16 r3 = wk->wu.routine_no[3];
++    Normal_18000_orig(wk);
++    if (r3 == RN3_START) {
++        cheat_lower_jump(wk);
++    }
++}
++
++void Normal_18000_init_unit(PLW* wk, u8 ps) {
++    Normal_18000_init_unit_orig(wk, ps);
++    cheat_lower_jump(wk);
++}
++
++void Normal_53000(PLW* wk) {
++    s16 r2 = wk->wu.routine_no[2];
++    Normal_53000_orig(wk);
++    if (wk->wu.routine_no[2] != r2) {
++        cheat_lower_jump(wk);
++    }
++}
++#pragma section

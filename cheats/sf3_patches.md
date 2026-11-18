@@ -2434,3 +2434,129 @@ moved code or data. `git apply --check` against main: applies.
 - Can't be built together with "Special moves travel twice as far sideways", "Special moves travel
   1.5 times as far sideways" or "Ground special moves work in the air" (all hook `Player_attack`)
   without merging the diffs by hand.
+
+## Jumps are 25% lower
+
+**Source diff:** `patches/jumps-25-lower.diff`
+**BPS:** `sf3_ggpatch/jumps-25-lower/` (simm1.0-.3)
+**Changes:** 231 bytes. 06700000-067000C7: `cheat_lower_jump` and the new `Normal_18000`,
+`Normal_18000_init_unit` and `Normal_53000`. Outside: their slots in the normal routine table
+`plpnm_lv_00` (065EBB7D-065EBB9D for states 18-26, 065EBC09 for state 53), and
+`Normal_18000_init_unit`'s address in the literal pools of `Attack_03000` (06126535) and
+`hoken_muriyari_chakuchi` (06126E4D), 3 bytes each.
+**Recorded:** 2026-11-18 00:07:48
+
+**Mechanism:** A jump takes off in `Normal_18000` (`src/PLNORMAL.c`, states 18-26: the
+neutral, forward and back jumps and high jumps), which loads the jump's speeds from `jpdat_tbl`:
+
+```c
+setup_mvxy_data(&wk->wu, jpdat_tbl[wk->wu.routine_no[2] - 18][1]);
+add_mvxy_speed(&wk->wu);
+```
+
+`mvxy.a[1]` is the upward speed and `mvxy.d[1]` the gravity added to it each frame (16.16).
+`Normal_18000_init_unit` does the same for a jump out of an attack (`src/PLPAT.c`), and
+`Normal_53000` for the jump that follows it. Hooks on all three call `cheat_lower_jump` right
+after takeoff, which cuts both the upward speed and the gravity to 3/4 and takes back a quarter of
+the takeoff frame's rise. The arc is then 3/4 as high, but the jump lasts as many frames and goes
+as far sideways. Jump attacks keep using the jump's speeds, so they follow the lower arc.
+
+**Evidence:** `Normal_18000` and `Normal_53000` are only called through `plpnm_lv_00`;
+`Normal_18000_init_unit` only from `src/PLPAT.c`. `jumping_union_process` lands the fighter
+when the height reaches 0, so landing is not changed. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Both fighters, player or CPU.
+- Ibuki's wall jump (`Normal_52000`, `remake_sankaku_tobi_mvxy`) is not hooked. It keeps the
+  lower gravity of the jump before it; when it sets a fresh upward speed it goes about 1/3 higher
+  than the normal wall jump, and when it builds on the current upward speed it stays about 3/4 as
+  high.
+- Special moves that jump use their own speeds and are not changed (see "Special moves go 25% less
+  high"). Neither are dashes, hops, Ibuki's bound or knockdowns.
+- Anti-airs and air attacks were spaced for full-height jumps, so some may now hit or miss
+  differently.
+
+## Special moves go 50% less high
+
+**Source diff:** `patches/specials-move-50-less-vertically.diff`
+**BPS:** `sf3_ggpatch/specials-move-50-less-vertically/` (simm1.0-.3)
+**Changes:** 243 bytes. 06700000-067000F7: the new `Player_attack`. 065EAF95: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 00:07:48
+
+**Mechanism:** The same hook as "Special moves go 25% less high", with a bigger cut. The new
+`Player_attack` (`src/PLPAT.c`) notes the fighter's height (`xyz[1].cal`, 16.16), runs the
+original, and keeps half of that frame's up or down movement off again:
+
+```c
+wk->wu.xyz[1].cal -= (wk->wu.xyz[1].cal - y0) / 2;
+```
+
+The whole path is 1/2 as high, and the fighter comes back down on the same frame as before. It is
+skipped when the original put the fighter at or below the ground, so a landing still lands at
+height 0. Only special moves (`wk->as` in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`),
+not super arts, command normals, jumps or leap attacks. Sideways movement is not changed.
+
+**Evidence:** As for the 25% version. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Rising specials (Shoryuken, Spinning Bird Kick and the like) peak 50% lower, so they miss high
+  opponents more often than in the 25% version.
+- A special done in the air that only goes down (a dive kick) comes down 50% slower, so it lasts
+  much longer before it lands.
+- A move that sets the height to a fixed value instead of moving by a speed is cut for one frame,
+  then goes back to normal on the next.
+- Projectiles are not changed. Both fighters, player or CPU.
+- Can't be built together with the other "Special moves go ... less high" versions, the two
+  "Special moves travel ... sideways" cheats or "Ground special moves work in the air" (all hook
+  `Player_attack`) without merging the diffs by hand.
+
+## Special moves go 75% less high
+
+**Source diff:** `patches/specials-move-75-less-vertically.diff`
+**BPS:** `sf3_ggpatch/specials-move-75-less-vertically/` (simm1.0-.3)
+**Changes:** 239 bytes. 06700000-067000F3: the new `Player_attack`. 065EAF95: its entry in the
+`routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-18 00:07:48
+
+**Mechanism:** The same hook as "Special moves go 25% less high", with a bigger cut. The new
+`Player_attack` (`src/PLPAT.c`) notes the fighter's height (`xyz[1].cal`, 16.16), runs the
+original, and keeps only a quarter of that frame's up or down movement:
+
+```c
+wk->wu.xyz[1].cal = y0 + (wk->wu.xyz[1].cal - y0) / 4;
+```
+
+The whole path is 1/4 as high, and the fighter comes back down on the same frame as before. It is
+skipped when the original put the fighter at or below the ground, so a landing still lands at
+height 0. Only special moves (`wk->as` in rows 8-17 of `asstbl_sa_ground` or `asstbl_sa_air`),
+not super arts, command normals, jumps or leap attacks. Sideways movement is not changed.
+
+**Evidence:** As for the 25% version. `sf3_cheat.py` found no moved code or data.
+`git apply --check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Rising specials (Shoryuken, Spinning Bird Kick and the like) peak 75% lower, so they miss high
+  opponents more often than in the 25% version.
+- A special done in the air that only goes down (a dive kick) comes down 75% slower, so it lasts
+  much longer before it lands.
+- A move that sets the height to a fixed value instead of moving by a speed is cut for one frame,
+  then goes back to normal on the next.
+- Projectiles are not changed. Both fighters, player or CPU.
+- Can't be built together with the other "Special moves go ... less high" versions, the two
+  "Special moves travel ... sideways" cheats or "Ground special moves work in the air" (all hook
+  `Player_attack`) without merging the diffs by hand.
