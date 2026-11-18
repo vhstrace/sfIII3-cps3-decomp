@@ -1650,6 +1650,8 @@ code or data. `git apply --check` against main: applies.
 blank interrupt's literal pool (`src/intr.src`).
 **Recorded:** 2026-11-15 20:37:06
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** The 3rd Strike version of SMB1 "All music plays at hurry-up speed". Each tick,
 `voice_process_secondary` (`src/sound_voice_2.c`) counts a music voice's note and event timers down
 by the song's tick step plus an extra tempo value:
@@ -1671,7 +1673,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - Only the tempo changes, not the pitch.
 - Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
   same hook, or the end of the same file).
