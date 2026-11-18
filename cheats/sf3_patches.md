@@ -909,7 +909,7 @@ main: applies. For the falls: `Player_damage`, `get_damage_reaction_data`, `subt
 
 **Caveats:**
 
-- Tested by the user in MAME (2026-11-16): works. The falls (added 2026-11-17) are not tested.
+- Tested by the user in MAME (2026-11-17): works, including the falls.
 - A fall comes one frame after the landing or dash end, so the landing pose may show for a frame.
 - Both fighters, player or CPU, can fall.
 - The fall is a damage state: it can be juggled or hit on the ground like after a real sweep, and
