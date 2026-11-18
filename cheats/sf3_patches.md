@@ -1733,6 +1733,8 @@ only Temporal Thunder for Urien (`cmd_data.c`). The other SA rows and table entr
 **Changes:** 4 bytes, in place: 065EBBBE and 065EBBC2, entries 34 and 35 of `plpnm_lv_00`.
 **Recorded:** 2026-11-15 20:51:16
 
+Tags: `demo-ready` `play-start` `curated` `video-ready`
+
 **Mechanism:** A parry in the air sets the fighter's state to 34 or 35 (`defense_sky`,
 `src/HITCHECK.c`), and both run `Normal_35000` (`src/PLNORMAL.c`) from the state table
 `plpnm_lv_00` (`data/PLPNM_tbl.c`). The ROM also has `Normal_air_paring`, which nothing uses. It is
@@ -1762,7 +1764,7 @@ main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - A fighter who parries while falling keeps falling (40% as fast) instead of popping up, so there
   is less time to attack back in the air.
 - For both players and the CPU. Ground parries are not changed.
