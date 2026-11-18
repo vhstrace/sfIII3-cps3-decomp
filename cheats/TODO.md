@@ -133,7 +133,6 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent stands still
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
-- [ ] Blocked special moves do full damage (added 2026-11-17)
 - [ ] Slippery floors: random falls after landings and dashes (added 2026-11-17)
 - [ ] Combo hits rise in pitch (added 2026-11-17)
 - [ ] Slow-motion sound in hit stop (added 2026-11-17)

@@ -2216,6 +2216,8 @@ are not changed)
 **Changes:** 3 bytes. 0618A9CB, 0618A9CD, 0618A9CF: `kezuri_pow_table` entries 1-3 (in place).
 **Recorded:** 2026-11-17 20:18:11
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** When a hit is blocked, `check_dm_att_guard` (`src/HITCHECK.c`) divides its damage by
 the attack's chip divisor (`kezuri_pow`):
 
@@ -2240,7 +2242,7 @@ against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-18): works.
 - Super arts too: their attack rows use the same table, so blocked supers do full damage as well.
 - The damage is the full hit's damage after the usual multipliers (difficulty, power-ups, combo
   scaling). The blocker still blocks: block stun, no knockdown, no stun gauge.
