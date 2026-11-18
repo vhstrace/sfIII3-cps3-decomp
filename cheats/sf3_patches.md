@@ -1622,8 +1622,12 @@ effects (header 1-0x7F), and the original code otherwise. So no sound effect sta
 and control codes are not changed.
 
 **Evidence:** Neither function is called from its own file (`sound_seq_start` is, so it is not
-hooked). Codes wrap at `snd_seq_max` as in `sound_seq_start`; each character's voices are 0x300 codes
-apart, so code + 1 is usually that character's next voice or sound. `sf3_cheat.py` found no moved
+hooked). Codes wrap at `snd_seq_max` as in `sound_seq_start`. Each character's voices
+are in their own block of 0x20 codes between 0x140 and 0x3FF (Ken 0x180, Chun-Li 0x1A0, Ryu
+0x200 and so on, from the `se` values in `data/*_char.c`). Each block has 18-32 sound effects
+in the sequence table (`snd_seq_rom_data`, 0678F000), so code + 1 is usually that character's
+next voice line. Shared hit and swing sounds are at 0x100-0x13F (62). Player 2's copies of all
+of these are 0x300 codes higher (`uid * 0x300` in `src/se_3.c`). `sf3_cheat.py` found no moved
 code or data. `git apply --check` against main: applies.
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
