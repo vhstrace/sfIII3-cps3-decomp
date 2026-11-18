@@ -1678,45 +1678,6 @@ against main: applies.
 - Can't be built together with "No music" or "Every sound effect is the next one in the list" (the
   same hook, or the end of the same file).
 
-## Yang's Senkyuutai uses its old, unused version
-
-**Source diff:** `patches/yang-old-senkyuutai.diff`
-**BPS:** `sf3_ggpatch/yang-old-senkyuutai/` (simm1.2 and .3 only)
-**Changes:** 4 bytes, in place: 065ED256 and 065ED266, two entries of `pl10_exatt_table`.
-**Recorded:** 2026-11-15 20:40:14
-
-**Mechanism:** Yang's 236+K (Senkyuutai, also EX) and his SA II (Tenshin Senkyuutai) run
-`Att_TENSHINSENKYUUTAI` (`src/PLPATUNI.c`), from entries 1 and 5 of his move table
-`pl10_exatt_table` (`data/plpat10_tbl.c`). The ROM also has `Att_TENSHINSENKYUUTAI_OLD`, which
-nothing uses. It is the same except that it lacks the newer version's contact step:
-
-```c
-if (wk->wu.routine_no[3] != TENSHINSENKYUU2_MOVE2 && wk->hos_fi_flag | wk->hos_em_flag) {
-    char_move_cmj4(&wk->wu);
-    wk->wu.routine_no[3] = TENSHINSENKYUU2_MOVE2;
-}
-```
-
-(when Yang is pushed by the opponent's body or a wall during the move, the new version skips the
-animation ahead and moves on to a second phase; the script's cue 50 does the same). This is an
-in-place change: the two table entries point to `Att_TENSHINSENKYUUTAI_OLD`.
-
-**Evidence:** `Att_TENSHINSENKYUUTAI_OLD` is in the ROM (061278A8 in `functions.tsv`) and is not
-referenced. `pl10_exatt_table` is Yang's only use of either routine. Only the low half of each
-4-byte pointer changed (2 bytes each), so only chips simm1.2 and .3 change. `sf3_cheat.py` found no
-moved code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- The difference only shows when Yang runs into the opponent or a wall during the move: the old
-  version keeps playing the move's animation instead of cutting to its follow-up. This may make the
-  move miss, hit differently, or look odd.
-- Uses no cheat code space, so it can go into a combined build (`sf3_cheat.py build a b`) with any
-  cheat that doesn't change `data/plpat10_tbl.c`. Its BPS files still only apply to the original chips.
-
 ## Yang's Kaihou uses its old, unused version
 
 **Source diff:** `patches/yang-old-kaihou.diff`
@@ -1756,8 +1717,6 @@ referenced. `cmd_data.c` names routine 23 `YANG_KAIHOU`, and `pl10_exatt_table` 
 - Not tested.
 - The newer version clears the vertical speed, which suggests the slide data has some. If so, Yang
   may rise or sink during the old slide. He may also slide differently when he reaches the opponent.
-- It changes the same table line as "Yang's Senkyuutai uses its old, unused version", so the two
-  diffs can't be combined as they are. Uses no cheat code space.
 
 ## Urien's SA II refills his health (his unused resurrection)
 
