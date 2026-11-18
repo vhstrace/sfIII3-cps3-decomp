@@ -1419,6 +1419,8 @@ pools. 0609501D and 06095025: `CAPCOM_Logo`'s and `Title`'s addresses in the lit
 `Loop_Demo`.
 **Recorded:** 2026-11-15 20:30:41
 
+Tags: `play-start` `utility`
+
 **Mechanism:** The 3rd Strike version of EarthBound "Skip the logos and the title screen" and Super
 Metroid "New games skip the opening cinematic". The attract loop in `Loop_Demo` (`src/Game_Main.c`)
 runs `CAPCOM_Logo` (`src/demo00.c`: the warning, CAPCOM and other logo screens), then `Title`
@@ -1453,7 +1455,7 @@ from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin 
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-17): works.
 - The attract mode becomes demo fights and rankings only. The opening movie after a coin (in
   `Title_At_a_Dash`) still plays.
 - The CPS3 BIOS screens before the game starts are not part of this program and still show.
