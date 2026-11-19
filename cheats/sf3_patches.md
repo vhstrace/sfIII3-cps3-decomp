@@ -2700,7 +2700,7 @@ data. `git apply --check` against main: applies.
 
 **Source diff:** `patches/specials-swap-x-and-y.diff`
 **BPS:** `sf3_ggpatch/specials-swap-x-and-y/` (simm1.0-.3)
-**Changes:** 675 bytes. 06700000-067002B1: `cheat_in_special`, `cheat_get32`, `cheat_put32`,
+**Changes:** 797 bytes. 06700000-06700333: `cheat_in_special`, `cheat_get32`, `cheat_put32`,
 `cheat_fall` and the new `Player_attack`. 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02`
 (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 15:30:35
@@ -2722,6 +2722,12 @@ Shoryuken would land on its first falling frame). So the move runs on its own, u
   so walls and pushing from the frame before still count.
 - After it runs, the new distance is saved, and the fighter is shown at the start plus the swapped
   distance (height at least 0).
+- Recovery: while the move's own position is on the ground and doesn't move (most often its
+  recovery, which can be long, as with Ibuki), a fighter shown above the ground drops with gravity
+  while the move goes on: 0.375 pixels a frame faster each frame, at most 9 pixels a frame. The
+  frames of dropping are counted in `pt_free[5]`, and the total drop is kept in `pt_free[6-7]`
+  (1/16 pixels). If the move moves again, the drop stays and the count starts again. Once the
+  fighter reaches the ground, the game ends the move as usual.
 - The game ends a move whose animation is over (`cg_type` 0xFF) only when the fighter is at height
   0: `process_attack` (`src/PLS00.c`) calls `jumping_cg_type_check`, which goes back to standing,
   only `if (wk->wu.xyz[1].disp.pos == 0 ...)`. So when the animation is over and the fighter is
@@ -2740,6 +2746,10 @@ values, so it is 2-byte aligned. `sf3_cheat.py` found no moved code or data. `gi
 --check` against main: applies.
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Changed on 2026-11-18 (2):** the user found that many specials stood still in the air in their
+recovery pose before falling, for many frames with Ibuki. The fighter now drops during the
+recovery (above) instead of waiting for the animation to end.
 
 **Fixed on 2026-11-18:** the user found that fighters didn't land after specials: they paused in the
 air for several seconds, then did the special again by themselves, higher each time. The first
@@ -2762,5 +2772,9 @@ animation is over.
   and hit where they used to miss.
 - If a wall stops the fighter, the move's own position doesn't know: the move still goes on in its
   own count.
-- Uses `pt_free[0-4]` and `[12-19]`. Can't be built together with the other cheats that hook
+- A ground special that stops moving partway and then goes on (a pause between steps) drops a
+  little during the pause, and goes on from the lower height.
+- The drop is not a jump: the fighter stays in the move's animation and can't block or act until
+  the move's recovery would allow it on the ground.
+- Uses `pt_free[0-7]` and `[12-19]`. Can't be built together with the other cheats that hook
   `Player_attack` without merging the diffs by hand.

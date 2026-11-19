@@ -1,5 +1,5 @@
 diff --git a/src/PLPAT.c b/src/PLPAT.c
-index ab0ffa1..f56be78 100644
+index ab0ffa1..b5d3b44 100644
 --- a/src/PLPAT.c
 +++ b/src/PLPAT.c
 @@ -194,7 +194,7 @@ const u8* cjdr_defense_table[24] = {
@@ -11,7 +11,7 @@ index ab0ffa1..f56be78 100644
      wk->wu.next_z = wk->wu.my_priority;
      wk->running_f = 0;
      wk->py->flag = 0;
-@@ -809,3 +809,101 @@ void hoken_muriyari_chakuchi(PLW* wk) {
+@@ -809,3 +809,130 @@ void hoken_muriyari_chakuchi(PLW* wk) {
          wk->wu.xyz[1].disp.pos = 0;
      }
  }
@@ -27,8 +27,14 @@ index ab0ffa1..f56be78 100644
 +   pt_free[0-3], and pt_free[4] is 1 while a special is running. The start's sideways position is
 +   worked out again each frame from where the fighter is shown, so walls and pushing still count.
 +   The game only ends a move whose animation is over (cg_type 0xFF) when the fighter is at height 0
-+   (process_attack, PLS00.C), so a fighter left in the air would stay in the move. Instead, when
-+   the animation is over and the fighter is above the ground, they fall as from a neutral jump. */
++   (process_attack, PLS00.C), so a fighter left in the air would stay in the move. So:
++   - while the move's own position is on the ground and doesn't move (its recovery, most often),
++     a fighter shown above the ground drops with gravity (0.375 pixels a frame more each frame, at
++     most 9 a frame) while the move goes on. The frames of dropping are counted in pt_free[5] and
++     the total drop is kept in pt_free[6-7] (1/16 pixels); the drop stays if the move moves again.
++     Once at the ground, the game ends the move as usual;
++   - if the animation is over and the fighter is still above the ground, they fall as from a
++     neutral jump. */
 +s32 cheat_in_special(PLW* wk) {
 +    const AS* as = wk->as;
 +    s16 pn = wk->player_number;
@@ -70,6 +76,10 @@ index ab0ffa1..f56be78 100644
 +    s32 sy;
 +    s32 x1;
 +    s32 y1;
++    s32 pf;
++    s32 pu;
++    s32 n;
++    s32 drop;
 +    if (!cheat_in_special(wk)) {
 +        wk->pt_free[4] = 0;
 +        Player_attack_orig(wk);
@@ -79,6 +89,8 @@ index ab0ffa1..f56be78 100644
 +        gf = 0;
 +        gu = 0;
 +        sy = wk->wu.xyz[1].cal;
++        wk->pt_free[5] = 0;
++        *(u16*)&wk->pt_free[6] = 0;
 +    } else {
 +        gf = cheat_get32(&wk->pt_free[12]);
 +        gu = cheat_get32(&wk->pt_free[16]);
@@ -87,11 +99,28 @@ index ab0ffa1..f56be78 100644
 +    sx = wk->wu.xyz[0].cal - (wk->wu.rl_flag ? gu : -gu);
 +    wk->wu.xyz[0].cal = sx + (wk->wu.rl_flag ? gf : -gf);
 +    wk->wu.xyz[1].cal = sy + gu;
++    pf = gf;
++    pu = gu;
 +    Player_attack_orig(wk);
 +    gf = wk->wu.rl_flag ? (wk->wu.xyz[0].cal - sx) : (sx - wk->wu.xyz[0].cal);
 +    gu = wk->wu.xyz[1].cal - sy;
 +    x1 = sx + (wk->wu.rl_flag ? gu : -gu);
-+    y1 = sy + gf;
++    n = wk->pt_free[5];
++    drop = *(u16*)&wk->pt_free[6];
++    if (gf != pf || gu != pu) {
++        n = 0;
++    } else if (wk->wu.xyz[1].cal <= 0 && sy + gf - (drop << 12) > 0) {
++        if (n < 24) {
++            n++;
++        }
++        drop += n * 6;
++        if (drop > 0xFFFF) {
++            drop = 0xFFFF;
++        }
++    }
++    wk->pt_free[5] = n;
++    *(u16*)&wk->pt_free[6] = drop;
++    y1 = sy + gf - (drop << 12);
 +    if (y1 < 0) {
 +        y1 = 0;
 +    }
