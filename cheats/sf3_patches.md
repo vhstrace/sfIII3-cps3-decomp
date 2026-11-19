@@ -2778,3 +2778,37 @@ animation is over.
   the move's recovery would allow it on the ground.
 - Uses `pt_free[0-7]` and `[12-19]`. Can't be built together with the other cheats that hook
   `Player_attack` without merging the diffs by hand.
+
+## Special moves swap their sideways and up-down movement, with twice the sideways movement
+
+**Source diff:** `patches/specials-swap-x-and-y-double-sideways.diff`
+**BPS:** `sf3_ggpatch/specials-swap-x-and-y-double-sideways/` (simm1.0-.3)
+**Changes:** 806 bytes. 06700000-0670033F: `cheat_in_special`, `cheat_get32`, `cheat_put32`,
+`cheat_fall` and the new `Player_attack`. 065EAF95: its entry in the `routine_no[1]` jump table
+`plmain_lv_02` (`data/PLMAIN_tbl.c`).
+**Recorded:** 2026-11-19 00:31:54
+
+**Mechanism:** The same hook as "Special moves swap their sideways and up-down movement", but a
+move's rise is shown as twice as much forward movement. Only the two lines that turn the move's
+upward distance into a sideways offset change: `sx = xyz[0].cal - (rl_flag ? gu * 2 : -gu * 2)`
+before the original runs, and `x1 = sx + (rl_flag ? gu * 2 : -gu * 2)` after it. The move's
+forward movement still becomes height at 1:1, and the recovery drop and the fall at the end are
+the same.
+
+Why: a MAME log of the first version (2026-11-19) showed the swap working, but Ryu's Shoryukens
+only rise 58, 91 and 130 pixels (LP, MP, HP), and the sprite art reaches far above that point, so
+most of what looks like rising was still there. The swapped height (the move's own forward drift)
+was 33, 54 and 67 pixels. With this version the Shoryukens go 116, 182 and 260 pixels forward
+and back.
+
+**Evidence:** as for the first version. `sf3_cheat.py` found no moved code or data. `git apply
+--check` against main: applies.
+
+**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The same caveats as the first version.
+- A rising move still comes back to where it started: the rise is forward, the fall is backward.
+- Near a wall, the doubled forward part stops at the wall sooner.

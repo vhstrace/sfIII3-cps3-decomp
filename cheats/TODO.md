@@ -133,6 +133,7 @@ Cheats added on 2026-11-15, built but not tested yet. Check each one off (or rem
 - [ ] The CPU opponent keeps running away
 - [ ] The CPU opponent walks twice as fast
 - [ ] Special moves swap their sideways and up-down movement (added 2026-11-18)
+- [ ] Special moves swap their sideways and up-down movement, with twice the sideways movement (added 2026-11-19)
 
 ## To test: new cheats from the to-do items
 

@@ -1,0 +1,144 @@
+diff --git a/src/PLPAT.c b/src/PLPAT.c
+index ab0ffa1..a5d22f8 100644
+--- a/src/PLPAT.c
++++ b/src/PLPAT.c
+@@ -194,7 +194,7 @@ const u8* cjdr_defense_table[24] = {
+ };
+ 
+ 
+-void Player_attack(PLW* wk) {
++void Player_attack_orig(PLW* wk) {   /* was Player_attack: unchanged */
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->py->flag = 0;
+@@ -809,3 +809,130 @@ void hoken_muriyari_chakuchi(PLW* wk) {
+         wk->wu.xyz[1].disp.pos = 0;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Cheat: special moves swap their sideways and up-down movement. Forward becomes up, back becomes
++   down (but not below the ground), up becomes forward and down becomes back.
++   The move's own code runs on its own, unswapped position, so its landing checks and timing work
++   as usual: before each frame the fighter is put at that position, and after it the fighter is
++   shown at the move's start plus the swapped distance. The move's own distance from its start,
++   forward and up, is kept in pt_free[12-15] and [16-19] (16.16), the start height in
++   pt_free[0-3], and pt_free[4] is 1 while a special is running. The start's sideways position is
++   worked out again each frame from where the fighter is shown, so walls and pushing still count.
++   The game only ends a move whose animation is over (cg_type 0xFF) when the fighter is at height 0
++   (process_attack, PLS00.C), so a fighter left in the air would stay in the move. So:
++   - while the move's own position is on the ground and doesn't move (its recovery, most often),
++     a fighter shown above the ground drops with gravity (0.375 pixels a frame more each frame, at
++     most 9 a frame) while the move goes on. The frames of dropping are counted in pt_free[5] and
++     the total drop is kept in pt_free[6-7] (1/16 pixels); the drop stays if the move moves again.
++     Once at the ground, the game ends the move as usual;
++   - if the animation is over and the fighter is still above the ground, they fall as from a
++     neutral jump. */
++s32 cheat_in_special(PLW* wk) {
++    const AS* as = wk->as;
++    s16 pn = wk->player_number;
++    return wk->wu.routine_no[1] == PLAYER_ATTACK && wk->wu.routine_no[2] >= ATTACK_SPECIAL &&
++        Bonus_Game_Flag == 0 && wk->tsukami_f == 0 && wk->tsukamare_f == 0 &&
++        ((as >= &asstbl_sa_ground[pn][8][0].as && as <= &asstbl_sa_ground[pn][17][3].as) ||
++         (as >= &asstbl_sa_air[pn][8][0].as && as <= &asstbl_sa_air[pn][17][3].as));
++}
++
++s32 cheat_get32(u8* p) {
++    u16* h = (u16*)p;
++    return (s32)(((u32)h[0] << 16) | h[1]);
++}
++
++void cheat_put32(u8* p, s32 v) {
++    u16* h = (u16*)p;
++    h[0] = (u16)((u32)v >> 16);
++    h[1] = (u16)v;
++}
++
++void cheat_fall(PLW* wk) {
++    wk->pt_free[4] = 0;
++    wk->guard_flag = 0;
++    wk->wu.cg_type = 0;
++    wk->wu.routine_no[1] = PLAYER_NORMAL;
++    wk->wu.routine_no[2] = 22;
++    wk->wu.routine_no[3] = 1;
++    set_char_move_init(&wk->wu, 0, jpdat_tbl[4][0]);
++    setup_mvxy_data(&wk->wu, jpdat_tbl[4][1]);
++    wk->wu.mvxy.a[0].sp = 0;
++    wk->wu.mvxy.d[0].sp = 0;
++    wk->wu.mvxy.a[1].sp = 0;
++}
++
++void Player_attack(PLW* wk) {
++    s32 gf;
++    s32 gu;
++    s32 sx;
++    s32 sy;
++    s32 x1;
++    s32 y1;
++    s32 pf;
++    s32 pu;
++    s32 n;
++    s32 drop;
++    if (!cheat_in_special(wk)) {
++        wk->pt_free[4] = 0;
++        Player_attack_orig(wk);
++        return;
++    }
++    if (wk->pt_free[4] == 0 || wk->wu.routine_no[3] == RN3_START) {
++        gf = 0;
++        gu = 0;
++        sy = wk->wu.xyz[1].cal;
++        wk->pt_free[5] = 0;
++        *(u16*)&wk->pt_free[6] = 0;
++    } else {
++        gf = cheat_get32(&wk->pt_free[12]);
++        gu = cheat_get32(&wk->pt_free[16]);
++        sy = cheat_get32(&wk->pt_free[0]);
++    }
++    sx = wk->wu.xyz[0].cal - (wk->wu.rl_flag ? gu * 2 : -gu * 2);
++    wk->wu.xyz[0].cal = sx + (wk->wu.rl_flag ? gf : -gf);
++    wk->wu.xyz[1].cal = sy + gu;
++    pf = gf;
++    pu = gu;
++    Player_attack_orig(wk);
++    gf = wk->wu.rl_flag ? (wk->wu.xyz[0].cal - sx) : (sx - wk->wu.xyz[0].cal);
++    gu = wk->wu.xyz[1].cal - sy;
++    x1 = sx + (wk->wu.rl_flag ? gu * 2 : -gu * 2);
++    n = wk->pt_free[5];
++    drop = *(u16*)&wk->pt_free[6];
++    if (gf != pf || gu != pu) {
++        n = 0;
++    } else if (wk->wu.xyz[1].cal <= 0 && sy + gf - (drop << 12) > 0) {
++        if (n < 24) {
++            n++;
++        }
++        drop += n * 6;
++        if (drop > 0xFFFF) {
++            drop = 0xFFFF;
++        }
++    }
++    wk->pt_free[5] = n;
++    *(u16*)&wk->pt_free[6] = drop;
++    y1 = sy + gf - (drop << 12);
++    if (y1 < 0) {
++        y1 = 0;
++    }
++    wk->wu.xyz[0].cal = x1;
++    wk->wu.xyz[1].cal = y1;
++    cheat_put32(&wk->pt_free[12], gf);
++    cheat_put32(&wk->pt_free[16], gu);
++    cheat_put32(&wk->pt_free[0], sy);
++    wk->pt_free[4] = 1;
++    if (cheat_in_special(wk)) {
++        if (wk->wu.cg_type == 0xFF && y1 > 0) {
++            cheat_fall(wk);
++        }
++    } else {
++        wk->pt_free[4] = 0;
++        if (wk->wu.routine_no[1] == PLAYER_NORMAL && y1 > 0) {
++            cheat_fall(wk);
++        }
++    }
++}
++#pragma section
