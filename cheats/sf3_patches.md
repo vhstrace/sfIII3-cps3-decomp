@@ -2700,8 +2700,8 @@ data. `git apply --check` against main: applies.
 
 **Source diff:** `patches/specials-swap-x-and-y.diff`
 **BPS:** `sf3_ggpatch/specials-swap-x-and-y/` (simm1.0-.3)
-**Changes:** 589 bytes. 06700000-0670025B: `cheat_in_special`, `cheat_get32`, `cheat_put32` and the
-new `Player_attack`. 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02`
+**Changes:** 675 bytes. 06700000-067002B1: `cheat_in_special`, `cheat_get32`, `cheat_put32`,
+`cheat_fall` and the new `Player_attack`. 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02`
 (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 15:30:35
 
@@ -2722,8 +2722,11 @@ Shoryuken would land on its first falling frame). So the move runs on its own, u
   so walls and pushing from the frame before still count.
 - After it runs, the new distance is saved, and the fighter is shown at the start plus the swapped
   distance (height at least 0).
-- If the special has ended (the fighter is back in `PLAYER_NORMAL`) with the fighter above the
-  ground, they are put in the falling part of a neutral jump: `routine_no[2]` 22 (`Normal_18000`,
+- The game ends a move whose animation is over (`cg_type` 0xFF) only when the fighter is at height
+  0: `process_attack` (`src/PLS00.c`) calls `jumping_cg_type_check`, which goes back to standing,
+  only `if (wk->wu.xyz[1].disp.pos == 0 ...)`. So when the animation is over and the fighter is
+  above the ground (or the special has ended some other way into `PLAYER_NORMAL` there),
+  `cheat_fall` puts them in the falling part of a neutral jump: `routine_no[2]` 22 (`Normal_18000`,
   `src/PLNORMAL.c`), `routine_no[3]` 1 (`N18_AIR`), the neutral jump's animation and gravity
   (`jpdat_tbl[4]`), and no speed. They drop and land through `jumping_union_process` as usual.
 
@@ -2738,9 +2741,16 @@ values, so it is 2-byte aligned. `sf3_cheat.py` found no moved code or data. `gi
 
 **Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
 
+**Fixed on 2026-11-18:** the user found that fighters didn't land after specials: they paused in the
+air for several seconds, then did the special again by themselves, higher each time. The first
+build only made fighters fall once they were back in `PLAYER_NORMAL`, but the game never put a
+fighter in the air back there (the height check above), so the move stayed stuck on its last frame
+until its script started it again, from the new height. Now the fall starts as soon as the
+animation is over.
+
 **Caveats:**
 
-- Not tested.
+- Not tested since the fix.
 - Only special and EX moves, for both fighters, player or CPU. Not super arts, normals, command
   throws (while holding or held), or projectiles once they are out.
 - Ground specials that travel can leave the fighter high up when they end; they then fall from

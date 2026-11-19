@@ -1,5 +1,5 @@
 diff --git a/src/PLPAT.c b/src/PLPAT.c
-index ab0ffa1..2b435df 100644
+index ab0ffa1..f56be78 100644
 --- a/src/PLPAT.c
 +++ b/src/PLPAT.c
 @@ -194,7 +194,7 @@ const u8* cjdr_defense_table[24] = {
@@ -11,7 +11,7 @@ index ab0ffa1..2b435df 100644
      wk->wu.next_z = wk->wu.my_priority;
      wk->running_f = 0;
      wk->py->flag = 0;
-@@ -809,3 +809,87 @@ void hoken_muriyari_chakuchi(PLW* wk) {
+@@ -809,3 +809,101 @@ void hoken_muriyari_chakuchi(PLW* wk) {
          wk->wu.xyz[1].disp.pos = 0;
      }
  }
@@ -26,7 +26,9 @@ index ab0ffa1..2b435df 100644
 +   forward and up, is kept in pt_free[12-15] and [16-19] (16.16), the start height in
 +   pt_free[0-3], and pt_free[4] is 1 while a special is running. The start's sideways position is
 +   worked out again each frame from where the fighter is shown, so walls and pushing still count.
-+   If the move ends with the fighter above the ground, they fall as from a neutral jump. */
++   The game only ends a move whose animation is over (cg_type 0xFF) when the fighter is at height 0
++   (process_attack, PLS00.C), so a fighter left in the air would stay in the move. Instead, when
++   the animation is over and the fighter is above the ground, they fall as from a neutral jump. */
 +s32 cheat_in_special(PLW* wk) {
 +    const AS* as = wk->as;
 +    s16 pn = wk->player_number;
@@ -45,6 +47,20 @@ index ab0ffa1..2b435df 100644
 +    u16* h = (u16*)p;
 +    h[0] = (u16)((u32)v >> 16);
 +    h[1] = (u16)v;
++}
++
++void cheat_fall(PLW* wk) {
++    wk->pt_free[4] = 0;
++    wk->guard_flag = 0;
++    wk->wu.cg_type = 0;
++    wk->wu.routine_no[1] = PLAYER_NORMAL;
++    wk->wu.routine_no[2] = 22;
++    wk->wu.routine_no[3] = 1;
++    set_char_move_init(&wk->wu, 0, jpdat_tbl[4][0]);
++    setup_mvxy_data(&wk->wu, jpdat_tbl[4][1]);
++    wk->wu.mvxy.a[0].sp = 0;
++    wk->wu.mvxy.d[0].sp = 0;
++    wk->wu.mvxy.a[1].sp = 0;
 +}
 +
 +void Player_attack(PLW* wk) {
@@ -85,16 +101,14 @@ index ab0ffa1..2b435df 100644
 +    cheat_put32(&wk->pt_free[16], gu);
 +    cheat_put32(&wk->pt_free[0], sy);
 +    wk->pt_free[4] = 1;
-+    if (!cheat_in_special(wk)) {
++    if (cheat_in_special(wk)) {
++        if (wk->wu.cg_type == 0xFF && y1 > 0) {
++            cheat_fall(wk);
++        }
++    } else {
 +        wk->pt_free[4] = 0;
 +        if (wk->wu.routine_no[1] == PLAYER_NORMAL && y1 > 0) {
-+            wk->wu.routine_no[2] = 22;
-+            wk->wu.routine_no[3] = 1;
-+            set_char_move_init(&wk->wu, 0, jpdat_tbl[4][0]);
-+            setup_mvxy_data(&wk->wu, jpdat_tbl[4][1]);
-+            wk->wu.mvxy.a[0].sp = 0;
-+            wk->wu.mvxy.d[0].sp = 0;
-+            wk->wu.mvxy.a[1].sp = 0;
++            cheat_fall(wk);
 +        }
 +    }
 +}
