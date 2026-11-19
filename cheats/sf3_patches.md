@@ -933,6 +933,8 @@ main: applies. For the falls: `Player_damage`, `get_damage_reaction_data`, `subt
 `routine_no[0]` jump table `plmain_lv_00` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 01:28:50
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** "Slippery floors" as it was before the random falls were added (its diff from
 commit b46f710, 2026-11-16), as a separate cheat. It is listed right after the version with falls.
 The 3rd Strike version of the SMB2, SMB3, ALTTP and OoT "slippery floors" cheats.
@@ -968,8 +970,7 @@ main: applies.
 
 **Caveats:**
 
-- Not tested as its own build. The same code was tested by the user in MAME (2026-11-16) as
-  "Slippery floors": it worked.
+- Tested by the user in MAME (2026-11-18): works.
 - Fighters never slip and fall.
 - Every ground movement is smoothed: walks, dashes, attacks that step forward, and pushback from
   hits and blocks. Dashes start much slower and slide further: a short dash may be mostly slide. Attacks that step forward may whiff
