@@ -2790,6 +2790,8 @@ animation is over.
 `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-19 00:31:54
 
+Tags: `demo-ready` `video-ready` `interesting` `play-start`
+
 **Mechanism:** The same hook as "Special moves swap their sideways and up-down movement", but a
 move's rise is shown as twice as much forward movement. Only the two lines that turn the move's
 upward distance into a sideways offset change: `sx = xyz[0].cal - (rl_flag ? gu * 2 : -gu * 2)`
@@ -2810,7 +2812,7 @@ and back.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-19): works.
 - The same caveats as the first version.
 - A rising move still comes back to where it started: the rise is forward, the fall is backward.
 - Near a wall, the doubled forward part stops at the wall sooner.
