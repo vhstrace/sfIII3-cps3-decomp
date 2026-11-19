@@ -646,7 +646,6 @@ to `xyz[0].cal` in the facing direction, and `mvxy.a[1].sp` (0 for a walk) to th
 - Characters whose walk is not states 3 and 4 (if any) are not changed.
 - Can't be built together with "Low gravity: jumps go twice as high" (both diffs add to the end of
   `src/PLNORMAL.c`).
-- Can't be built together with "The CPU opponent walks twice as fast" (same file end in `src/PLNORMAL.c`).
 
 ## Jump again in mid-air
 
@@ -735,7 +734,6 @@ or data. `git apply --check` against main: applies.
 - Jumps may go above the top of the screen.
 - Can't be built together with "Fighters walk twice as fast" (both diffs add to the end of
   `src/PLNORMAL.c`).
-- Can't be built together with "The CPU opponent walks twice as fast" (same file end in `src/PLNORMAL.c`).
 
 ## Fighters face away from each other
 
@@ -1207,45 +1205,6 @@ applies.
   stay where they are made too, which may look odd.
 - Can't be built together with "Projectiles fly twice as fast" (both hook `effect_13_move`).
 
-## Projectiles pass through each other
-
-**Source diff:** `patches/projectiles-pass-through-each-other.diff`
-**BPS:** `sf3_ggpatch/projectiles-pass-through-each-other/` (simm1.0-.3)
-**Changes:** 70 bytes. 06700000-06700047: the new `effect_at_vs_effect_dm`. 0608D019: its address in the
-literal pool after `cal_hit_mark_pos` (used by `set_struck_status`).
-**Recorded:** 2026-11-15 20:22:17
-
-**Mechanism:** The 3rd Strike version of the SMB1, SMB3, SMW and ALTTP "fly through enemies" cheats.
-When `attack_hit_check` finds one effect's attack box on another effect, `set_struck_status`
-(`src/HITCHECK.c`) calls `effect_at_vs_effect_dm` (`src/HITEFEF.c`). For two projectiles it trades
-their power, so both usually vanish:
-
-```c
-} else if (ds->wu.id == 13) {
-    switch (as->wu.work_id) {
-    case 4:
-        ds->wu.dm_vital = as->wu.vital_new;
-        as->wu.dm_vital = ds->wu.vital_new;
-```
-
-and then sets the hit state (`routine_no[1] = 1`, hit stop 6). This is a hook: when both works are
-projectiles (effect id 13), the new `effect_at_vs_effect_dm` does none of that and sets the attacking
-shell's `att_hit_ok` back to 1 (`attack_hit_check` cleared it), so it can still hit the opponent.
-Otherwise it runs the original.
-
-**Evidence:** `effect_at_vs_effect_dm` is only called from `set_struck_status`. `effect_13_init` sets
-`wu.id = 13` (`src/EFF13.c`). `sf3_cheat.py` found no moved code or data. `git apply --check` against
-main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- In the frame the two meet, the hit check has already used up that frame's hit for both shells, so
-  a shell that is touching the opponent and the other shell at once hits the opponent one frame late.
-- Other effects that can hit projectiles (not effect 13) still stop them.
-
 ## No knockback from hits
 
 **Source diff:** `patches/no-knockback-from-hits.diff`
@@ -1322,103 +1281,6 @@ returns 3 for a projectile that comes from behind.
   high/low still matters.
 - Walking forward toward an attack now blocks it, so it is much harder to hit a fighter who is moving
   at all.
-
-## The CPU opponent stands still
-
-**Source diff:** `patches/cpu-stands-still.diff`
-**BPS:** `sf3_ggpatch/cpu-stands-still/` (simm1.0-.3)
-**Changes:** 39 bytes. The new `CPU_Sub` at 06700000. 06119639: its address in the literal pool of
-`Player_move`.
-**Recorded:** 2026-11-15 20:26:21
-
-**Mechanism:** The 3rd Strike version of Metroid "Enemies can't move", EarthBound "Enemies on the map
-can't move" and SMW "Every Chargin' Chuck stands there and does nothing". `Player_move`
-(`src/PLMAIN.c`) gets a CPU fighter's input from `CPU_Sub` (`src/Com_Pl.c`), which runs the AI:
-
-```c
-if (wk->wu.operator) {
-    wk->cp->sw_lvbt = lv_data;
-} else {
-    wk->cp->sw_lvbt = processed_lvbt(CPU_Sub(wk));
-}
-```
-
-This is a hook: in a paid game (`Demo_Flag` set) and outside bonus stages, the new `CPU_Sub` returns 0
-(no lever, no buttons) without running the AI. Otherwise it runs the original.
-
-**Evidence:** `CPU_Sub` is only called from `Player_move`. The CPU's moves all come from this input
-word; the original also returns 0 when the fight doesn't allow input (`Allow_a_battle_f`).
-`sf3_cheat.py` found no moved code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- The CPU never blocks, parries, attacks, gets up quickly or techs throws.
-- Gill's resurrection and other automatic things that don't need input still happen.
-- The attract-mode demo and the bonus stages play as usual.
-- Can't be built together with "The CPU opponent keeps running away" (both hook `CPU_Sub`).
-
-## The CPU opponent keeps running away
-
-**Source diff:** `patches/cpu-keeps-running-away.diff`
-**BPS:** `sf3_ggpatch/cpu-keeps-running-away/` (simm1.0-.3)
-**Changes:** 81 bytes. The new `CPU_Sub` at 06700000. 06119639: its address in the literal pool of
-`Player_move`.
-**Recorded:** 2026-11-15 20:26:54
-
-**Mechanism:** The 3rd Strike version of EarthBound "Enemies on the map always run away from Ness" and
-SMB2 "Enemies face and walk away". Same place as "The CPU opponent stands still": `CPU_Sub`
-(`src/Com_Pl.c`) gives `Player_move` the CPU's input for the frame. This is a hook: in a paid game
-(`Demo_Flag` set), outside bonus stages, and while the fight allows input (the same
-`Allow_a_battle_f` and `pcon_dp_flag` test the original starts with), the new `CPU_Sub` returns
-`LEVER_LEFT` if the CPU is left of its opponent and `LEVER_RIGHT` otherwise, without running the AI.
-
-**Evidence:** `CPU_Sub` is only called from `Player_move`, which passes its result through
-`processed_lvbt` like a player's `p1sw_0`. Lever bits from `include/work.h`. `sf3_cheat.py` found no
-moved code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- The CPU walks backward until it reaches the edge of the screen, then stays there.
-- Holding back also blocks, so the CPU blocks every high and mid attack (but not lows or throws).
-- Can't be built together with "The CPU opponent stands still" (both hook `CPU_Sub`).
-- The attract-mode demo and the bonus stages play as usual.
-
-## The CPU opponent walks twice as fast
-
-**Source diff:** `patches/cpu-walks-twice-as-fast.diff`
-**BPS:** `sf3_ggpatch/cpu-walks-twice-as-fast/` (simm1.0-.3)
-**Changes:** 144 bytes. The new `Normal_03000` and `Normal_04000` at 06700000. 065EBB41 and 065EBB45: their
-addresses in the jump table `plpnm_lv_00`.
-**Recorded:** 2026-11-15 20:27:34
-
-**Mechanism:** The 3rd Strike version of Metroid "Most enemies move twice as fast" and ALTTP "Soldiers
-chase Link at double speed". It is "Fighters walk twice as fast" for the CPU only: after the original
-walk-forward and walk-back routines (`Normal_03000`, `Normal_04000`, `src/PLNORMAL.c`) move the
-fighter, the hooks call `add_mvxy_speed` once more while the fighter is still walking, but only for a
-CPU fighter (`wu.operator == 0`) in a paid game (`Demo_Flag` set).
-
-**Evidence:** Same hook points as `fighters-walk-twice-as-fast.diff`. `operator` is what
-`Player_move` uses to choose between the player's input and `CPU_Sub`. `sf3_cheat.py` found no
-moved code or data. `git apply --check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- Only walking is faster. Dashes, jumps, attacks and the CPU's reactions are the same speed. Making the
-  whole CPU fighter run twice per frame was not done: its AI, command input and animation timers would
-  all run twice against one hit check per frame.
-- The CPU may still walk at a normal pace in places, since the AI picks how long to walk by its own
-  timers and distances.
-- Can't be built together with "Fighters walk twice as fast" or "Low gravity" (same hooks, or the end of
-  the same file).
 
 ## Hold Start when picking a character to play as Gill or Shin Akuma
 
@@ -1825,53 +1687,6 @@ main: applies.
   is less time to attack back in the air.
 - For both players and the CPU. Ground parries are not changed.
 - Uses no cheat code space.
-
-## The CPU opponent only jumps backward and guards in the air (unused CPU AI)
-
-**Source diff:** `patches/cpu-jumps-back-and-guards.diff`
-**BPS:** `sf3_ggpatch/cpu-jumps-back-and-guards/` (simm1.0-.3)
-**Changes:** 267 bytes. The new `Jump` at 06700000. Its address in 86 literal pools, all in the CPU
-AI's `Passive*`, `Active*`, `Pattern*` and `Shell*` routines (`src/Com_*.c`, `src/active*.c` and
-the rest).
-**Recorded:** 2026-11-15 20:53:15
-
-**Mechanism:** The CPU AI jumps with `Jump(wk, Jump_Dir)` (`src/Com_Sub.c`), which picks the jump
-direction and checks once, as the CPU leaves the ground, whether to guard (`Check_Air_Guard`). The
-ROM also has `Jump_Air_Guard`, which nothing uses:
-
-```c
-case 0:
-    ...
-    Free_Lever[wk->wu.id] = Setup_Guard_Lever(wk, Lever);   /* Lever 1: away from the opponent */
-case 1:
-    Lever_Buff[wk->wu.id] = Free_Lever[wk->wu.id] | 1;      /* up and away */
-    ...
-default:
-    Check_Air_Guard(wk);                                     /* every frame in the air */
-    Lever_Buff[wk->wu.id] = Lever_LR[wk->wu.id];
-```
-
-This is a hook: `Jump` is renamed `Jump_orig`, and the new `Jump` in the CHEAT section calls
-`Jump_Air_Guard(wk, 1)`. `Keep_Away` in the same file now calls `Jump_orig`, so its code stays the
-same size.
-
-**Evidence:** `Jump_Air_Guard` (0600BB08 in `functions.tsv`) is not referenced. Its steps use
-`CP_Index[id][1]` the same way `Jump` does, and end the AI step the same way when the CPU lands.
-`Keep_Away` was the only same-file caller; calling `Jump` from the CHEAT section made it 16 bytes
-shorter, which moved the code after it. `sf3_cheat.py` found no moved code or data. `git apply
---check` against main: applies.
-
-**Revisions:** sfiii3nr1 (990512, Japan, no CD) only. Others not checked.
-
-**Caveats:**
-
-- Not tested.
-- Only the CPU. Every jump its AI picks becomes a back jump; it no longer jumps in, except for its
-  high jumps (`Hi_Jump`), jump attacks (`Jump_Attack` and others) and the keep-away jump, which
-  are separate routines.
-- `Jump_Air_Guard` doesn't wait for the AI's `Combo_Speed` delay before jumping.
-- The guard check holds the lever back (and down) in the air. Few attacks can be guarded in the air
-  in 3rd Strike, so the guarding may not show.
 
 ## Each fighter's movement moves the other fighter
 

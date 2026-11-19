@@ -32,7 +32,6 @@ Allow players and/or the CPU to use these:
       non-attack animation (scripts 0 and 1). Shin Gouki's script 0 is also his Raging Demon
       (25252+PP). Calling the checks would start a move with no attack that ends at once.
 - [x] The CMD_MAIN.c debug menu: its top-level entry, debug_scene_outer_dispatch, is never called. So the menu's setup, player setup, the catch and hit-box viewers and the record screens can't be reached either.
-- [x] Unused CPU AI: Jump_Air_Guard, which blocks in the air during a jump.
 
 ## Damage and health
 
@@ -93,20 +92,9 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 - [x] Projectiles fly twice as fast (SMB1, SMB3, SMW, ALTTP and Zelda 1 "fly twice as fast")
 - [x] Projectiles crawl or stand still (ALTTP "Sword beams fly at quarter speed" and "stay where they
       appear", Zelda 1 "Sword beams and Magical Rod shots crawl")
-- [x] Projectiles pass through each other (SMB1, SMB3, SMW and ALTTP "fly through enemies"):
-      `effect_at_vs_effect_dm` (`src/HITEFEF.c`)
 - [x] no position change from hits
 - [x] Blocking works facing either way (Zelda 1 and ALTTP "Shield blocks shots from any direction"):
       `Check_Guard_Type` and the guard checks
-
-## CPU opponent
-
-- [x] The CPU opponent stands still (Metroid "Enemies can't move", EarthBound "Enemies on the map
-      can't move", SMW "Every Chargin' Chuck stands there and does nothing"): `src/Com_Pl.c`
-- [x] The CPU opponent keeps running away (EarthBound "Enemies on the map always run away from Ness",
-      SMB2 "Enemies face and walk away")
-- [x] The CPU opponent moves twice as fast (Metroid "Most enemies move twice as fast", ALTTP "Soldiers
-      chase Link at double speed")
 
 ## Characters and start-up
 
@@ -128,13 +116,3 @@ motion; "Slow motion" in `docs/HOW_THE_GAME_WORKS.md`, `src/SLOWF.c`).
 ## To test
 
 Cheats added on 2026-11-15, built but not tested yet. Check each one off (or remove it) after testing.
-- [ ] Projectiles pass through each other
-- [ ] The CPU opponent stands still
-- [ ] The CPU opponent keeps running away
-- [ ] The CPU opponent walks twice as fast
-
-## To test: new cheats from the to-do items
-
-Added on 2026-11-15 while working through the unchecked items above. Built but not tested yet.
-
-- [ ] The CPU opponent only jumps backward and guards in the air (unused CPU AI)
