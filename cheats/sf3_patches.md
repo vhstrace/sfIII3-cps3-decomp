@@ -2705,6 +2705,8 @@ data. `git apply --check` against main: applies.
 (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 15:30:35
 
+Tags: `demo-ready` `interesting` `play-start`
+
 **Mechanism:** A hook on `Player_attack` (`src/PLPAT.c`), which runs a fighter's attack for one
 frame. During a special move, forward movement becomes upward, backward becomes downward (stopping
 at the ground), upward becomes forward and downward becomes backward. A Shoryuken flies forward and
@@ -2760,7 +2762,7 @@ animation is over.
 
 **Caveats:**
 
-- Not tested since the fix.
+- Tested by the user in MAME (2026-11-19): works.
 - Only special and EX moves, for both fighters, player or CPU. Not super arts, normals, command
   throws (while holding or held), or projectiles once they are out.
 - Ground specials that travel can leave the fighter high up when they end; they then fall from
