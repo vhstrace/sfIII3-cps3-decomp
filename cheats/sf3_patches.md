@@ -2441,7 +2441,7 @@ moved code or data. `git apply --check` against main: applies.
 065EAF95: its entry in the `routine_no[1]` jump table `plmain_lv_02` (`data/PLMAIN_tbl.c`).
 **Recorded:** 2026-11-18 00:30:16
 
-Tags: `demo-ready` `play-start` `curated`
+Tags: `demo-ready` `play-start`
 
 **Mechanism:** `Player_attack` (`src/PLPAT.c`) runs a fighter's attack for one frame: it steps the
 move's animation script and moves the fighter. The new `Player_attack` runs the original, and on
