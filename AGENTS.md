@@ -29,7 +29,8 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   from nvram over the ROM, keyed by `sfiii3nr1`, so `/userdata/saves/mame/nvram/sfiii3nr1` is a plain
   placeholder file instead of a folder: MAME can't load or save that nvram, and each ROM runs its own
   code. (A gameStart script to delete the nvram didn't work: Batocera only runs scripts with the Linux exec
-  bit, which files written over SMB don't get.) Set up 2026-11-19.
+  bit, which files written over SMB don't get.) Set up and checked by the user 2026-11-19 (fighters-face-away
+  ran its own code after curated).
   Batocera's own MAME `default.cfg` is right for Xbox 360 pads (Back = button 7 = Coin, Start = button 8),
   checked on Luis's box 2026-11-19; don't add input overrides to `sfiii3nr1.cfg` (a try with `SELECT`/`START`
   codes broke Coin). Luis's Batocera is reached only through the share, not SSH.
