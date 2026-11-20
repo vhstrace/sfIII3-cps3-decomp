@@ -10,7 +10,7 @@ diff --git a/src/PLPAT.c b/src/PLPAT.c
      wk->wu.next_z = wk->wu.my_priority;
      wk->running_f = 0;
      wk->py->flag = 0;
-@@ -809,3 +809,47 @@
+@@ -809,3 +809,65 @@
          wk->wu.xyz[1].disp.pos = 0;
      }
  }
@@ -19,6 +19,8 @@ diff --git a/src/PLPAT.c b/src/PLPAT.c
 +#pragma section CHEAT
 +/* Cheat for the curated build: "Special moves are 50% faster", "Special moves travel 1.5 times as far"
 +   and "Special moves go 75% less high" in one hook, since each of them replaces Player_attack.
++   "Ground special moves work in the air" also replaces it; its part is the Player_attack below,
++   which wraps this one (cheat_curated_attack).
 +   A special move's animation row comes from rows 8-17 of asstbl_sa_ground or asstbl_sa_air (rows 0-7
 +   are the super arts). On every 2nd frame of a special move, the move's routine runs twice (the frame
 +   count is kept in pt_free[12]). Then, of whatever the routine moved the fighter this frame, half the
@@ -33,7 +35,7 @@ diff --git a/src/PLPAT.c b/src/PLPAT.c
 +         (as >= &asstbl_sa_air[pn][8][0].as && as <= &asstbl_sa_air[pn][17][3].as));
 +}
 +
-+void Player_attack(PLW* wk) {
++void cheat_curated_attack(PLW* wk) {
 +    s32 x0 = wk->wu.xyz[0].cal;
 +    s32 y0 = wk->wu.xyz[1].cal;
 +    s32 sp = cheat_in_special(wk);
@@ -56,5 +58,97 @@ diff --git a/src/PLPAT.c b/src/PLPAT.c
 +    } else {
 +        wk->pt_free[12] = 0;
 +    }
++}
++
++/* "Ground special moves work in the air": keep the height through the move's first step, which
++   forces a landing (hoken_muriyari_chakuchi). */
++void Player_attack(PLW* wk) {
++    s16 y;
++    if (wk->pt_free[4]) {
++        wk->pt_free[4] = 0;
++        y = wk->wu.xyz[1].disp.pos;
++        cheat_curated_attack(wk);
++        if (wk->wu.routine_no[1] == PLAYER_ATTACK) {
++            wk->wu.xyz[1].disp.pos = y;
++        }
++        return;
++    }
++    cheat_curated_attack(wk);
++}
++#pragma section
+diff --git a/src/PLS00.c b/src/PLS00.c
+--- a/src/PLS00.c
++++ b/src/PLS00.c
+@@ -1582,7 +1582,7 @@
+ 
+ 
+ 
+-void process_attack(PLW* wk) {
++void process_attack_orig(PLW* wk) {   /* was process_attack: unchanged */
+     if (wk->wu.routine_no[3]) {
+         if (check_ashimoto_ex(wk)) {
+             return;
+@@ -1675,3 +1675,21 @@
+     }
+     return 0;
+ }
++
++
++#pragma section CHEAT
++/* Cheat: ground special moves in the air. A move only ends on the ground (process_attack checks
++   cue 255 and 64 only at height 0), so once the animation reaches its end cue in the air, fall 8
++   pixels a frame until landing. */
++void process_attack(PLW* wk) {
++    process_attack_orig(wk);
++    if (wk->wu.routine_no[1] == PLAYER_ATTACK && wk->wu.routine_no[3] != RN3_START
++        && (wk->wu.cg_type == 0xFF || wk->wu.cg_type == 64) && wk->wu.xyz[1].disp.pos > 0
++        && !(Bonus_Game_Flag == BONUS_CAR && wk->bs2_on_car)) {
++        wk->wu.xyz[1].disp.pos -= 8;
++        if (wk->wu.xyz[1].disp.pos < 0) {
++            wk->wu.xyz[1].disp.pos = 0;
++        }
++    }
++}
++#pragma section
+diff --git a/src/PLS03.c b/src/PLS03.c
+--- a/src/PLS03.c
++++ b/src/PLS03.c
+@@ -453,7 +453,7 @@
+ 
+ /* Start the special move whose command has been entered, on the ground or in the air (its EX version
+  * when allowed); 1 when one starts. */
+-s32 check_special_attack(PLW* wk) {
++s32 check_special_attack_orig(PLW* wk) {   /* was check_special_attack: unchanged */
+     s16 i;
+     s16 j;
+     u16 cusw;
+@@ -641,3 +641,29 @@
+ }
+ 
+ 
++#pragma section CHEAT
++/* Cheat: ground special moves in the air. If no air special matches, check the ground specials with
++   the height set to 0, then put the height back. pt_free[4] tells Player_attack to keep the height
++   when the move's first step forces a landing (hoken_muriyari_chakuchi). */
++s32 check_special_attack(PLW* wk) {
++    s16 y;
++    if ((Bonus_Game_Flag == BONUS_CAR && wk->bs2_on_car) || wk->wu.xyz[1].disp.pos <= 0) {
++        return check_special_attack_orig(wk);
++    }
++    if (check_special_attack_orig(wk)) {
++        return 1;
++    }
++    if (pcon_dp_flag || (wk->spmv_ng_flag & 0x20000000)) {
++        return 0;
++    }
++    y = wk->wu.xyz[1].disp.pos;
++    wk->wu.xyz[1].disp.pos = 0;
++    if (check_special_attack_orig(wk)) {
++        wk->wu.xyz[1].disp.pos = y;
++        wk->pt_free[4] = 1;
++        return 1;
++    }
++    wk->wu.xyz[1].disp.pos = y;
++    return 0;
 +}
 +#pragma section

@@ -19,8 +19,8 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   Batocera at `/Volumes/share/roms/mame/Game Genie Hacked/Street Fighter III 3rd Strike/<name>/sfiii3nr1.zip`
   (check with `cmp`). The file must be named `sfiii3nr1.zip`, so each build gets its own folder. `<name>` is
   the cheat's slug, or `sf3-curated` (Batocera folder `curated`) for the cheats tagged `curated`. The curated
-  build uses `patches/_curated-specials.diff` in place of the three `curated` cheats that hook
-  `Player_attack` (50% faster, 1.5x as far, 75% less high). Built so far: `sf3-curated`, `half-speed`,
+  build uses `patches/_curated-specials.diff` in place of the four `curated` cheats that hook
+  `Player_attack` (50% faster, 1.5x as far, 75% less high, ground specials in the air). Built so far: `sf3-curated`, `half-speed`,
   `time-moves-only-with-input`, `jump-again-in-mid-air`, `fighters-face-away`, `slippery-floors`, `conveyor-belt-floor`, `every-attack-hits-anywhere`, `music-and-sound-effects-high-pitched`, `fighters-move-each-other`. Not tested on Batocera yet.
   They go in `mame`, not `fbneo` (2026-11-19): FBNeo finds each chip by its CRC, so it reports the four
   patched program chips as missing. MAME only warns about the wrong checksums.
