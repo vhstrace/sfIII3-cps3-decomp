@@ -24,6 +24,11 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   `time-moves-only-with-input`, `jump-again-in-mid-air`, `fighters-face-away`, `slippery-floors`, `conveyor-belt-floor`, `every-attack-hits-anywhere`, `music-and-sound-effects-high-pitched`, `fighters-move-each-other`. Not tested on Batocera yet.
   They go in `mame`, not `fbneo` (2026-11-19): FBNeo finds each chip by its CRC, so it reports the four
   patched program chips as missing. MAME only warns about the wrong checksums.
+  Batocera's `mame` folder runs MAME 2003-Plus by default, which has no CPS3, so `batocera.conf` has
+  `mame["sfiii3nr1.zip"].emulator=mame` and `.core=mame` (standalone MAME). MAME loads the program flash
+  from nvram over the ROM, keyed by `sfiii3nr1`, so `/userdata/system/scripts/sf3-cheat-nvram.sh` deletes
+  that nvram whenever a ROM under `Game Genie Hacked/Street Fighter III 3rd Strike/` starts. (Both set up
+  2026-11-19.)
 - **BPS patches are per chip.** People's `sfiii3nr1.zip` files differ (split, merged or non-merged sets, and
   different zip tools), but the chip files inside are always the same. So each cheat's BPS patches the
   program chip files (`sfiii3-simm1.0` to `.3`), not the zip.
