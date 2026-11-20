@@ -1899,6 +1899,8 @@ against main: applies.
 `src/PLS00.c` (`nm_02000` ... `check_cg_cancel_data`), `plmain_lv_02` and `process_ndcca`.
 **Recorded:** 2026-11-15 23:37:47
 
+Tags: `demo-ready` `play-start` `curated` `video-ready`
+
 **Mechanism:** `check_special_attack` (`src/PLS03.c`) checks only the air specials (slots 46-55)
 when the fighter is above the ground:
 
@@ -1944,7 +1946,7 @@ or data. `git apply --check` against main: applies.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in MAME (2026-11-19): works.
 - Only special moves, not super arts. Supers use their own checks (`check_super_arts_attack`) and
   are not changed.
 - Most ground specials don't move the fighter up or down, so the fighter hangs in the air for the
