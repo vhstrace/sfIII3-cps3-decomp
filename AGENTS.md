@@ -21,7 +21,7 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   the cheat's slug, or `sf3-curated` (Batocera folder `curated`) for the cheats tagged `curated`. The curated
   build uses `patches/_curated-specials.diff` in place of the four `curated` cheats that hook
   `Player_attack` (50% faster, 1.5x as far, 75% less high, ground specials in the air). Built so far: `sf3-curated`, `half-speed`,
-  `time-moves-only-with-input`, `jump-again-in-mid-air`, `fighters-face-away`, `slippery-floors`, `conveyor-belt-floor`, `every-attack-hits-anywhere`, `music-and-sound-effects-high-pitched`, `fighters-move-each-other`. Not tested on Batocera yet.
+  `time-moves-only-with-input`, `jump-again-in-mid-air`, `fighters-face-away`, `slippery-floors`, `conveyor-belt-floor`, `every-attack-hits-anywhere`, `music-and-sound-effects-high-pitched`, `fighters-move-each-other`. They launch on Batocera (checked by the user, 2026-11-19).
   They go in `mame`, not `fbneo` (2026-11-19): FBNeo finds each chip by its CRC, so it reports the four
   patched program chips as missing. MAME only warns about the wrong checksums.
   Batocera's `mame` folder runs MAME 2003-Plus by default, which has no CPS3, so `batocera.conf` has
