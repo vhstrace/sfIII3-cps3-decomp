@@ -29,6 +29,11 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   from nvram over the ROM, keyed by `sfiii3nr1`, so `/userdata/system/scripts/sf3-cheat-nvram.sh` deletes
   that nvram whenever a ROM under `Game Genie Hacked/Street Fighter III 3rd Strike/` starts. (Both set up
   2026-11-19.)
+  Batocera's MAME reads Xbox 360 pads as SDL game controllers (A/B/X/Y/LB/RB = buttons 1-6, stick clicks
+  7-8, Back = `SELECT`, Start = `START`), but its generated `default.cfg` puts Coin and Start on buttons 7
+  and 8 (the stick clicks). `/userdata/system/configs/mame/sfiii3nr1.cfg` (MAME's per-game file, which
+  Batocera doesn't rewrite) maps both players' Start and Coin to Start and Back, and keeps Batocera's
+  attack layout: LP X, MP Y, HP LB, LK A, MK B, HK RB. Backup: `sfiii3nr1.cfg.bak-2026-11-19`.
 - **BPS patches are per chip.** People's `sfiii3nr1.zip` files differ (split, merged or non-merged sets, and
   different zip tools), but the chip files inside are always the same. So each cheat's BPS patches the
   program chip files (`sfiii3-simm1.0` to `.3`), not the zip.
