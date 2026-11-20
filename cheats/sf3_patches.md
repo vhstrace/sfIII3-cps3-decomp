@@ -1391,7 +1391,7 @@ from any step (`Ck_Coin` at the top of `Loop_Demo`), and the title after a coin 
 `Main_Jmp_Tbl` (the nearest symbol is `grade_t_table`).
 **Recorded:** 2026-11-15 20:32:31
 
-Tags: `demo-ready` `play-start` `video-ready`
+Tags: `demo-ready` `play-start` `video-ready` `curated`
 
 **Mechanism:** The game still has the developers' "OBJECT TEST" debug menu (`src/CMD_MAIN.c`): BG
 SELECT, OBJECT LOOK, OBJECT EDIT, OBJECT EDIT 2, HIT, ALL CHARACTER, PARTS, and pages named after staff
