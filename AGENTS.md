@@ -21,7 +21,7 @@ There is no `CLAUDE.md` in this project (user's choice, 2026-11-15). Keep all in
   the cheat's slug, or `sf3-curated` (Batocera folder `curated`) for the cheats tagged `curated`. The curated
   build uses `patches/_curated-specials.diff` in place of the three `curated` cheats that hook
   `Player_attack` (50% faster, 1.5x as far, 75% less high). Built so far: `sf3-curated`, `half-speed`,
-  `time-moves-only-with-input`, `jump-again-in-mid-air`. Not tested in FBNeo yet.
+  `time-moves-only-with-input`, `jump-again-in-mid-air`, `fighters-face-away`. Not tested in FBNeo yet.
 - **BPS patches are per chip.** People's `sfiii3nr1.zip` files differ (split, merged or non-merged sets, and
   different zip tools), but the chip files inside are always the same. So each cheat's BPS patches the
   program chip files (`sfiii3-simm1.0` to `.3`), not the zip.
