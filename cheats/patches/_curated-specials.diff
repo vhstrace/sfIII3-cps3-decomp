@@ -1,0 +1,60 @@
+diff --git a/src/PLPAT.c b/src/PLPAT.c
+--- a/src/PLPAT.c
++++ b/src/PLPAT.c
+@@ -194,7 +194,7 @@
+ };
+ 
+ 
+-void Player_attack(PLW* wk) {
++void Player_attack_orig(PLW* wk) {   /* was Player_attack: unchanged */
+     wk->wu.next_z = wk->wu.my_priority;
+     wk->running_f = 0;
+     wk->py->flag = 0;
+@@ -809,3 +809,47 @@
+         wk->wu.xyz[1].disp.pos = 0;
+     }
+ }
++
++
++#pragma section CHEAT
++/* Cheat for the curated build: "Special moves are 50% faster", "Special moves travel 1.5 times as far"
++   and "Special moves go 75% less high" in one hook, since each of them replaces Player_attack.
++   A special move's animation row comes from rows 8-17 of asstbl_sa_ground or asstbl_sa_air (rows 0-7
++   are the super arts). On every 2nd frame of a special move, the move's routine runs twice (the frame
++   count is kept in pt_free[12]). Then, of whatever the routine moved the fighter this frame, half the
++   sideways part is added again, and only a quarter of the up-down part is kept while the fighter stays
++   above the ground (a landing that puts them at height 0 is kept). */
++s32 cheat_in_special(PLW* wk) {
++    const AS* as = wk->as;
++    s16 pn = wk->player_number;
++    return wk->wu.routine_no[1] == PLAYER_ATTACK && wk->wu.routine_no[2] >= ATTACK_SPECIAL &&
++        Bonus_Game_Flag == 0 && wk->tsukami_f == 0 && wk->tsukamare_f == 0 &&
++        ((as >= &asstbl_sa_ground[pn][8][0].as && as <= &asstbl_sa_ground[pn][17][3].as) ||
++         (as >= &asstbl_sa_air[pn][8][0].as && as <= &asstbl_sa_air[pn][17][3].as));
++}
++
++void Player_attack(PLW* wk) {
++    s32 x0 = wk->wu.xyz[0].cal;
++    s32 y0 = wk->wu.xyz[1].cal;
++    s32 sp = cheat_in_special(wk);
++    Player_attack_orig(wk);
++    if (sp) {
++        wk->pt_free[12]++;
++        if (wk->pt_free[12] >= 2) {
++            wk->pt_free[12] = 0;
++            if (cheat_in_special(wk) && wk->wu.routine_no[3] != RN3_START &&
++                wk->wu.hit_stop == 0 && wk->wu.dm_stop == 0) {
++                Player_attack_orig(wk);
++            }
++        }
++        if (wk->tsukami_f == 0 && wk->tsukamare_f == 0) {
++            wk->wu.xyz[0].cal += (wk->wu.xyz[0].cal - x0) / 2;
++            if (wk->wu.xyz[1].cal > 0) {
++                wk->wu.xyz[1].cal = y0 + (wk->wu.xyz[1].cal - y0) / 4;
++            }
++        }
++    } else {
++        wk->pt_free[12] = 0;
++    }
++}
++#pragma section
